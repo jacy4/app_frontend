@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './componentes/Navbar';
-import CentrosView from './CentrosView';
+import CentrosView from './views/CentrosView';
 
 function App() {
   return (
