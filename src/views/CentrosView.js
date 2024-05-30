@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-//import './CentrosView.css'; // Importe seus estilos CSS, se houver
 
 const CentrosView = () => {
   const [centros, setCentros] = useState([]);
@@ -10,27 +9,30 @@ const CentrosView = () => {
     const fetchCentros = async () => {
       try {
         const response = await axios.get('https://backend-teste-q43r.onrender.com/centros/listarCentros');
-        setCentros(response.data);
+        if (response.data && Array.isArray(response.data)) {
+          console.log(response.data);
+          setCentros(response.data);
+        } else {
+          console.error('Resposta da API vazia ou formato de dados incorreto');
+        }
       } catch (error) {
+        console.error('Erro ao buscar centros:', error);
         setError(error.message);
       }
     };
 
-    fetchCentros();
-  }, []);
+    fetchCentros(); // Chama a função fetchCentros aqui
 
-  if (error) {
-    return <div className="error-message">Erro ao buscar os centros: {error}</div>;
-  }
+  }, []); // Faz a chamada do useEffect uma única vez, passando um array vazio de dependências
 
   if (centros.length === 0) {
     return <div className='empty-message'>Nenhum centro disponível.</div>;
   }
 
   return (
-    <div >
-      <h2 >Lista de Centros</h2>
-      <table >
+    <div>
+      <h2>Lista de Centros</h2>
+      <table>
         <thead>
           <tr>
             <th>Nome</th>
