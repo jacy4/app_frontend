@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-//import './CentrosView.css'; // Importe seu arquivo de estilos CSS
+import './CentrosView.css'; // Importe seus estilos CSS, se houver
 
 const CentrosView = () => {
   const [centros, setCentros] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCentros = async () => {
@@ -11,34 +12,34 @@ const CentrosView = () => {
         const response = await axios.get('https://backend-teste-q43r.onrender.com/centros/listarCentros');
         setCentros(response.data);
       } catch (error) {
-        console.error('Erro ao buscar os centros:', error);
+        setError(error.message);
       }
     };
 
     fetchCentros();
   }, []);
 
+  if (error) {
+    return <div className="error-message">Erro ao buscar os centros: {error}</div>;
+  }
+
   if (centros.length === 0) {
     return <div className='empty-message'>Nenhum centro disponível.</div>;
   }
 
   return (
-    <div >
+    <div className="centros-container">
       <h2 className="title">Lista de Centros</h2>
       <table className="table">
         <thead>
           <tr>
             <th>Nome</th>
-            <th>Localização</th>
-            {/* Adicione mais colunas conforme necessário */}
           </tr>
         </thead>
         <tbody>
           {centros.map(centro => (
             <tr key={centro.id}>
               <td>{centro.nome}</td>
-              <td>{centro.localizacao}</td>
-              {/* Adicione mais colunas conforme necessário */}
             </tr>
           ))}
         </tbody>
