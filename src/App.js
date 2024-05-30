@@ -7,8 +7,8 @@ function App() {
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/centros" element={<CentrosView />} />
+        <Route path="/" element={<CentrosView/>} />
+        <Route path="/centros" element={<CentrosView/>} />
       </Routes>
     </Router>
   );
