@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './CentrosView.css'; // Importe seus estilos CSS, se houver
+//import './CentrosView.css'; // Importe seus estilos CSS, se houver
 
 const CentrosView = () => {
   const [centros, setCentros] = useState([]);
@@ -28,9 +28,9 @@ const CentrosView = () => {
   }
 
   return (
-    <div className="centros-container">
-      <h2 className="title">Lista de Centros</h2>
-      <table className="table">
+    <div >
+      <h2 >Lista de Centros</h2>
+      <table >
         <thead>
           <tr>
             <th>Nome</th>
