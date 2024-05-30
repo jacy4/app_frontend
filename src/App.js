@@ -8,7 +8,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<CentrosView/>} />
-        <Route path="/centros" element={<CentrosView/>} />
+        <Route path="/listar_centros" element={<CentrosView/>} />
       </Routes>
     </Router>
   );
