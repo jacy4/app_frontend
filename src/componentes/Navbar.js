@@ -12,7 +12,7 @@ const Navbar = () => {
             <div className="menu-icon">
               <i className="fas fa-bars"></i>
             </div>
-            <a href="#" className="navbar-logo font-extrabold text-blue-500">SOFTINSA</a>
+            <a href="/" className="navbar-logo font-extrabold text-blue-500">SOFTINSA</a>
           </div>
           <ul className="navbar-menu">
             <li><a href="#">Painel de Administração</a></li>
@@ -31,18 +31,17 @@ const Navbar = () => {
         </div>
       </nav>
       <div className="sidebar">
-        <ul className="sidebar-menu">
-          <li><a href="#">Pagina Incial</a></li>
+        <ul class="sidebar-menu top-options">
+          <li><a href="#">Página Inicial</a></li>
           <li><a href="#">Áreas</a></li>
-         
-          <li><a href="#">Usuarios</a></li>
-          <li><a href="#">Definições</a></li>
-          
         </ul>
+        <ul class="sidebar-menu bottom-options">
+        <li><Link to="/listar_users">Usuários</Link></li> 
+          <li><a href="#">Definições</a></li>
+  </ul>
+
       </div>
-      <div className="main-content">
-        {/* Conteúdo principal do seu site */}
-      </div>
+
     </>
   );
 };

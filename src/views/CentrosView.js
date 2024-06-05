@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import "../App.css";
 const CentrosView = () => {
   const [centros, setCentros] = useState([]);
   const [error, setError] = useState(null);
@@ -29,25 +29,30 @@ const CentrosView = () => {
     return <div className='empty-message'>Nenhum centro disponível.</div>;
   }
 
-  return (
-    <div>
+ return (
+  <div className='fundo_principal_porcausa_do_side_bar'>
+    <div className="inner-div">
       <h2>Lista de Centros</h2>
       <table>
         <thead>
-          <tr>
-            <th>Nome</th>
+        <tr>
+            <th>#</th> {/* Cabeçalho para o símbolo # */}
+            <th>Nome</th> {/* Cabeçalho para o nome */}
           </tr>
         </thead>
         <tbody>
           {centros.map(centro => (
             <tr key={centro.id}>
+              <td>{centro.id}</td>
               <td>{centro.nome}</td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default CentrosView;

@@ -1,145 +1,170 @@
 /* navbar.css */
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-  }
-  
-  .navbar {
-    background-color: #333;
-    overflow: hidden;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-  }
-  
-  .navbar-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 20px;
-  }
-  
-  .navbar-logo-container {
-    display: flex;
-    align-items: center;
-  }
-  
-  .navbar-logo {
-    color: white;
-    text-decoration: none;
-    font-size: 20px;
-    margin-left: 20px; /* Aumenta o espaço entre o ícone e o logo */
-  }
-  
-  .font-extrabold {
-    font-weight: 700;
-  }
-  
-  .text-blue-500 {
-    color: #3b82f6; /* Azul do Tailwind CSS */
-  }
-  
+  margin: 0;
+  font-family: 'Nunito Sans', sans-serif;
+}
+
+.navbar {
+  background-color: #ffffff;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+}
+
+.navbar-logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo {
+  color: rgb(0, 0, 0);
+  text-decoration: none;
+  font-size: 20px;
+  margin-left: 20px;
+  /* Aumenta o espaço entre o ícone e o logo */
+}
+
+.font-extrabold {
+  font-weight: 700;
+}
+
+.text-blue-500 {
+  color: #3b82f6;
+  /* Azul do Tailwind CSS */
+}
+
+.navbar-menu {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+.navbar-menu li {
+  padding: 8px 12px;
+}
+
+.navbar-menu a {
+  color: rgb(108, 106, 106);
+  text-decoration: none;
+  display: block;
+}
+
+.navbar-menu-item-dropdown {
+  position: relative;
+}
+
+.navbar-menu-dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: rgb(157, 152, 152);
+  min-width: 160px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.navbar-menu-item-dropdown:hover .navbar-menu-dropdown-content {
+  display: block;
+}
+
+.navbar-menu-dropdown-content a {
+  color: rgb(132, 129, 129);
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.navbar-menu-dropdown-content a:hover {
+  background-color: #ffffff;
+}
+
+.menu-icon {
+  font-size: 24px;
+  cursor: pointer;
+  color: rgb(0, 0, 0);
+}
+
+.sidebar {
+  height: calc(100% - 60px);
+  /* Ajuste para o tamanho da navbar */
+  width: 250px;
+  /* Define a largura do sidebar */
+  position: fixed;
+  top: 60px;
+  /* Inicia logo abaixo da navbar */
+  left: 0;
+  background-color: #ffffff;
+  overflow-x: hidden;
+  padding-top: 5px;
+  z-index: 999;
+  display: flex;
+  /* Adiciona display flex */
+  flex-direction: column;
+}
+
+.sidebar-menu {
+  list-style-type: none;
+  padding: 0;
+
+}
+
+.top-options {
+  margin-bottom: auto;
+  /* Alinha as opções ao topo */
+}
+
+.bottom-options {
+  margin-top: auto;
+  /* Alinha as opções ao fundo */
+}
+
+.sidebar-menu li {
+  padding: 10px 50px;
+}
+
+.sidebar-menu a {
+  color: rgb(0, 0, 0);
+  text-decoration: none;
+  display: block;
+  font-weight: 600;
+}
+
+.sidebar-menu a:hover {
+  background-color: #15669f98;
+}
+
+.main-content {
+  margin-left: 250px;
+  /* Mesma largura do sidebar */
+  padding: 20px;
+  padding-top: 80px;
+  /* Espaço para a navbar fixa */
+}
+
+@media screen and (max-width: 768px) {
   .navbar-menu {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-  }
-  
-  .navbar-menu li {
-    padding: 8px 12px;
-  }
-  
-  .navbar-menu a {
-    color: white;
-    text-decoration: none;
-    display: block;
-  }
-  
-  .navbar-menu-item-dropdown {
-    position: relative;
-  }
-  
-  .navbar-menu-dropdown-content {
     display: none;
-    position: absolute;
-    background-color: white;
-    min-width: 160px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    z-index: 1;
   }
-  
-  .navbar-menu-item-dropdown:hover .navbar-menu-dropdown-content {
-    display: block;
-  }
-  
-  .navbar-menu-dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-  }
-  
-  .navbar-menu-dropdown-content a:hover {
-    background-color: #ddd;
-  }
-  
-  .menu-icon {
-    font-size: 24px;
-    cursor: pointer;
-    color: white;
-  }
-  
+
   .sidebar {
-    height: calc(100% - 60px); /* Ajuste para o tamanho da navbar */
-    width: 250px; /* Define a largura do sidebar */
-    position: fixed;
-    top: 60px; /* Inicia logo abaixo da navbar */
-    left: 0;
-    background-color: #333;
-    overflow-x: hidden;
-    padding-top: 20px;
-    z-index: 999;
+    width: 100%;
+    /* Sidebar ocupará 100% da largura da tela em dispositivos menores */
+    height: calc(100% - 60px);
+    top: 60px;
   }
-  
-  .sidebar-menu {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .sidebar-menu li {
-    padding: 8px 16px;
-  }
-  
-  .sidebar-menu a {
-    color: white;
-    text-decoration: none;
-    display: block;
-  }
-  
-  .sidebar-menu a:hover {
-    background-color: #575757;
-  }
-  
+
   .main-content {
-    margin-left: 250px; /* Mesma largura do sidebar */
-    padding: 20px;
-    padding-top: 80px; /* Espaço para a navbar fixa */
+    margin-left: 0;
+    /* Remover margem em dispositivos menores */
+    padding-top: 80px;
   }
-  
-  @media screen and (max-width: 768px) {
-    .navbar-menu {
-      display: none;
-    }
-    .sidebar {
-      width: 100%; /* Sidebar ocupará 100% da largura da tela em dispositivos menores */
-      height: calc(100% - 60px);
-      top: 60px;
-    }
-    .main-content {
-      margin-left: 0; /* Remover margem em dispositivos menores */
-      padding-top: 80px;
-    }
-  }
-  
+}
