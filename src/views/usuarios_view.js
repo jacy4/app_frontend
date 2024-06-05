@@ -38,6 +38,7 @@ const UsuariosView = () => {
           <thead>
             <tr>
               <th>#</th> {/* Cabeçalho para o ID */}
+              <th>Avatar</th> {/* Cabeçalho para o avatar */}
               <th>Nome</th> {/* Cabeçalho para o nome */}
               <th>Sobrenome</th> {/* Cabeçalho para o sobrenome */}
             </tr>
@@ -46,6 +47,7 @@ const UsuariosView = () => {
             {usuarios.map(usuario => (
               <tr key={usuario.id}>
                 <td>{usuario.id}</td>
+                <td><img src={usuario.caminho_foto} alt="Avatar" className="avatar-mini" /></td>
                 <td>{usuario.nome}</td>
                 <td>{usuario.sobrenome}</td>
               </tr>
