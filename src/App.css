@@ -36,3 +36,9 @@
     transform: rotate(360deg);
   }
 }
+
+.background-image {
+  background-image: url('/frontend/public/fundo_site.png');
+  background-size: cover;
+  background-position: center;
+}

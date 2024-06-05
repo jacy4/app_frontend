@@ -6,7 +6,7 @@ const CentrosView = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchCentros = async () => {
+    const buscarCentros = async () => {
       try {
         const response = await axios.get('https://backend-teste-q43r.onrender.com/centros/listarCentros');
         if (response.data && Array.isArray(response.data)) {
@@ -21,7 +21,7 @@ const CentrosView = () => {
       }
     };
 
-    fetchCentros(); // Chama a função fetchCentros aqui
+   buscarCentros(); 
 
   }, []); // Faz a chamada do useEffect uma única vez, passando um array vazio de dependências
 
