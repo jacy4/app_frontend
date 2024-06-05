@@ -47,7 +47,7 @@ const UsuariosView = () => {
             {usuarios.map(usuario => (
               <tr key={usuario.id}>
                 <td>{usuario.id}</td>
-                <td><img src={usuario.caminho_foto} alt="Avatar" className="avatar-mini" /></td>
+                <td><img src="opt/render/project/src/IMAGENS/image-1717631529127-926903368.jpg" alt="Avatar"  /></td>
                 <td>{usuario.nome}</td>
                 <td>{usuario.sobrenome}</td>
               </tr>
