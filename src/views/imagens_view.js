@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import "../App.css";
+
 const ImagensView = () => {
   const [imagens, setImagens] = useState([]);
   const [error, setError] = useState(null);
@@ -22,10 +23,15 @@ const ImagensView = () => {
   return (
     <div className='fundo_principal_porcausa_do_side_bar'>
       <h2>Imagens Disponíveis</h2>
-      <div className="imagens-container">
-        {imagens.map((imagem, index) => (
-          <img key={index} src={imagem} alt={`Imagem ${index}`} />
-        ))}
+      {error && <p>{error}</p>}
+      <div className='imagens-container'>
+        {imagens.length > 0 ? (
+          imagens.map((imagem, index) => (
+            <img key={index} src={imagem.url} alt={`Imagem ${index + 1}`} />
+          ))
+        ) : (
+          <p>Carregando...</p>
+        )}
       </div>
     </div>
   );
