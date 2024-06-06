@@ -30,6 +30,7 @@ const Navbar = () => {
           </ul>
         </div>
       </nav>
+      {/*
       <div className="sidebar">
         <ul class="sidebar-menu top-options">
           <li><a href="#">Página Inicial</a></li>
@@ -41,7 +42,7 @@ const Navbar = () => {
   </ul>
 
       </div>
-
+  */}
     </>
   );
 };
