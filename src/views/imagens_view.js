@@ -27,7 +27,7 @@ const ImagensView = () => {
       <div className='imagens-container'>
         {imagens.length > 0 ? (
           imagens.map((imagem, index) => (
-            <img key={index} src={imagem.url} alt={`Imagem ${index + 1}`} />
+            <img key={index} src="/opt/render/project/src/IMAGENS/image-1717659748028-163118690.png" alt={`Imagem ${index + 1}`} />
           ))
         ) : (
           <p>Carregando...</p>
