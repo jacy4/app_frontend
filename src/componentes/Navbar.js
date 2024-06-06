@@ -36,7 +36,7 @@ const Navbar = () => {
           <li><a href="#">Áreas</a></li>
         </ul>
         <ul class="sidebar-menu bottom-options">
-        <li><Link to="/listar_users">Usuários</Link></li> 
+        <li><Link to="/listar_imagens">Usuários</Link></li> 
           <li><a href="#">Definições</a></li>
   </ul>
 
