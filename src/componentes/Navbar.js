@@ -163,7 +163,7 @@ const Navbar = () => {
             </li>
             <li>
               <Link
-                to="#"
+                to="/criar_publicacao"
                 className={selectedMenu === 'Definições' ? 'active' : ''}
                 onClick={() => setSelectedMenu('Definições')}
               >

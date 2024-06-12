@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './componentes/Navbar';
-import Login from './componentes/Login';
+import Login from '../src/views/LOGIN/Login';
 import CentrosView from './views/CentrosView';
 import UsersView from './views/VIEW_USUARIOS/usuarios_view';
 import PaginaInicial from './views/PAGINA_INICIAL/pagina_inicial';
-import FormView from './views/FromView';
+
+import PublicacoesView  from './views/PUBLICACOES/view_publicacao';
 
 import './App.css'; // Certifique-se de ajustar o caminho conforme necessário
 
@@ -28,7 +29,7 @@ function App() {
               <>
                 <Route path="/listar_centros" element={<CentrosView />} />
                 <Route path="/listar_users" element={<UsersView />} />
-                <Route path="/criar_publicacao" element={<FormView />} />
+                <Route path="/criar_publicacao" element={<PublicacoesView />} />
                 <Route path="/pagina_inicial" element={<PaginaInicial />} />
               </>
             )}
