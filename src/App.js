@@ -1,23 +1,41 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './componentes/Navbar';
+import Login from './componentes/Login';
 import CentrosView from './views/CentrosView';
-import UsersView from './views/usuarios_view';
-import ImagensView from './views/imagens_view';
+import UsersView from './views/VIEW_USUARIOS/usuarios_view';
+import PaginaInicial from './views/PAGINA_INICIAL/pagina_inicial';
+import FormView from './views/FromView';
+
+import './App.css'; // Certifique-se de ajustar o caminho conforme necessário
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
   return (
-    <div > 
-      <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<CentrosView />} />
-          <Route path="/listar_centros" element={<CentrosView />} />
-          <Route path="/listar_users" element={<UsersView />} />
-          <Route path="/listar_imagens" element={<ImagensView />} />
-        </Routes>
-      </Router>
-    </div>
+    <Router>
+      <div className={isAuthenticated ? "container" : "login-container"}>
+      {isAuthenticated && <Navbar />}
+          <Routes>
+            <Route path="/" element={
+              isAuthenticated ? <Navigate to="/pagina_inicial" /> : <Login onLogin={handleLogin} />
+            } />
+            {isAuthenticated && (
+              <>
+                <Route path="/listar_centros" element={<CentrosView />} />
+                <Route path="/listar_users" element={<UsersView />} />
+                <Route path="/criar_publicacao" element={<FormView />} />
+                <Route path="/pagina_inicial" element={<PaginaInicial />} />
+              </>
+            )}
+          </Routes>
+        </div>
+      
+    </Router>
   );
 }
 

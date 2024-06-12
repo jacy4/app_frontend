@@ -1,0 +1,63 @@
+.create-user-button {
+    display: flex;
+    align-items: center;
+    width: 170px; /* Ajustado para mais espaço horizontal */
+    height: 50px; /* Ajustado para mais espaço vertical */
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s;
+    padding: 10px;
+  }
+  
+  .create-user-button:hover {
+    transform: scale(1.05);
+  }
+  
+  .create-user-button.selected {
+    background-color: #4880FF; /* Cor de fundo quando selecionado */
+    color: white; /* Cor do texto quando selecionado */
+  }
+  
+  .icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+  }
+  
+  .icon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .text-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Alinha o texto verticalmente ao centro */
+  }
+  
+  .title {
+    font-size: 14px;
+    color: #90a4ae;
+    margin: 0; /* Remove a margem */
+    line-height: 1; /* Ajusta o espaçamento entre linhas */
+  }
+  
+  .subtitle {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000;
+    margin: 3px; /* Remove a margem */
+    line-height: 1; /* Ajusta o espaçamento entre linhas */
+  }
+  
+  .create-user-button.selected .title,
+  .create-user-button.selected .subtitle {
+    color: white; /* Cor do texto quando selecionado */
+  }
+  

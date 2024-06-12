@@ -1,0 +1,174 @@
+.div_princ {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 250px); /* Ajustar a largura para descontar o menu lateral */
+  background-color: #1f4162; /* Cor de fundo azul */
+  padding: 20px;
+  box-sizing: border-box; /* Inclui padding e border no cálculo da largura e altura */
+  overflow: auto;
+  flex: 1;
+  min-height: calc(100vh - 90px); /* Ajustar para ocupar a altura da tela menos a navbar */
+  margin-left: 250px; /* Espaço para o menu lateral */
+  margin-top: 60px;
+}
+
+.button-container {
+  display: flex;
+  gap: 20px; /* Espaço entre os botões */
+  margin-bottom: 20px; /* Espaço abaixo dos botões */
+}
+
+.title2 {
+  color: white; /* Cor do texto */
+  font-size: 36px; /* Tamanho da fonte */
+  text-align: left; /* Alinha o texto à esquerda */
+  margin: 0; /* Remove margens adicionais */
+  padding: 20px 0; /* Adiciona espaçamento acima e abaixo do título */
+}
+
+.users-view {
+  padding: 0px;
+  background-color: #f9f9f9;
+  margin-left: 0px; /* Adiciona espaçamento à esquerda */
+  margin-right: 50px; /* Adiciona espaçamento à direita */
+  border-radius: 10px; /* Arredonda os cantos da view */
+}
+
+.button-container .create-user-button:last-child {
+  margin-left: auto; 
+}
+
+.users-table {
+  color: #718EBF;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  text-align: left;
+  border-radius: 10px; /* Arredonda os cantos da tabela */
+  overflow: hidden; /* Garante que o arredondamento dos cantos seja aplicado corretamente */
+}
+
+.users-table th, .users-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.users-table th {
+  background-color: #f4f4f4;
+}
+
+.users-table td {
+  color: black; /* Define a cor preta para as células de dados */
+}
+
+.user-info {
+  color: black;
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.status {
+  color: green;
+  font-weight: bold;
+}
+
+.edit-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.edit-btn:hover {
+  background-color: #0056b3;
+}
+
+.more-info {
+  text-align: center;
+  color: #888;
+  margin-top: 20px;
+}
+
+.create-user-form {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+}
+
+.create-user-form h2 {
+  margin-bottom: 20px;
+}
+
+.create-user-form form {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px; /* Adiciona espaço entre as colunas do formulário */
+}
+
+.form-left, .form-right {
+  flex: 1;
+}
+
+.form-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.create-user-form label {
+  display: flex;
+  flex-direction: column;
+}
+
+.create-user-form input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.create-user-form button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: auto; /* Ajuste para o botão de envio */
+  align-self: flex-start; /* Ajuste para alinhar o botão de envio à esquerda */
+}
+
+.create-user-form button:hover {
+  background-color: #0056b3;
+}
+
+.image-label {
+  cursor: pointer;
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+}

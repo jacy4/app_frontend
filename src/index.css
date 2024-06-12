@@ -7,14 +7,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
   height: 70vh;
 
-  background-image: url('../public/fundo_site.png');
-  background-size: 100% auto; /* 100% de largura, altura automática */
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  
 
 }
-
-
 
 
 code {
