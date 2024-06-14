@@ -6,7 +6,7 @@ import CentrosView from './views/CentrosView';
 import UsersView from './views/VIEW_USUARIOS/usuarios_view';
 import PaginaInicial from './views/PAGINA_INICIAL/pagina_inicial';
 
-import PublicacoesView  from './views/PUBLICACOES/view_publicacao';
+import PublicacoesView from './views/PUBLICACOES/publicacao_view';
 
 import './App.css'; // Certifique-se de ajustar o caminho conforme necessário
 
