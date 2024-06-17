@@ -483,6 +483,7 @@ const PublicacoesView = () => {
 
       {showPublicationList && (
         <div className="search-container">
+        <div className="search-wrapper">
           <input
             type="text"
             placeholder="Procurar por Publicação..."
@@ -490,16 +491,17 @@ const PublicacoesView = () => {
             onChange={handleSearchChange}
             className="search-input"
           />
+          <i className="fas fa-search search-icon"></i>
+        </div>
         </div>
       )}
 
-
 {showCreateForm && (
-        <div className="publicacao_div_princ"><h1 className="title2">Criar Publicação</h1>
+        <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Criar Publicação</h1>
           <div className="header">
             <h1 className="header-title">Nome do local</h1>
             <div className="author">
-              <span>Autor :</span>
+            <div className= "authorName"><span>Autor :</span></div>
               <img src="https://i.ibb.co/7G5m74B/author.png" alt="Eu" className="author-icon" />
               <span>Eu</span>
             </div>
