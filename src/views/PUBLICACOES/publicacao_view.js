@@ -351,40 +351,120 @@
 // };
 
 // // export default PublicacoesView;
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './PublicacoesView.css'; 
+import axios from 'axios';
 import CreatePublicationButton from '../../componentes/botao_view_publicacoes/criar_publicacao';
 
 const PublicacoesView = () => {
-  const [publicacoes, setPublicacoes] = useState([
-    {
-      id: 1,
-      titulo: "Estado Municipal do Fontelo",
-      topico: "Futebol",
-      createdAt: "2024-06-12T12:34:56Z",
-      estado: "Active"
-    },
-    {
-      id: 2,
-      titulo: "Estádio dos trabelos",
-      topico: "Futebol",
-      createdAt: "2024-06-12T12:34:56Z",
-      estado: "Active"
-    }
-  ]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [publicacoes, setPublicacoes] = useState([]);
+  const [error, setError] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showPublicationList, setShowPublicationList] = useState(true);
   const [selectedButton, setSelectedButton] = useState('list'); // Default to "list" button
-  const [activeTab, setActiveTab] = useState('descricao');
-
+  const [centroId, setCentroId] = useState(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [publicationToDelete, setPublicationToDelete] = useState(null);
+  const [showHideModal, setShowHideModal] = useState(false);
+  const [publicationToHide, setPublicationToHide] = useState(null);
+  const [removalReason, setRemovalReason] = useState('');
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [publicationToEdit, setPublicationToEdit] = useState(null);
+  const [showSuccessMessageDelete, setShowSuccessMessageDelete] = useState(false);
+  
   // Form states
   const [titulo, setTitulo] = useState('');
   const [topico, setTopico] = useState('');
+
+  useEffect(() => {
+    const storedCentroId = sessionStorage.getItem('centro_id');
+    if (storedCentroId) {
+      setCentroId(storedCentroId);
+    }
+  }, []);
+
+  useEffect(() => {
+    const buscarPublicacoes = async () => {
+      if (!centroId) {
+        console.log('centroId não definido');
+        return;
+      }
+      console.log(`Buscando publicações para centroId: ${centroId}`);
+      try {
+        const response = await axios.get(`http://localhost:3000/publicacoes/listarPublicacoes/${centroId}`);
+        if (response.data && Array.isArray(response.data)) {
+          console.log(response.data);
+          setPublicacoes(response.data);
+        } else {
+          console.error('Resposta da API vazia ou formato de dados incorreto');
+        }
+      } catch (error) {
+        console.error('Erro ao buscar publicações:', error);
+        setError(error.message);
+      }
+    };
+  
+    buscarPublicacoes();
+  }, [centroId]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState('descricao');
+
+  // Form states
+  const handleHideClick = (publication) => {
+    setPublicationToHide(publication);
+    setShowHideModal(true);
+  };
+  
+  const handleEditClick = (publication) => {
+    setShowEditForm(true);
+    setShowPublicationList(false);
+    setSelectedButton('create'); // Set the selected button
+};
+
+  
+
+  const handleConfirmHide = () => {
+    // Lógica para ocultar a publicação
+    setShowHideModal(false);
+    setRemovalReason('');
+  };
+  
+  const handleCancelHide = () => {
+    setShowHideModal(false);
+    setPublicationToHide(null);
+    setRemovalReason('');
+  };
+  
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
   
+  const handleDeleteClick = (publication) => {
+    setPublicationToDelete(publication);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setShowDeleteModal(false);
+    // Aqui você deve realizar a lógica para realmente deletar a publicação
+    setShowSuccessMessage(true); // Exibir a mensagem de sucesso após a exclusão
+};
+
+  
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setPublicationToDelete(null);
+  };
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setPublicationToDelete(null);
+  };
+  const handleConfirmDelete = () => {
+    // Lógica para deletar a publicação
+    setShowDeleteModal(false);
+  };
+
   const formatarData = (data) => {
     const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
     return new Date(data).toLocaleDateString('pt-PT', options);
@@ -424,15 +504,23 @@ const PublicacoesView = () => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredPublicacoes = publicacoes.filter((publicacao) =>
-    publicacao.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    publicacao.topico.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredPublicacoes = publicacoes.filter((publicacoes) =>
+    publicacoes.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    publicacoes.topico.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleDelete = (publication) => {
+    // Aqui você deve adicionar a lógica para deletar a publicação
+    // Após deletar, você pode atualizar o estado `publicacoes` para remover a publicação
+    setPublicacoes(publicacoes.filter(p => p.id !== publication.id));
+    closeDeleteModal();
+  };
+
 
   return (
     <div className="publicacoes-div_princ"> 
-      {!showCreateForm && <h1 className="publicacoes-title2">Lista de Publicações deste Centro</h1>}
-      {!showCreateForm && (
+      {!showCreateForm && !showEditForm && <h1 className="publicacoes-title2">Lista de Publicações deste Centro</h1>}
+      {!showCreateForm && !showEditForm && (
         <div className="publicacoes-button-container">
           <div className="left-buttons">
             <CreatePublicationButton
@@ -495,6 +583,185 @@ const PublicacoesView = () => {
         </div>
         </div>
       )}
+      
+{showEditForm && (
+  <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Editar informações do Local</h1>
+  <div className="header">
+    <h1 className="header-title">Nome do local</h1>
+    <div className="author">
+    <div className= "authorName"><span>Autor :</span></div>
+      <img src="https://i.ibb.co/7G5m74B/author.png" alt="Eu" className="author-icon" />
+      <span>Eu</span>
+    </div>
+  </div>
+  <div className="tabs">
+    <button
+      className={`tab ${activeTab === 'descricao' ? 'active' : ''}`}
+      onClick={() => handleTabClick('descricao')}
+    >
+      <i className="fas fa-info-circle tab-icon"></i> Descrição
+    </button>
+    <button
+      className={`tab ${activeTab === 'galeria' ? 'active' : ''}`}
+      onClick={() => handleTabClick('galeria')}
+    >
+      <i className="fas fa-images tab-icon"></i> Galeria
+    </button>
+    <button
+      className={`tab ${activeTab === 'horario' ? 'active' : ''}`}
+      onClick={() => handleTabClick('horario')}
+    >
+      <i className="fas fa-clock tab-icon"></i> Horário
+    </button>
+    <button
+      className={`tab ${activeTab === 'localizacao' ? 'active' : ''}`}
+      onClick={() => handleTabClick('localizacao')}
+    >
+      <i className="fas fa-map-marker-alt tab-icon"></i> Localização
+    </button>
+    <button
+      className={`tab ${activeTab === 'comentarios' ? 'active' : ''}`}
+      onClick={() => handleTabClick('comentarios')}
+    >
+      <i className="fas fa-comments tab-icon"></i> Comentários
+    </button>
+    <button
+      className={`tab ${activeTab === 'mais_informacoes' ? 'active' : ''}`}
+      onClick={() => handleTabClick('mais_informacoes')}
+    >
+      <i className="fas fa-info tab-icon"></i> Mais Informações
+    </button>
+  </div>
+  <div className="tab-content">
+    {activeTab === 'descricao' && (
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Tópico do Local</label>
+          <select value={topico} onChange={(e) => setTopico(e.target.value)}>
+            <option value="">selecionar tópico</option>
+            <option value="futebol">Futebol</option>
+            <option value="basquete">Basquete</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Nome do local</label>
+          <input type="text" placeholder="inserir nome do local" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
+        </div>
+        <div className="form-group">
+          <label>Descrição do local</label>
+          <textarea placeholder="inserir uma breve descrição do local"></textarea>
+        </div>
+        <div className="form-buttons">
+          <button type="button" className="cancel-button">Cancelar</button>
+          <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+        </div>
+      </form>
+    )}
+    {activeTab === 'galeria' && (
+    <div className="tab-content_galeria">
+      <h2>Galeria do local</h2>
+      <div className="gallery-upload">
+        <div className="upload-box">
+          <span className="upload-icon">+</span>
+          <span className="upload-text">Upload</span>
+        </div>
+        <p className="gallery-info">
+          <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do local
+        </p>
+      </div>
+      <div className="form-buttons">
+        <button type="button" className="cancel-button">Cancelar</button>
+        <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+      </div>
+    </div>
+  )}
+
+    {activeTab === 'horario' && (
+      <div>
+        <h2>Horário do local</h2>
+        {['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'].map((dia, index) => (
+          <div key={index} className="form-group_horario">
+            <label>{dia}</label>
+            <input type="text" placeholder="hora" />
+          </div>
+        ))}
+        <div className="form-buttons">
+          <button type="button" className="cancel-button">Cancelar</button>
+          <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+        </div>
+      </div>
+    )}
+    {activeTab === 'localizacao' && (
+      <div className="tab-content_localizacao">
+        <h2>Localização do local</h2>
+        <div className="localizacao-content">
+          <div className="form-group">
+            <label>Endereço do local:</label>
+            <input type="text" placeholder="inserir local" />
+          </div>
+          <div className="map-placeholder">
+            <img src="link-para-imagem-do-mapa" alt="Map Placeholder" />
+          </div>
+        </div>
+        <div className="form-buttons">
+          <button type="button" className="cancel-button">Cancelar</button>
+          <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+        </div>
+      </div>
+    )}
+
+    {activeTab === 'comentarios' && (
+      <div className="tab-content_comentarios">
+        <div className="search-container_comentarios">
+        <div className="search-wrapper_comentarios">
+          <input
+            type="text"
+            placeholder="Procurar por Comentário..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="search-input"
+          />
+          <i className="fas fa-search search-icon"></i>
+        </div>
+        </div>
+        <div className="no-comments">
+          <i className="fas fa-comment-slash no-comments-icon"></i>
+          <p>Ainda sem comentários</p>
+        </div>
+        <div className="form-buttons">
+          <button type="button" className="cancel-button">Cancelar</button>
+          <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+        </div>
+      </div>
+    )}
+
+  {activeTab === 'mais_informacoes' && (
+    <div className="tab-content_mais_informacoes">
+      <form>
+        <div className="form-group">
+          <label>Pagina Web</label>
+          <input type="text" placeholder="inserir site" />
+        </div>
+        <div className="form-group">
+          <label>Telemovel/telefone</label>
+          <input type="text" placeholder="inserir contacto telefónico" />
+        </div>
+        <div className="form-group">
+          <label>Email oficial</label>
+          <input type="text" placeholder="...inserir email..." />
+        </div>
+        <div className="form-buttons">
+          <button type="button" className="cancel-button">Cancelar</button>
+          <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+        </div>
+      </form>
+    </div>
+  )}
+  
+
+  </div>
+</div>
+)}
 
 {showCreateForm && (
         <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Criar Publicação</h1>
@@ -548,11 +815,9 @@ const PublicacoesView = () => {
             {activeTab === 'descricao' && (
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                  <label>Área do Local</label>
-                  <select>
-                    <option>Desporto</option>
-                  </select>
-                </div>
+                    <label>Área do Local</label>
+                    <input type="text" value="Desporto" readOnly />
+                  </div>
                 <div className="form-group">
                   <label>Tópico do Local</label>
                   <select value={topico} onChange={(e) => setTopico(e.target.value)}>
@@ -575,11 +840,102 @@ const PublicacoesView = () => {
                 </div>
               </form>
             )}
-            {activeTab === 'galeria' && <div>Galeria de imagens</div>}
-            {activeTab === 'horario' && <div>Horário de funcionamento</div>}
-            {activeTab === 'localizacao' && <div>Localização no mapa</div>}
-            {activeTab === 'comentarios' && <div>Comentários dos usuários</div>}
-            {activeTab === 'mais_informacoes' && <div>Mais informações sobre o local</div>}
+            {activeTab === 'galeria' && (
+            <div className="tab-content_galeria">
+              <h2>Galeria do local</h2>
+              <div className="gallery-upload">
+                <div className="upload-box">
+                  <span className="upload-icon">+</span>
+                  <span className="upload-text">Upload</span>
+                </div>
+                <p className="gallery-info">
+                  <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do local
+                </p>
+              </div>
+              <div className="form-buttons">
+                <button type="button" className="cancel-button">Cancelar</button>
+                <button type="submit" className="submit-button">Continuar</button>
+              </div>
+            </div>
+          )}
+
+            {activeTab === 'horario' && (
+              <div>
+                <h2>Horário do local</h2>
+                {['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'].map((dia, index) => (
+                  <div key={index} className="form-group_horario">
+                    <label>{dia}</label>
+                    <input type="text" placeholder="hora" />
+                  </div>
+                ))}
+                <div className="form-buttons">
+                  <button type="button" className="cancel-button">Cancelar</button>
+                  <button type="submit" className="submit-button">Continuar</button>
+                </div>
+              </div>
+            )}
+            {activeTab === 'localizacao' && (
+              <div className="tab-content_localizacao">
+                <h2>Localização do local</h2>
+                <div className="localizacao-content">
+                  <div className="form-group">
+                    <label>Endereço do local:</label>
+                    <input type="text" placeholder="inserir local" />
+                  </div>
+                  <div className="map-placeholder">
+                    <img src="link-para-imagem-do-mapa" alt="Map Placeholder" />
+                  </div>
+                </div>
+                <div className="form-buttons">
+                  <button type="button" className="cancel-button">Cancelar</button>
+                  <button type="submit" className="submit-button">Continuar</button>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'comentarios' && (
+              <div className="tab-content_comentarios">
+                <div className="no-comments">
+                  <i className="fas fa-comment-slash no-comments-icon"></i>
+                  <p>Ainda sem comentários</p>
+                </div>
+                <div className="form-buttons">
+                  <button type="button" className="cancel-button">Cancelar</button>
+                  <button type="submit" className="submit-button">Continuar</button>
+                </div>
+              </div>
+            )}
+
+          {activeTab === 'mais_informacoes' && (
+            <div className="tab-content_mais_informacoes">
+              <form>
+                <div className="form-group">
+                  <label>Pagina Web</label>
+                  <input type="text" placeholder="inserir site" />
+                </div>
+                <div className="form-group">
+                  <label>Telemovel/telefone</label>
+                  <input type="text" placeholder="inserir contacto telefónico" />
+                </div>
+                <div className="form-group">
+                  <label>Email oficial</label>
+                  <input type="text" placeholder="...inserir email..." />
+                </div>
+                <div className="form-buttons">
+                  <button type="button" className="cancel-button">Cancelar</button>
+                  <button type="submit" className="submit-button_maisinfos" onClick={() => setShowSuccessMessage(true)}>Publicar</button>
+                </div>
+              </form>
+            </div>
+          )}
+          {showSuccessMessage ? (
+            <div className="success-message">
+              <h1>Publicação criada com sucesso!</h1>
+              <p>Como você é o administrador do seu centro, não será necessário passar pelo processo de validação.</p>
+              <button onClick={() => setShowSuccessMessage(false)}>Continuar</button>
+            </div>
+          ) : null}
+
           </div>
         </div>
       )}
@@ -598,22 +954,62 @@ const PublicacoesView = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredPublicacoes.map((publicacao, index) => (
-                <tr key={publicacao.id}>
+              {filteredPublicacoes.map((publicacoes, index) => (
+                <tr key={publicacoes.id}>
                   <td>{index + 1}</td>
-                  <td>{publicacao.titulo}</td>
-                  <td>{publicacao.topico}</td>
-                  <td>{formatarData(publicacao.createdAt)}</td>
+                  <td>{publicacoes.titulo}</td>
+                  <td>{publicacoes.topico.nome}</td>
+                  <td>{formatarData(publicacoes.createdAt)}</td>
                   <td>
-                    <span className="publications-status active">{publicacao.estado}</span>
+                    <span className="publications-status active">{publicacoes.estado}</span>
                   </td>
                   <td>
                     <div className="edit-buttons-container">
                       <button className="edit-btn">i</button>
-                      <button className="publications-edit-btn"><i className="fas fa-eye-slash"></i></button>
-                      <button className="publications-edit-btn">✏️</button>
-                      <button className="publications-edit-btn">🗑️</button>
+                      <button className="publications-edit-btn" onClick={() => handleHideClick(publicacoes)}><i className="fas fa-eye-slash"></i></button>
+                      <button className="publications-edit-btn"onClick={() => handleEditClick(publicacoes)}>✏️</button>
+                      <button className="publications-edit-btn" onClick={() => handleDeleteClick(publicacoes)}>🗑️</button>
+
                     </div>
+                    {showSuccessMessageDelete && (
+                        <div className="success-message">
+                            <h1>Ação aplicada com sucesso!</h1>
+                            <button onClick={() => setShowSuccessMessage(false)}>Continuar</button>
+                        </div>
+                    )}
+                    {showDeleteModal && (
+                      <div className="modal">
+                        <div className="modal-icon">❌</div>
+                        <div className="modal-header">Eliminar Publicação?</div>
+                        <div className="modal-body">
+                          O user que criou esta publicação irá ser notificado sobre a sua ação!
+                        </div>
+                        <div className="modal-buttons">
+                          <button className="delete-button" onClick={handleConfirmDelete}>Eliminar</button>
+                          <button className="cancel-button_delete" onClick={handleCancelDelete}>Cancelar</button>
+                        </div></div>)}
+                    {showHideModal && (
+                          <div className="modal_hide">
+                            <div className="modal-icon_hide">👁️</div>
+                            <div className="modal-header_hide">Ocultar Publicação</div>
+                            <div className="modal-body_hide">
+                              <p>Ao ocultar Publicação, este irá ser oculto aos utilizadores mas não será eliminado.</p>
+                              <p>Insira abaixo o motivo por qual removeu o comentário deste utilizador, o qual vai ser notificado da sua ação.</p>
+                              <textarea
+                                placeholder="...motivo de remoção..."
+                                value={removalReason}
+                                onChange={(e) => setRemovalReason(e.target.value)}
+                                maxLength="240"
+                              />
+                              <div className="character-count">{removalReason.length}/240</div>
+                            </div>
+                            <div className="modal-buttons">
+                              <button className="cancel-button_hide" onClick={handleCancelHide}>Cancelar</button>
+                              <button className="hide-button" onClick={handleConfirmHide}>Ocultar</button>
+                            </div>
+                          </div>
+                        )}
+
                   </td>
                 </tr>
               ))}
