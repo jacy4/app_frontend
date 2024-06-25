@@ -355,6 +355,8 @@ import React, { useState, useEffect } from 'react';
 import './PublicacoesView.css'; 
 import axios from 'axios';
 import CreatePublicationButton from '../../componentes/botao_view_publicacoes/criar_publicacao';
+import { GoogleMap, LoadScript, Marker, useJsApiLoader } from '@react-google-maps/api';
+
 
 const PublicacoesView = () => {
   const [publicacoes, setPublicacoes] = useState([]);
@@ -372,6 +374,12 @@ const PublicacoesView = () => {
   const [showEditForm, setShowEditForm] = useState(false);
   const [publicationToEdit, setPublicationToEdit] = useState(null);
   const [showSuccessMessageDelete, setShowSuccessMessageDelete] = useState(false);
+  const [showSuccessMessageHide, setShowSuccessMessageHide] = useState(false);
+  const [filter, setFilter] = useState('all');
+  const [showDetailViewDenunciada, setShowDetailViewDenunciada] = useState(false);
+  const [publicationDetailDenunciada, setPublicationDetailDenunciada] = useState(null);
+
+  
   
   // Form states
   const [titulo, setTitulo] = useState('');
@@ -407,6 +415,19 @@ const PublicacoesView = () => {
   
     buscarPublicacoes();
   }, [centroId]);
+
+  const handleViewDetailsClick = (publication) => {
+    if (publication.estado.toLowerCase() === 'denunciada') {
+      setPublicationDetailDenunciada(publication);
+      setShowDetailViewDenunciada(true);
+    } else {
+      // lógica para outras visualizações de detalhes, se houver
+    }
+  };
+  
+  
+  
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('descricao');
 
@@ -421,14 +442,6 @@ const PublicacoesView = () => {
     setShowPublicationList(false);
     setSelectedButton('create'); // Set the selected button
 };
-
-  
-
-  const handleConfirmHide = () => {
-    // Lógica para ocultar a publicação
-    setShowHideModal(false);
-    setRemovalReason('');
-  };
   
   const handleCancelHide = () => {
     setShowHideModal(false);
@@ -461,9 +474,10 @@ const PublicacoesView = () => {
     setPublicationToDelete(null);
   };
   const handleConfirmDelete = () => {
-    // Lógica para deletar a publicação
     setShowDeleteModal(false);
-  };
+    setShowSuccessMessageDelete(true); // Exibir a mensagem de sucesso após a exclusão
+};
+
 
   const formatarData = (data) => {
     const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
@@ -504,10 +518,6 @@ const PublicacoesView = () => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredPublicacoes = publicacoes.filter((publicacoes) =>
-    publicacoes.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    publicacoes.topico.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const handleDelete = (publication) => {
     // Aqui você deve adicionar a lógica para deletar a publicação
@@ -516,44 +526,112 @@ const PublicacoesView = () => {
     closeDeleteModal();
   };
 
+  const handleConfirmHide = () => {
+    setShowHideModal(false);
+    setRemovalReason('');
+    setShowSuccessMessageHide(true); // Exibir a mensagem de sucesso após ocultar
+  };
+  
+
+
+  const containerStyle = {
+    width: '100%',
+    height: '200px'
+  };
+  
+  const center = {
+    lat: 40.64679593699455,
+    lng: -7.91968580401233
+  };
+  
+  const API_KEY = 'AIzaSyAPQ0rU-UXFxtKNTNnes9XB6iQ_dCLycHo'; // Substitua pela sua API Key do Google Maps
+
+  const [mapCenter, setMapCenter] = useState(center); // center é a posição inicial do mapa
+  const [address, setAddress] = useState('');
+
+  const handleAddressChange = (event) => {
+    setAddress(event.target.value);
+  };
+  
+  const handleAddressSubmit = async (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      try {
+        const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
+          params: {
+            address: address,
+            key: API_KEY, // substitua pela sua chave de API
+          },
+        });
+        if (response.data.results.length > 0) {
+          const location = response.data.results[0].geometry.location;
+          setMapCenter(location);
+        } else {
+          alert('Local não encontrado');
+        }
+      } catch (error) {
+        console.error('Erro ao buscar o endereço:', error);
+      }
+    }
+  };
+
+  const handleButtonClick = (filter) => {
+    setFilter(filter);
+    setShowPublicationList(true);
+    setShowCreateForm(false);
+    setShowEditForm(false);
+    setSelectedButton(filter);
+  };
+  
+  
+  const filteredPublicacoes = publicacoes.filter((publicacoes) => {
+    if (filter === 'all') return true;
+    return publicacoes.estado.toLowerCase() === filter;
+  });
+  
+  const countPublicacoesPorValidar = publicacoes.filter(p => p.estado.toLowerCase() === 'por validar').length;
+  const countPublicacoesAtivas = publicacoes.filter(p => p.estado.toLowerCase() === 'ativa').length;
+  const countPublicacoesDenunciadas = publicacoes.filter(p => p.estado.toLowerCase() === 'denunciada').length;
+  
+  
 
   return (
     <div className="publicacoes-div_princ"> 
-      {!showCreateForm && !showEditForm && <h1 className="publicacoes-title2">Lista de Publicações deste Centro</h1>}
-      {!showCreateForm && !showEditForm && (
+      {!showCreateForm && !showEditForm && !showDetailViewDenunciada && <h1 className="publicacoes-title2">Lista de Publicações deste Centro</h1>}
+      {!showCreateForm && !showEditForm && !showDetailViewDenunciada && (
         <div className="publicacoes-button-container">
           <div className="left-buttons">
             <CreatePublicationButton
-              onClick={handleShowPublicationListClick}
+              onClick={() => handleButtonClick('all')}
               iconSrc="https://i.ibb.co/P4nsk4w/Icon-criar.png"
               iconBgColor="#e0f7fa"
               title="Publicações Totais"
               subtitle={publicacoes.length.toString()}
-              isSelected={selectedButton === 'list'}
+              isSelected={selectedButton === 'all'}
             />
             <CreatePublicationButton
               iconSrc="https://i.ibb.co/Y3jNfMt/pending-icon-512x504-9zrlrc78.png"
               iconBgColor="#FFEECC"
               title="Por validar"
-              subtitle="1"
-              isSelected={selectedButton === 'pending'}
-              onClick={() => setSelectedButton('pending')}
+              subtitle={countPublicacoesPorValidar.toString()}
+              isSelected={selectedButton === 'por validar'}
+              onClick={() => handleButtonClick('por validar')}
             />
             <CreatePublicationButton
               iconSrc="https://i.ibb.co/D8QwJ6M/active-removebg-preview.png"
               iconBgColor="#CCFFCC"
               title="Ativas"
-              subtitle="16"
-              isSelected={selectedButton === 'active'}
-              onClick={() => setSelectedButton('active')}
+              subtitle={countPublicacoesAtivas.toString()}
+              isSelected={selectedButton === 'ativa'}
+              onClick={() => handleButtonClick('ativa')}
             />
             <CreatePublicationButton
               iconSrc="https://i.ibb.co/RPC7vW8/Icon-denuncia.png"
               iconBgColor="#FFE0EB"
               title="Denunciadas"
-              subtitle="5"
-              isSelected={selectedButton === 'reported'}
-              onClick={() => setSelectedButton('reported')}
+              subtitle={countPublicacoesDenunciadas.toString()}
+              isSelected={selectedButton === 'denunciada'}
+              onClick={() => handleButtonClick('denunciada')}
             />
           </div>
           <div className="right-button">
@@ -568,8 +646,7 @@ const PublicacoesView = () => {
           </div>
         </div>
       )}
-
-      {showPublicationList && (
+      {!showDetailViewDenunciada && showPublicationList && (
         <div className="search-container">
         <div className="search-wrapper">
           <input
@@ -653,7 +730,7 @@ const PublicacoesView = () => {
         </div>
         <div className="form-buttons">
           <button type="button" className="cancel-button">Cancelar</button>
-          <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+          <button className="save-button"><i className="fas fa-save"></i>Guardar Alterações</button>
         </div>
       </form>
     )}
@@ -697,10 +774,24 @@ const PublicacoesView = () => {
         <div className="localizacao-content">
           <div className="form-group">
             <label>Endereço do local:</label>
-            <input type="text" placeholder="inserir local" />
+            <input
+              type="text"
+              placeholder="inserir local"
+              value={address}
+              onChange={handleAddressChange}
+              onKeyDown={handleAddressSubmit}
+            />
           </div>
           <div className="map-placeholder">
-            <img src="link-para-imagem-do-mapa" alt="Map Placeholder" />
+            <LoadScript googleMapsApiKey={API_KEY}>
+              <GoogleMap
+                mapContainerStyle={containerStyle}
+                center={mapCenter}
+                zoom={10}
+              >
+                <Marker position={mapCenter} />
+              </GoogleMap>
+            </LoadScript>
           </div>
         </div>
         <div className="form-buttons">
@@ -762,6 +853,46 @@ const PublicacoesView = () => {
   </div>
 </div>
 )}
+{showDetailViewDenunciada ? (
+  <div className="publicacoes_div_princ">
+    <h1 className="publicacoes-title2">Denúncias do Local</h1>
+    <div className="header">
+      <h1 className="header-title">{publicationDetailDenunciada.titulo}</h1>
+      <div className="author">
+        <div className="authorName"><span>Autor :</span></div>
+        <img src="https://i.ibb.co/7G5m74B/author.png" alt="Eu" className="author-icon" />
+        <span>{publicationDetailDenunciada.autor}</span>
+      </div>
+    </div>
+    <div className="tab-content2">
+      <h2>Lista de Denúncias</h2>
+      <div className="denuncia-card">
+        <div className="denuncia-header">
+          <img src="https://via.placeholder.com/40" alt="User" className="user-icon" />
+          <div className="denuncia-info">
+            <strong>Vitor Ferreira</strong>
+            <p>29/01/2023</p>
+          </div>
+        </div>
+        <div className="denuncia-content">
+          <p><strong>Motivo da denúncia :</strong> Informação Errada ou Não Fidedigna</p>
+          <p><strong>Informação adicional :</strong> Boa tarde, não é que o local seja indevido mas eu moro perto e a morada não é essa</p>
+        </div>
+      </div>
+      <div className="form-buttons">
+        <button type="button" className="cancel-button" onClick={() => setShowDetailViewDenunciada(false)}>Cancelar</button>
+        <button type="button" className="save-button">Tomar Medidas</button>
+      </div>
+    </div>
+  </div>
+) : null}
+
+
+
+
+
+
+
 
 {showCreateForm && (
         <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Criar Publicação</h1>
@@ -883,7 +1014,15 @@ const PublicacoesView = () => {
                     <input type="text" placeholder="inserir local" />
                   </div>
                   <div className="map-placeholder">
-                    <img src="link-para-imagem-do-mapa" alt="Map Placeholder" />
+                    <LoadScript googleMapsApiKey={API_KEY}>
+                      <GoogleMap
+                        mapContainerStyle={containerStyle}
+                        center={center}
+                        zoom={10}
+                      >
+                        <Marker position={center} />
+                      </GoogleMap>
+                    </LoadScript>
                   </div>
                 </div>
                 <div className="form-buttons">
@@ -892,7 +1031,6 @@ const PublicacoesView = () => {
                 </div>
               </div>
             )}
-
             {activeTab === 'comentarios' && (
               <div className="tab-content_comentarios">
                 <div className="no-comments">
@@ -940,7 +1078,7 @@ const PublicacoesView = () => {
         </div>
       )}
 
-      {showPublicationList && (
+      {!showDetailViewDenunciada && showPublicationList && (
         <div className="publications-view">
           <table className="publications-table">
             <thead>
@@ -954,29 +1092,25 @@ const PublicacoesView = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredPublicacoes.map((publicacoes, index) => (
-                <tr key={publicacoes.id}>
-                  <td>{index + 1}</td>
-                  <td>{publicacoes.titulo}</td>
-                  <td>{publicacoes.topico.nome}</td>
-                  <td>{formatarData(publicacoes.createdAt)}</td>
-                  <td>
-                    <span className="publications-status active">{publicacoes.estado}</span>
-                  </td>
+            {filteredPublicacoes.map((publicacoes, index) => (
+          <tr key={publicacoes.id}>
+            <td>{index + 1}</td>
+            <td>{publicacoes.titulo}</td>
+            <td>{publicacoes.topico.nome}</td>
+            <td>{formatarData(publicacoes.createdAt)}</td>
+            <td>
+              <span className={`publications-status ${publicacoes.estado.toLowerCase().replace(' ', '-')}`}>
+                {publicacoes.estado}
+              </span>
+                </td>
                   <td>
                     <div className="edit-buttons-container">
-                      <button className="edit-btn">i</button>
+                      <button className="edit-btn" onClick={() => handleViewDetailsClick(publicacoes)}>i</button>
                       <button className="publications-edit-btn" onClick={() => handleHideClick(publicacoes)}><i className="fas fa-eye-slash"></i></button>
                       <button className="publications-edit-btn"onClick={() => handleEditClick(publicacoes)}>✏️</button>
                       <button className="publications-edit-btn" onClick={() => handleDeleteClick(publicacoes)}>🗑️</button>
 
                     </div>
-                    {showSuccessMessageDelete && (
-                        <div className="success-message">
-                            <h1>Ação aplicada com sucesso!</h1>
-                            <button onClick={() => setShowSuccessMessage(false)}>Continuar</button>
-                        </div>
-                    )}
                     {showDeleteModal && (
                       <div className="modal">
                         <div className="modal-icon">❌</div>
@@ -1009,6 +1143,25 @@ const PublicacoesView = () => {
                             </div>
                           </div>
                         )}
+                        {showSuccessMessageHide && <div className="modal-backdrop"></div>}
+                          {showSuccessMessageHide && (
+                            <div className="success-message_delete">
+                              <div className="success-message-icon"></div>
+                              <h1>Ação aplicada com sucesso!</h1>
+                              <button onClick={() => setShowSuccessMessageHide(false)}>Continuar</button>
+                            </div>
+                          )}
+                        {showSuccessMessageDelete && <div className="modal-backdrop"></div>}
+                          {showSuccessMessageDelete && (
+                            <div className="success-message_delete">
+                              <div className="success-message-icon"></div>
+                              <h1>Ação aplicada com sucesso!</h1>
+                              <button onClick={() => setShowSuccessMessageDelete(false)}>Continuar</button>
+                            </div>
+                          )}
+
+
+
 
                   </td>
                 </tr>

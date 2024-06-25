@@ -142,9 +142,18 @@
   font-size: 12px;
 }
 
-.publications-status.active {
-  background-color: #28a745;
+.publications-status.ativa {
+  background-color: #28a745; /* Verde */
 }
+
+.publications-status.por-validar {
+  background-color: #f7d694; /* Amarelo */
+}
+
+.publications-status.denunciada {
+  background-color: #dc3545; /* Vermelho */
+}
+
 
 
 
@@ -695,4 +704,84 @@
 
 .search-input_comentarios::placeholder {
   color: #D3DDED; /* Cor azulada para o texto do placeholder */
+}.success-message_delete {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 50px;
+  text-align: center;
+  z-index: 1000;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
+.success-message_delete h1 {
+  font-size: 24px;
+  margin-bottom: 20px; /* Ajuste conforme necessário */
+}
+
+.success-message_delete button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px; /* Ajuste conforme necessário */
+}
+
+.success-message-icon {
+  width: 40px; /* Tamanho do ícone */
+  height: 40px; /* Tamanho do ícone */
+  margin-bottom: 20px; /* Espaço entre o ícone e o texto */
+  background: url('https://i.ibb.co/SBF55ft/Captura-de-ecr-2024-06-23-234924.png') no-repeat center center;
+  background-size: contain; /* Ajuste conforme necessário */
+}
+
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+
+.tab-content2 {
+  padding: 20px;
+  background-color: #fff;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.denuncia-card {
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #fff;
+  margin-top: 15px;
+}
+
+.denuncia-header {
+  display: flex;
+  align-items: center;
+}
+
+.denuncia-info {
+  font-size: 14px;
+}
+
+.denuncia-content {
+  margin-top: 10px;
+}
+
