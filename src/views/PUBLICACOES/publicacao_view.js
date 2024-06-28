@@ -1,355 +1,3 @@
-// import React, { useState, useEffect } from 'react';
-// import axios from 'axios';
-// import './PublicacoesView.css'; 
-// import CreatePublicationButton from '../../componentes/botao_view_publicacoes/criar_publicacao';
-
-// const PublicacoesView = () => {
-//   const [publicacoes, setPublicacoes] = useState([]);
-//   const [error, setError] = useState(null);
-//   const [showCreateForm, setShowCreateForm] = useState(false);
-//   const [showPublicationList, setShowPublicationList] = useState(true);
-//   const [selectedButton, setSelectedButton] = useState('list'); // Default to "list" button
-//   const [centroId, setCentroId] = useState(null);
-
-//   // Form states
-//   const [titulo, setTitulo] = useState('');
-//   const [topico, setTopico] = useState('');
-
-//   useEffect(() => {
-//     const storedCentroId = sessionStorage.getItem('centro_id');
-//     if (storedCentroId) {
-//       setCentroId(storedCentroId);
-//     }
-//   }, []);
-
-//   useEffect(() => {
-//     const buscarPublicacoes = async () => {
-//       if (!centroId) {
-//         console.log('centroId não definido');
-//         return;
-//       }
-//       console.log(`Buscando publicações para centroId: ${centroId}`);
-//       try {
-//         const response = await axios.get(`https://backend-teste-q43r.onrender.com/publications/listarPublicacoes/${centroId}`);
-//         if (response.data && Array.isArray(response.data)) {
-//           console.log(response.data);
-//           setPublicacoes(response.data);
-//         } else {
-//           console.error('Resposta da API vazia ou formato de dados incorreto');
-//         }
-//       } catch (error) {
-//         console.error('Erro ao buscar publicações:', error);
-//         setError(error.message);
-//       }
-//     };
-  
-//     buscarPublicacoes();
-//   }, [centroId]);
-
-//   const formatarData = (data) => {
-//     const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-//     return new Date(data).toLocaleDateString('pt-PT', options);
-//   };
-
-//   const handleCreatePublicationClick = () => {
-//     setShowCreateForm(true);
-//     setShowPublicationList(false);
-//     setSelectedButton('create'); // Set the selected button
-//   };
-
-//   const handleShowPublicationListClick = () => {
-//     setShowCreateForm(false);
-//     setShowPublicationList(true);
-//     setSelectedButton('list'); // Set the selected button
-//   };
-
-//   const handleSubmit = async (event) => {
-//     event.preventDefault();
-//     try {
-//       const response = await axios.post('https://backend-teste-q43r.onrender.com/publications/create', {
-//         titulo,
-//         topico,
-//         centro_id: centroId // Pass the correct centro_id here
-//       });
-//       if (response.status === 200) {
-//         alert('Publicação criada com sucesso!');
-//         setShowCreateForm(false);
-//         setShowPublicationList(true);
-//         // Update the publication list after creating a new publication
-//         setPublicacoes([...publicacoes, response.data]);
-//       } else {
-//         alert('Erro ao criar publicação.');
-//       }
-//     } catch (error) {
-//       console.error('Erro ao criar publicação:', error);
-//       alert('Erro ao criar publicação.');
-//     }
-//   };
-
-//   if (error) {
-//     return <div className='error-message'>Erro ao buscar publicações: {error}</div>;
-//   }
-
-//   if (publicacoes.length === 0) {
-//     return <div className='empty-message'>Nenhuma publicação disponível.</div>;
-//   }
-
-//   return (
-//     <div className="div_princ"> 
-//       <h1 className="title2">Lista de Publicações deste Centro</h1>
-//       <div className="button-container">
-//         <CreatePublicationButton
-//           onClick={handleShowPublicationListClick}
-//           iconSrc="https://i.ibb.co/P4nsk4w/Icon-criar.png"
-//           iconBgColor="#e0f7fa"
-//           title="Publicações Totais"
-//           subtitle={publicacoes.length.toString()}
-//           isSelected={selectedButton === 'list'}
-//         />
-//         <CreatePublicationButton
-//           iconSrc="https://i.ibb.co/RPC7vW8/Icon-denuncia.png"
-//           iconBgColor="#FFE0EB"
-//           title="Publicações Denunciadas"
-//           subtitle="5"
-//           isSelected={selectedButton === 'reported'}
-//           onClick={() => setSelectedButton('reported')}
-//         />
-//         <CreatePublicationButton
-//           onClick={handleCreatePublicationClick}
-//           iconSrc="https://i.ibb.co/P4nsk4w/Icon-criar.png"
-//           iconBgColor="#e0f7fa"
-//           title="Criar Publicação"
-//           subtitle="Criar..."
-//           isSelected={selectedButton === 'create'}
-//         />
-//       </div>
-
-//       {showCreateForm && (
-//         <div className="create-publication-form">
-//           <h2>Criar Nova Publicação</h2>
-//           <form onSubmit={handleSubmit}>
-//             <div className="form-left">
-//               <label>
-//                 Título:
-//                 <input type="text" name="titulo" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
-//               </label>
-//               <label>
-//                 Tópico:
-//                 <input type="text" name="topico" value={topico} onChange={(e) => setTopico(e.target.value)} />
-//               </label>
-//             </div>
-//             <button type="submit">Criar</button>
-//           </form>
-//         </div>
-//       )}
-
-//       {showPublicationList && (
-//         <div className="publications-view">
-//           <table className="publications-table">
-//             <thead>
-//               <tr>
-//                 <th>#</th>
-//                 <th>Nome da Publicação</th>
-//                 <th>Tópico</th>
-//                 <th>Data de Criação</th>
-//                 <th>Estado</th>
-//                 <th>Editar</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {publicacoes.map((publicacao, index) => (
-//                 <tr key={publicacao.id}>
-//                   <td>{index + 1}</td>
-//                   <td>{publicacao.titulo}</td>
-//                   <td>{publicacao.topico}</td>
-//                   <td>{formatarData(publicacao.createdAt)}</td>
-//                   <td>Active</td>
-//                   <td>
-//                     <button className="edit-btn">i</button>
-//                     <button className="edit-btn">✏️</button>
-//                     <button className="edit-btn">🗑️</button>
-//                   </td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default PublicacoesView;
-
-
-// import React, { useState } from 'react';
-// import './PublicacoesView.css'; 
-// import CreatePublicationButton from '../../componentes/botao_view_publicacoes/criar_publicacao';
-// import CriarPublicacaoView from './criar_publicacao_view';
-
-// const PublicacoesView = () => {
-//   const [publicacoes, setPublicacoes] = useState([
-//     {
-//       id: 1,
-//       titulo: "Estado Municipal do Fontelo",
-//       topico: "Futebol",
-//       createdAt: "2024-06-12T12:34:56Z",
-//       estado: "Active"
-//     },
-//     {
-//       id: 2,
-//       titulo: "Estádio dos trabelos",
-//       topico: "Futebol",
-//       createdAt: "2024-06-12T12:34:56Z",
-//       estado: "Active"
-//     }
-//   ]);
-//   const [searchTerm, setSearchTerm] = useState('');
-//   const [showCreateForm, setShowCreateForm] = useState(false);
-//   const [showPublicationList, setShowPublicationList] = useState(true);
-//   const [selectedButton, setSelectedButton] = useState('list'); // Default to "list" button
-
-//   // Form states
-//   const [titulo, setTitulo] = useState('');
-//   const [topico, setTopico] = useState('');
-
-//   const formatarData = (data) => {
-//     const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-//     return new Date(data).toLocaleDateString('pt-PT', options);
-//   };
-
-//   const handleCreatePublicationClick = () => {
-//     setShowCreateForm(true);
-//     setShowPublicationList(false);
-//     setSelectedButton('create'); // Set the selected button
-//   };
-
-//   const handleShowPublicationListClick = () => {
-//     setShowCreateForm(false);
-//     setShowPublicationList(true);
-//     setSelectedButton('list'); // Set the selected button
-//   };
-
-//   const handleCreatePublicationSubmit = ({ titulo, topico }) => {
-//     // Adiciona a nova publicação aos dados estáticos
-//     const novaPublicacao = {
-//       id: publicacoes.length + 1,
-//       titulo,
-//       topico,
-//       createdAt: new Date().toISOString(),
-//       estado: "Active"
-//     };
-//     setPublicacoes([...publicacoes, novaPublicacao]);
-//     setShowCreateForm(false);
-//     setShowPublicationList(true);
-//   };
-//   const handleSearchChange = (event) => {
-//     setSearchTerm(event.target.value);
-//   };
-
-//   const filteredPublicacoes = publicacoes.filter((publicacao) =>
-//     publicacao.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//     publicacao.topico.toLowerCase().includes(searchTerm.toLowerCase())
-//   );
-
-//   return (
-//     <div className="publicacoes-div_princ"> 
-//       {!showCreateForm && <h1 className="publicacoes-title2">Lista de Publicações deste Centro</h1>}
-//       {!showCreateForm && (
-//         <div className="publicacoes-button-container">
-//           <div className="left-buttons">
-//             <CreatePublicationButton
-//               onClick={handleShowPublicationListClick}
-//               iconSrc="https://i.ibb.co/P4nsk4w/Icon-criar.png"
-//               iconBgColor="#e0f7fa"
-//               title="Publicações Totais"
-//               subtitle={publicacoes.length.toString()}
-//               isSelected={selectedButton === 'list'}
-//             />
-//             <CreatePublicationButton
-//               iconSrc="https://i.ibb.co/Y3jNfMt/pending-icon-512x504-9zrlrc78.png"
-//               iconBgColor="#FFEECC"
-//               title="Por validar"
-//               subtitle="1"
-//               isSelected={selectedButton === 'pending'}
-//               onClick={() => setSelectedButton('pending')}
-//             />
-//             <CreatePublicationButton
-//               iconSrc="https://i.ibb.co/D8QwJ6M/active-removebg-preview.png"
-//               iconBgColor="#CCFFCC"
-//               title="Ativas"
-//               subtitle="16"
-//               isSelected={selectedButton === 'active'}
-//               onClick={() => setSelectedButton('active')}
-//             />
-//             <CreatePublicationButton
-//               iconSrc="https://i.ibb.co/RPC7vW8/Icon-denuncia.png"
-//               iconBgColor="#FFE0EB"
-//               title="Denunciadas"
-//               subtitle="5"
-//               isSelected={selectedButton === 'reported'}
-//               onClick={() => setSelectedButton('reported')}
-//             />
-//           </div>
-//           <div className="right-button">
-//             <CreatePublicationButton
-//               onClick={handleCreatePublicationClick}
-//               iconSrc="https://i.ibb.co/P4nsk4w/Icon-criar.png"
-//               iconBgColor="#e0f7fa"
-//               title="Criar Publicação"
-//               subtitle="Criar..."
-//               isSelected={selectedButton === 'create'}
-//             />
-//           </div>
-//         </div>
-//       )}
-
-//       {showCreateForm && (
-//         <CriarPublicacaoView onSubmit={handleCreatePublicationSubmit} />
-//       )}
-
-//       {showPublicationList && (
-//         <div className="publications-view">
-//           <table className="publications-table">
-//             <thead>
-//               <tr>
-//                 <th>#</th>
-//                 <th>Nome da Publicação</th>
-//                 <th>Tópico</th>
-//                 <th>Data de Criação</th>
-//                 <th>Estado</th>
-//                 <th>Editar</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {filteredPublicacoes.map((publicacao, index) => (
-//                 <tr key={publicacao.id}>
-//                   <td>{index + 1}</td>
-//                   <td>{publicacao.titulo}</td>
-//                   <td>{publicacao.topico}</td>
-//                   <td>{formatarData(publicacao.createdAt)}</td>
-//                   <td>
-//                     <span className="publications-status active">{publicacao.estado}</span>
-//                   </td>
-//                   <td>
-//                     <div className="edit-buttons-container">
-//                       <button className="edit-btn">i</button>
-//                       <button className="publications-edit-btn"><i className="fas fa-eye-slash"></i></button>
-//                       <button className="publications-edit-btn">✏️</button>
-//                       <button className="publications-edit-btn">🗑️</button>
-                      
-//                     </div>
-//                   </td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
 // // export default PublicacoesView;
 import React, { useState, useEffect } from 'react';
 import './PublicacoesView.css'; 
@@ -378,9 +26,23 @@ const PublicacoesView = () => {
   const [filter, setFilter] = useState('all');
   const [showDetailViewDenunciada, setShowDetailViewDenunciada] = useState(false);
   const [publicationDetailDenunciada, setPublicationDetailDenunciada] = useState(null);
+  const [showMedidasModal, setShowMedidasModal] = useState(false);
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [showSuccessMessageAlert, setShowSuccessMessageAlert] = useState(false);
+  const [selectedPublication, setSelectedPublication] = useState(null);
+  const [showDeleteModalMedidas, setShowDeleteModalMedidas] = useState(false);
+  const [deleteMessage, setDeleteMessage] = useState('');
+  const [showSuccessMessageMedidas, setShowSuccessMessageMedidas] = useState(false);
+  const [showApprovalView, setShowApprovalView] = useState(false);
+  const [publicationDetail, setPublicationDetail] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState('descricao');
+  const [showApproveModal, setShowApproveModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectMessage, setRejectMessage] = useState('');
 
-  
-  
+
   // Form states
   const [titulo, setTitulo] = useState('');
   const [topico, setTopico] = useState('');
@@ -420,17 +82,15 @@ const PublicacoesView = () => {
     if (publication.estado.toLowerCase() === 'denunciada') {
       setPublicationDetailDenunciada(publication);
       setShowDetailViewDenunciada(true);
+    } else if (publication.estado.toLowerCase() === 'por validar') {
+      setPublicationDetail(publication);
+      setShowApprovalView(true);
     } else {
       // lógica para outras visualizações de detalhes, se houver
     }
   };
-  
-  
-  
-  
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('descricao');
 
+  
   // Form states
   const handleHideClick = (publication) => {
     setPublicationToHide(publication);
@@ -438,10 +98,15 @@ const PublicacoesView = () => {
   };
   
   const handleEditClick = (publication) => {
+    setPublicationToEdit(publication);
+    setSelectedPublication(publication);
     setShowEditForm(true);
     setShowPublicationList(false);
-    setSelectedButton('create'); // Set the selected button
-};
+    setShowMedidasModal(false);
+    setShowDetailViewDenunciada(false); // Fechar o modal "Tomar Medidas"
+  };
+  
+  
   
   const handleCancelHide = () => {
     setShowHideModal(false);
@@ -593,12 +258,83 @@ const PublicacoesView = () => {
   const countPublicacoesAtivas = publicacoes.filter(p => p.estado.toLowerCase() === 'ativa').length;
   const countPublicacoesDenunciadas = publicacoes.filter(p => p.estado.toLowerCase() === 'denunciada').length;
   
+  const handleMedidasClick = () => {
+    setShowMedidasModal(true);
+  };
   
+  const handleCloseMedidasModal = () => {
+    setShowMedidasModal(false);
+  };
+
+  const handleAlertClick = () => {
+    setShowAlertModal(true);
+    setShowMedidasModal(false);
+  };
+  
+  const handleSendAlert = () => {
+    // Adicione a lógica para enviar o alerta aqui
+    console.log("Alerta enviado:", alertMessage);
+  
+    // Mostrar mensagem de sucesso
+    setShowSuccessMessageAlert(true);
+  
+    // Após enviar o alerta, você pode fechar o modal
+    setShowAlertModal(false);
+  };
+  
+  const handleDeleteClickMedidas = () => {
+    setShowDeleteModalMedidas(true);
+    setShowMedidasModal(false); // Fechar o modal de "Tomar Medidas"
+  };
+  
+
+const handleDeleteMedidas = () => {
+  // Adicione a lógica para enviar a mensagem de remoção aqui
+  console.log("Motivo da remoção:", deleteMessage);
+  // Após enviar a mensagem, você pode fechar o modal
+  setShowDeleteModalMedidas(false);
+  setShowSuccessMessageMedidas(true);
+};
+
+const handleInfoClick = (publication) => {
+  setPublicationDetail(publication);
+  setShowApprovalView(true);
+};
+
+const handleApproveClick = () => {
+  setShowApproveModal(true);
+};
+
+const handleConfirmApprove = () => {
+  // Adicione a lógica para aprovar o local aqui
+  console.log("Local aprovado!");
+  setShowApproveModal(false);
+  setShowSuccessMessageMedidas(true); // Mostrar a mensagem de sucesso após a aprovação
+};
+
+const handleRejectClick = () => {
+  setShowRejectModal(true);
+};
+
+const handleRejectApprove = () => {
+  // Adicione a lógica para aprovar o local aqui
+  console.log("Local rejeitado!");
+  setShowRejectModal(false);
+  setShowSuccessMessageMedidas(true); // Mostrar a mensagem de sucesso após a aprovação
+};
+
+const handleRejectSubmit = () => {
+  // Adicione a lógica para enviar a rejeição aqui
+  console.log("Rejeição enviada:", rejectMessage);
+  setShowRejectModal(false);
+};
+
+
 
   return (
     <div className="publicacoes-div_princ"> 
-      {!showCreateForm && !showEditForm && !showDetailViewDenunciada && <h1 className="publicacoes-title2">Lista de Publicações deste Centro</h1>}
-      {!showCreateForm && !showEditForm && !showDetailViewDenunciada && (
+      {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && <h1 className="publicacoes-title2">Lista de Publicações deste Centro</h1>}
+      {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView &&(
         <div className="publicacoes-button-container">
           <div className="left-buttons">
             <CreatePublicationButton
@@ -646,7 +382,7 @@ const PublicacoesView = () => {
           </div>
         </div>
       )}
-      {!showDetailViewDenunciada && showPublicationList && (
+      {!showDetailViewDenunciada && !showApprovalView && showPublicationList && (
         <div className="search-container">
         <div className="search-wrapper">
           <input
@@ -664,7 +400,7 @@ const PublicacoesView = () => {
 {showEditForm && (
   <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Editar informações do Local</h1>
   <div className="header">
-    <h1 className="header-title">Nome do local</h1>
+  <h1 className="header-title">{selectedPublication.titulo}</h1>
     <div className="author">
     <div className= "authorName"><span>Autor :</span></div>
       <img src="https://i.ibb.co/7G5m74B/author.png" alt="Eu" className="author-icon" />
@@ -853,6 +589,100 @@ const PublicacoesView = () => {
   </div>
 </div>
 )}
+
+{showApprovalView && publicationDetail && (
+  <div className="publicacoes_div_princ">
+    <h1 className="publicacoes-title2">Aprovação do Local</h1>
+    <div className="header">
+      <h1 className="header-title">Nome: {publicationDetail.titulo}</h1>
+      <div className="author">
+        <div className="authorName"><span>Autor :</span></div>
+        <img src="https://i.ibb.co/7G5m74B/author.png" alt="Autor" className="author-icon" />
+        <span>{publicationDetail.autor}</span>
+      </div>
+    </div>
+    <div className="tab-content2">
+      <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Local</button>
+      <div className="gallery">
+        {publicationDetail.galeria && publicationDetail.galeria.length > 0 ? (
+          publicationDetail.galeria.map((image, index) => (
+            <img key={index} src={image} alt={`Galeria ${index}`} className="gallery-image" />
+          ))
+        ) : (
+          <p>Galeria indisponível</p>
+        )}
+      </div>
+      <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Local</button>
+      <div className="description">
+        <p>{publicationDetail.descricao}</p>
+      </div>
+      <div className="form-buttons">
+      <button className="reject-button" onClick={handleRejectClick}>
+        <i className="fas fa-times"></i> Rejeitar Local
+      </button>
+      <button className="approve-button" onClick={handleApproveClick}>
+        <i className="fas fa-check"></i> Aprovar Local
+      </button>
+
+
+    </div>
+    </div>
+    
+  </div>
+)}
+{showRejectModal && (
+  <div className="modal-backdrop">
+    <div className="modal">
+      <div className="modal-header">
+      <img src="https://i.ibb.co/tstvCh3/Captura-de-ecr-2024-06-28-170539.png"/>
+        <span>Rejeitar Local ?</span>
+      </div>
+      <div className="modal-body">
+        <p>
+          Insira abaixo o motivo por qual rejeitou a aprovação deste local sugerido por este utilizador, o qual vai ser notificado da sua ação.
+        </p>
+        <textarea
+          className="large-textareaAlert"
+          placeholder="...motivo da rejeição..."
+          value={rejectMessage}
+          onChange={(e) => setRejectMessage(e.target.value)}
+          maxLength="240"
+        />
+        <div className="character-count">{rejectMessage.length}/240</div>
+      </div>
+      <div className="modal-footer2">
+        <button type="button" className="cancel-button" onClick={() => setShowRejectModal(false)}>Cancelar</button>
+        <button type="button" className="rejeitar-submit-button" onClick={handleRejectApprove}>Rejeitar</button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+{showApproveModal && (
+  <div className="modal-approve-backdrop">
+    <div className="modal-approve">
+      <div className="modal-approve-header">
+      <img src="https://i.ibb.co/pvK4g0y/Captura-de-ecr-2024-06-28-163917.png" alt="Captura-de-ecr-2024-06-28-163917" />
+        <h2>Aprovar Local ?</h2>
+      </div>
+      <div className="modal-approve-body">
+        <p>
+          Ao aprovar este local, irá de imediato ficar disponível na aplicação para a consulta dos utilizadores.
+        </p>
+      </div>
+      <div className="modal-approve-footer">
+        <button type="button" className="approve-cancel-button" onClick={() => setShowApproveModal(false)}>Cancelar</button>
+        <button type="button" className="approve-confirm-button" onClick={handleConfirmApprove}>Aprovar</button>
+        
+      </div>
+    </div>
+  </div>
+)}
+
+
+
 {showDetailViewDenunciada ? (
   <div className="publicacoes_div_princ">
     <h1 className="publicacoes-title2">Denúncias do Local</h1>
@@ -865,23 +695,57 @@ const PublicacoesView = () => {
       </div>
     </div>
     <div className="tab-content2">
-      <h2>Lista de Denúncias</h2>
-      <div className="denuncia-card">
-        <div className="denuncia-header">
-          <img src="https://via.placeholder.com/40" alt="User" className="user-icon" />
-          <div className="denuncia-info">
-            <strong>Vitor Ferreira</strong>
-            <p>29/01/2023</p>
+      <div className="denuncia-header2">
+        <h2>Lista de Denúncias</h2>
+        <span className="total-denuncias">Total: 1 Denúncia</span>
+      </div>
+      <div className="denuncia-lista">
+        <div className="denuncia-card">
+          <div className="denuncia-header">
+            <img src="https://via.placeholder.com/40" alt="User" className="user-icon" />
+            <div className="denuncia-info">
+              <strong>Vitor Ferreira</strong>
+              <p>29/01/2023</p>
+            </div>
+          </div>
+          <div className="denuncia-content">
+            <p><strong>Motivo da denúncia :</strong> Informação Errada ou Não Fidedigna</p>
+            <p><strong>Informação adicional :</strong></p>
+            <p>Boa tarde, não é que o local seja indevido mas eu moro perto e a morada não é essa, é tal tal tal, tal qualquer coisa! Obrigado pela atenção</p>
           </div>
         </div>
-        <div className="denuncia-content">
-          <p><strong>Motivo da denúncia :</strong> Informação Errada ou Não Fidedigna</p>
-          <p><strong>Informação adicional :</strong> Boa tarde, não é que o local seja indevido mas eu moro perto e a morada não é essa</p>
+        <div className="denuncia-card">
+          <div className="denuncia-header">
+            <img src="https://via.placeholder.com/40" alt="User" className="user-icon" />
+            <div className="denuncia-info">
+              <strong>Vitor Ferreira</strong>
+              <p>29/01/2023</p>
+            </div>
+          </div>
+          <div className="denuncia-content">
+            <p><strong>Motivo da denúncia :</strong> Informação Errada ou Não Fidedigna</p>
+            <p><strong>Informação adicional :</strong></p>
+            <p>Boa tarde, não é que o local seja indevido mas eu moro perto e a morada não é essa, é tal tal tal, tal qualquer coisa! Obrigado pela atenção</p>
+          </div>
+        </div>
+        <div className="denuncia-card">
+          <div className="denuncia-header">
+            <img src="https://via.placeholder.com/40" alt="User" className="user-icon" />
+            <div className="denuncia-info">
+              <strong>Vitor Ferreira</strong>
+              <p>29/01/2023</p>
+            </div>
+          </div>
+          <div className="denuncia-content">
+            <p><strong>Motivo da denúncia :</strong> Informação Errada ou Não Fidedigna</p>
+            <p><strong>Informação adicional :</strong></p>
+            <p>Boa tarde, não é que o local seja indevido mas eu moro perto e a morada não é essa, é tal tal tal, tal qualquer coisa! Obrigado pela atenção</p>
+          </div>
         </div>
       </div>
       <div className="form-buttons">
         <button type="button" className="cancel-button" onClick={() => setShowDetailViewDenunciada(false)}>Cancelar</button>
-        <button type="button" className="save-button">Tomar Medidas</button>
+        <button type="button" className="save-button" onClick={handleMedidasClick}>Tomar Medidas</button>
       </div>
     </div>
   </div>
@@ -890,9 +754,115 @@ const PublicacoesView = () => {
 
 
 
+{showMedidasModal && (
+  <>
+    <div className="modal-backdrop2"></div>
+    <div className="modal">
+      <div className="modal-header">
+      <img src="https://i.ibb.co/PDt0P85/Captura-de-ecr-2024-06-26-171232.png" alt="Captura-de-ecr-2024-06-26-171232" className="modal-icon" />
+        <span>Tomar medidas:</span>
+      </div>
+      <div className="modal-body">
+      <div className="option" onClick={handleDeleteClickMedidas}>
+          <img src="https://i.ibb.co/18XzT1q/Captura-de-ecr-2024-06-26-171433.png" alt="Captura-de-ecr-2024-06-26-171433" />
+          <span>Eliminar Local</span>
+        </div>
+        <div className="option" onClick={() => handleEditClick(publicationDetailDenunciada)}>
+          <img src="https://i.ibb.co/9hm2v8B/Captura-de-ecr-2024-06-26-171921.png" alt="Captura-de-ecr-2024-06-26-171921" />
+          <span>Editar Local</span>
+        </div>
+        <div className="option" onClick={handleAlertClick}>
+          <img src="https://i.ibb.co/ZHC0zw5/Captura-de-ecr-2024-06-26-172004.png" alt="Captura-de-ecr-2024-06-26-172004" />
+          <span>Alertar Autor do Local</span>
+        </div>
+      </div>
+      <div className="modal-footer">
+        <button type="button" className="cancel-button" onClick={() => setShowMedidasModal(false)}>Cancelar</button>
+      </div>
+    </div>
+  </>
+)}
+
+{showDeleteModalMedidas && (
+  <>
+    <div className="modalDeleteMedidas">
+      <div className="modalDeleteMedidas-header">
+        <img src="https://i.ibb.co/4dfypxd/Captura-de-ecr-2024-06-28-111846.png" alt="Delete Icon" />
+        <span>Eliminar Publicação?</span>
+      </div>
+      <div className="modalDeleteMedidas-body">
+        <p>
+          O user que criou esta Publicação irá ser notificado sobre a sua ação!
+          Insira abaixo o motivo por qual removeu o publicação deste utilizador, o qual vai ser notificado da sua ação.
+        </p>
+        <textarea
+          className="large-textareaDeleteMedidas"
+          placeholder="...motivo de remoção..."
+          value={deleteMessage}
+          onChange={(e) => setDeleteMessage(e.target.value)}
+          maxLength="240"
+        />
+        <div className="character-count">{deleteMessage.length}/240</div>
+      </div>
+      <div className="modalDeleteMedidas-footer">
+        <button type="button" className="cancel-button" onClick={() => setShowDeleteModalMedidas(false)}>Cancelar</button>
+        <button type="button" className="delete-button" onClick={handleDeleteMedidas}>Eliminar</button>
+      </div>
+    </div>
+    <div className="modalDeleteMedidas-backdrop" />
+  </>
+)}
+
+{showSuccessMessageMedidas && (
+  <div className="modal-backdrop">
+    <div className="success-message_delete">
+      <div className="success-message-icon"></div>
+      <h1>Ação aplicada com sucesso!</h1>
+      <button onClick={() => setShowSuccessMessageMedidas(false)}>Continuar</button>
+    </div>
+  </div>
+)}
+
+  
+
+{showAlertModal && (
+  <div className='modalAlert-backdrop2'>
+  <div className="modalAlert">
+    <div className="modalAlert-header">
+      <img src="https://i.ibb.co/ZHC0zw5/Captura-de-ecr-2024-06-26-172004.png" alt="Alert Icon" />
+      <span>Alertar Autor</span>
+    </div>
+    <div className="modalAlert-body">
+      <p>
+        Insira abaixo o que deseja alertar para o autor desta publicação, para que este possa o mesmo editar
+      </p>
+      <textarea
+        className="large-textareaAlert"
+        placeholder="...motivo de alerta..."
+        value={alertMessage}
+        onChange={(e) => setAlertMessage(e.target.value)}
+        maxLength="240"
+      />
+      <div className="character-count">{alertMessage.length}/240</div>
+    </div>
+    <div className="modalAlert-footer">
+      <button type="button" className="cancel-button" onClick={() => setShowAlertModal(false)}>Cancelar</button>
+      <button type="button" className="submit-button" onClick={handleSendAlert}>Enviar</button>
+    </div>
+  </div>
+</div>
+)}
 
 
-
+{showSuccessMessageAlert && <div className="modal-backdrop"></div>}
+  {showSuccessMessageAlert && (
+    <div className="success-message_delete">
+      <div className="success-message-icon"></div>
+      <h1>Ação aplicada com sucesso!</h1>
+      <button onClick={() => setShowSuccessMessageAlert(false)}>Continuar</button>
+    </div>
+)}
+  
 
 {showCreateForm && (
         <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Criar Publicação</h1>
@@ -1078,7 +1048,7 @@ const PublicacoesView = () => {
         </div>
       )}
 
-      {!showDetailViewDenunciada && showPublicationList && (
+      {!showDetailViewDenunciada && !showApprovalView && showPublicationList && (
         <div className="publications-view">
           <table className="publications-table">
             <thead>
