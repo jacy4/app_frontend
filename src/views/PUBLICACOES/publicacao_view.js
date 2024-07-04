@@ -4,7 +4,10 @@ import './PublicacoesView.css';
 import axios from 'axios';
 import CreatePublicationButton from '../../componentes/botao_view_publicacoes/criar_publicacao';
 import { GoogleMap, LoadScript, Marker, useJsApiLoader } from '@react-google-maps/api';
+import moment from 'moment';
+import 'moment/locale/pt'; // Importar o locale português
 
+moment.locale('pt'); // Definir o locale para português
 
 const PublicacoesView = () => {
   const [publicacoes, setPublicacoes] = useState([]);
@@ -41,8 +44,16 @@ const PublicacoesView = () => {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectMessage, setRejectMessage] = useState('');
+  const [showDetailView, setShowDetailView] = useState(false);
+  const [publicationDetailActive, setPublicationDetailActive] = useState(null);
+  const weekDays = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+  const [selectedPublicacao, setSelectedPublicacao] = useState(null);
+  const [showPendingModal, setShowPendingModal] = useState(false);
+  const [showReportedModal, setShowReportedModal] = useState(false);
+  const [comentarios, setComentarios] = useState([]);
+  const [novoComentario, setNovoComentario] = useState('');
 
-
+  const [isOpen, setIsOpen] = useState(false); 
   // Form states
   const [titulo, setTitulo] = useState('');
   const [topico, setTopico] = useState('');
@@ -79,16 +90,22 @@ const PublicacoesView = () => {
   }, [centroId]);
 
   const handleViewDetailsClick = (publication) => {
-    if (publication.estado.toLowerCase() === 'denunciada') {
-      setPublicationDetailDenunciada(publication);
-      setShowDetailViewDenunciada(true);
-    } else if (publication.estado.toLowerCase() === 'por validar') {
-      setPublicationDetail(publication);
-      setShowApprovalView(true);
-    } else {
-      // lógica para outras visualizações de detalhes, se houver
-    }
+    setSelectedPublication(publication);
+    setShowDetailView(true);
   };
+  
+  
+
+  const handlePendingViewClick = (publication) => {
+    setPublicationDetail(publication);
+    setShowApprovalView(true);
+  };
+  
+  const handleReportedViewClick = (publication) => {
+    setPublicationDetailDenunciada(publication);
+    setShowDetailViewDenunciada(true);
+  };
+  
 
   
   // Form states
@@ -138,10 +155,18 @@ const PublicacoesView = () => {
     setShowDeleteModal(false);
     setPublicationToDelete(null);
   };
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:3000/publicacoes/delete/${publicationToDelete.id}`);
+      setPublicacoes(publicacoes.filter(p => p.id !== publicationToDelete.id));
+      setShowSuccessMessageDelete(true); // Exibir a mensagem de sucesso após a exclusão
+    } catch (error) {
+      console.error('Erro ao deletar publicação:', error);
+      // Aqui você pode adicionar lógica para tratar erros, como mostrar uma mensagem de erro para o usuário
+    }
     setShowDeleteModal(false);
-    setShowSuccessMessageDelete(true); // Exibir a mensagem de sucesso após a exclusão
-};
+  };
+  
 
 
   const formatarData = (data) => {
@@ -192,6 +217,7 @@ const PublicacoesView = () => {
   };
 
   const handleConfirmHide = () => {
+    handleToggleVisibility(publicationToHide);
     setShowHideModal(false);
     setRemovalReason('');
     setShowSuccessMessageHide(true); // Exibir a mensagem de sucesso após ocultar
@@ -249,10 +275,9 @@ const PublicacoesView = () => {
   };
   
   
-  const filteredPublicacoes = publicacoes.filter((publicacoes) => {
-    if (filter === 'all') return true;
-    return publicacoes.estado.toLowerCase() === filter;
-  });
+  const filteredPublicacoes = publicacoes.filter(publicacao => 
+    publicacao.titulo.toLowerCase().includes(searchTerm.toLowerCase())
+  );
   
   const countPublicacoesPorValidar = publicacoes.filter(p => p.estado.toLowerCase() === 'por validar').length;
   const countPublicacoesAtivas = publicacoes.filter(p => p.estado.toLowerCase() === 'ativa').length;
@@ -328,13 +353,110 @@ const handleRejectSubmit = () => {
   console.log("Rejeição enviada:", rejectMessage);
   setShowRejectModal(false);
 };
+const isOpenNow = (horario) => {
+  const currentDay = moment().format('dddd'); // Dia da semana atual em português
+  const currentTime = moment(); // Hora atual
+
+  console.log("Horário Completo:", horario);
+  console.log("Dia Atual:", currentDay);
+  console.log("Hora Atual:", currentTime.format('HH:mm'));
+
+  if (!horario || !horario[currentDay]) {
+    console.log("Horário não definido para o dia atual ou horário é nulo.");
+    return false;
+  }
+
+  const todaySchedule = horario[currentDay];
+  if (todaySchedule.toLowerCase() === 'fechado') {
+    console.log("O local está fechado hoje.");
+    return false;
+  }
+
+  const [openTime, closeTime] = todaySchedule.split('-');
+  const openMoment = moment(openTime, 'HH:mm');
+  const closeMoment = moment(closeTime, 'HH:mm');
+
+  console.log("Horário de Abertura:", openMoment.format('HH:mm'));
+  console.log("Horário de Fechamento:", closeMoment.format('HH:mm'));
+
+  const isOpen = currentTime.isBetween(openMoment, closeMoment);
+  console.log("Está Aberto Agora:", isOpen);
+
+  return isOpen;
+};
+
+
+
+
+useEffect(() => {
+  if (selectedPublication && selectedPublication.horario) {
+    setIsOpen(isOpenNow(selectedPublication.horario));
+  }
+}, [selectedPublication]);
+
+
+const handlePendingClick = (publicacao) => {
+  // Lógica para tratar clique no botão de "Por validar"
+  // Exemplo: Abrir uma modal para validação
+  setSelectedPublicacao(publicacao);
+  setShowPendingModal(true);
+};
+
+const handleReportedClick = (publicacao) => {
+  // Lógica para tratar clique no botão de "Denunciada"
+  // Exemplo: Abrir uma modal para revisão de denúncia
+  setSelectedPublicacao(publicacao);
+  setShowReportedModal(true);
+};
+
+useEffect(() => {
+  const fetchComentarios = async () => {
+    if (selectedPublication) {
+      try {
+        const response = await axios.get(`http://localhost:3000/comentarios/listarComentarios/${selectedPublication.id}`);
+        setComentarios(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar comentários:', error);
+      }
+    }
+  };
+
+  fetchComentarios();
+}, [selectedPublication]);
+
+const handleAddComentario = async () => {
+  if (!novoComentario.trim()) {
+    return;
+  }
+  try {
+    const response = await axios.post(`http://localhost:3000/comentarios/add`, {
+      publicacao_id: selectedPublication.id,
+      autor: 'Autor do Comentário', // Substitua pelo nome do autor do comentário
+      conteudo: novoComentario
+    });
+    setComentarios([...comentarios, response.data]);
+    setNovoComentario('');
+  } catch (error) {
+    console.error('Erro ao adicionar comentário:', error);
+  }
+};
+
+const handleToggleVisibility = async (publicacao) => {
+  try {
+    const updatedVisivel = !publicacao.visivel;
+    await axios.put(`http://localhost:3000/publicacoes/updateVisibility/${publicacao.id}`, { visivel: updatedVisivel });
+    setPublicacoes(publicacoes.map(p => p.id === publicacao.id ? { ...p, visivel: updatedVisivel } : p));
+  } catch (error) {
+    console.error('Erro ao atualizar visibilidade da publicação:', error);
+  }
+};
 
 
 
   return (
     <div className="publicacoes-div_princ"> 
-      {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && <h1 className="publicacoes-title2">Lista de Publicações deste Centro</h1>}
-      {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView &&(
+      {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de Publicações deste Centro</h1>}
+      {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView &&(
         <div className="publicacoes-button-container">
           <div className="left-buttons">
             <CreatePublicationButton
@@ -382,7 +504,7 @@ const handleRejectSubmit = () => {
           </div>
         </div>
       )}
-      {!showDetailViewDenunciada && !showApprovalView && showPublicationList && (
+      {!showDetailViewDenunciada && !showApprovalView && !showDetailView && showPublicationList && (
         <div className="search-container">
         <div className="search-wrapper">
           <input
@@ -589,6 +711,120 @@ const handleRejectSubmit = () => {
   </div>
 </div>
 )}
+
+{showDetailView && selectedPublication && (
+  <div className="publicacoes_div_princ">
+    <h1 className="publicacoes-title2">Informações do Local</h1>
+    <div className="header">
+      <h1 className="header-title">{selectedPublication.titulo}</h1>
+      <div className="author">
+        <div className="authorName"><span>Autor :</span></div>
+        <img src="https://i.ibb.co/7G5m74B/author.png" alt="Autor" className="author-icon" />
+        <span>{selectedPublication.autor}</span>
+      </div>
+    </div>
+    <div className="tab-content2">
+      {selectedPublication.galeria && selectedPublication.galeria.length > 0 && (
+        <>
+          <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Local</button>
+          <div className="gallery">
+            {selectedPublication.galeria.map((image, index) => (
+              <img key={index} src={image} alt={`Galeria ${index}`} className="gallery-image" />
+            ))}
+          </div>
+        </>
+      )}
+      {selectedPublication.descricao && (
+        <>
+          <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Local</button>
+          <div className="description">
+            <p>{selectedPublication.descricao}</p>
+          </div>
+        </>
+      )}
+      {selectedPublication.horario && (
+        <>
+          <button className="tab active"><i className="fas fa-clock tab-icon"></i> Horário do Local</button>
+          <div className="additional-info">
+            <div className="status">
+              <i className="fas fa-check-circle"></i> {isOpen ? 'Aberto Agora' : 'Fechado Agora'}
+            </div>
+            <div className="schedule">
+              {weekDays.map((dia) => (
+                <p key={dia}><strong>{dia}:</strong> {selectedPublication.horario[dia] || 'Fechado'}</p>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+      {selectedPublication.estado && (
+        <>
+          <button className="tab active"><i className="fas fa-tasks tab-icon"></i> Estado da Publicação</button>
+          <div className="estado">
+            <p><strong>Estado:</strong> {selectedPublication.estado}</p>
+          </div>
+        </>
+      )}
+      {selectedPublication.localizacao && (
+        <>
+          <button className="tab active"><i className="fas fa-map-marker-alt tab-icon"></i> Localização</button>
+          <div className="location">
+            <p><strong>Localização:</strong> {selectedPublication.localizacao}</p>
+          </div>
+        </>
+      )}
+      {selectedPublication.paginaweb && (
+        <>
+          <button className="tab active"><i className="fas fa-globe tab-icon"></i> Página Web</button>
+          <div className="website">
+            <p><strong>Página web:</strong> {selectedPublication.paginaweb}</p>
+          </div>
+        </>
+      )}
+      {selectedPublication.telemovel && (
+        <>
+          <button className="tab active"><i className="fas fa-phone tab-icon"></i> Telefone</button>
+          <div className="phone">
+            <p><strong>Telemóvel/Telefone: </strong>{selectedPublication.telemovel}</p>
+          </div>
+        </>
+      )}
+      {selectedPublication.email && (
+        <>
+          <button className="tab active"><i className="fas fa-envelope tab-icon"></i> Email</button>
+          <div className="email">
+            <p><strong>Email:</strong> {selectedPublication.email}</p>
+          </div>
+        </>
+      )}
+      {/* Seção de Comentários */}
+      <button className="tab active"><i className="fas fa-comments tab-icon"></i> Comentários</button>
+      <div className="comentarios-section">
+        <div className="comentarios-list">
+          {comentarios.map((comentario) => (
+            <div key={comentario.id} className="comentario">
+              <p><strong>Autor: </strong>{comentario.autor}</p>
+              <p>{comentario.conteudo}</p>
+            </div>
+          ))}
+        </div>
+        {/* <div className="add-comentario">
+          <textarea
+            placeholder="Adicionar um comentário..."
+            value={novoComentario}
+            onChange={(e) => setNovoComentario(e.target.value)}
+          />
+          <button onClick={handleAddComentario}>Enviar</button>
+        </div> */}
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
+
 
 {showApprovalView && publicationDetail && (
   <div className="publicacoes_div_princ">
@@ -1048,7 +1284,7 @@ const handleRejectSubmit = () => {
         </div>
       )}
 
-      {!showDetailViewDenunciada && !showApprovalView && showPublicationList && (
+      {!showDetailViewDenunciada && !showApprovalView && !showDetailView && showPublicationList && (
         <div className="publications-view">
           <table className="publications-table">
             <thead>
@@ -1062,81 +1298,98 @@ const handleRejectSubmit = () => {
               </tr>
             </thead>
             <tbody>
-            {filteredPublicacoes.map((publicacoes, index) => (
-          <tr key={publicacoes.id}>
-            <td>{index + 1}</td>
-            <td>{publicacoes.titulo}</td>
-            <td>{publicacoes.topico.nome}</td>
-            <td>{formatarData(publicacoes.createdAt)}</td>
-            <td>
-              <span className={`publications-status ${publicacoes.estado.toLowerCase().replace(' ', '-')}`}>
-                {publicacoes.estado}
-              </span>
-                </td>
-                  <td>
-                    <div className="edit-buttons-container">
-                      <button className="edit-btn" onClick={() => handleViewDetailsClick(publicacoes)}>i</button>
-                      <button className="publications-edit-btn" onClick={() => handleHideClick(publicacoes)}><i className="fas fa-eye-slash"></i></button>
-                      <button className="publications-edit-btn"onClick={() => handleEditClick(publicacoes)}>✏️</button>
-                      <button className="publications-edit-btn" onClick={() => handleDeleteClick(publicacoes)}>🗑️</button>
+  {filteredPublicacoes.map((publicacoes, index) => {
+    
+    
+    return (
+      <tr key={publicacoes.id}>
+        <td>{index + 1}</td>
+        <td>{publicacoes.titulo}</td>
+        <td>{publicacoes.topico.nome}</td>
+        <td>{formatarData(publicacoes.createdAt)}</td>
+        <td>
+          <span className={`publications-status ${publicacoes.estado.toLowerCase().replace(' ', '-')}`}>
+            {publicacoes.estado}
+          </span>
+        </td>
+        <td>
+          <div className="edit-buttons-container">
+            <button className="edit-btn" onClick={() => handleViewDetailsClick(publicacoes)}>i</button>
+            <button 
+              className="publications-edit-btn" 
+              onClick={() => handleHideClick(publicacoes)}>
+              <i className={`fas ${publicacoes.visivel ? 'fa-eye' : 'fa-eye-slash'}`}></i>
+            </button>
+            <button className="publications-edit-btn"onClick={() => handleEditClick(publicacoes)}>✏️</button>
+            <button className="publications-edit-btn" onClick={() => handleDeleteClick(publicacoes)}>🗑️</button>
+            {publicacoes.estado === 'Por validar' && (
+              <button className="publications-edit-btn" onClick={() => handlePendingViewClick(publicacoes)}>
+                <img src="https://i.ibb.co/9T565FK/Captura-de-ecr-2024-07-04-123100-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-123100-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
+              </button>
+            )}
+            {publicacoes.estado === 'Denunciada' && (
+              <button className="publications-edit-btn" onClick={() => handleReportedViewClick(publicacoes)}>
+                <img src="https://i.ibb.co/Cwhk8dN/Captura-de-ecr-2024-07-04-115321-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-115321-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
+              </button>
+            )}
+          </div>
+          {showDeleteModal && (
+            <div className="modal">
+              <div className="modal-icon">❌</div>
+              <div className="modal-header">Eliminar Publicação?</div>
+              <div className="modal-body">
+                O user que criou esta publicação irá ser notificado sobre a sua ação!
+              </div>
+              <div className="modal-buttons">
+                <button className="delete-button" onClick={handleConfirmDelete}>Eliminar</button>
+                <button className="cancel-button_delete" onClick={handleCancelDelete}>Cancelar</button>
+              </div>
+            </div>
+          )}
+          {showHideModal && (
+            <div className="modal_hide">
+              <div className="modal-icon_hide">👁️</div>
+              <div className="modal-header_hide">Ocultar Publicação</div>
+              <div className="modal-body_hide">
+                <p>Ao ocultar Publicação, este irá ser oculto aos utilizadores mas não será eliminado.</p>
+                <p>Insira abaixo o motivo por qual removeu o comentário deste utilizador, o qual vai ser notificado da sua ação.</p>
+                <textarea
+                  className="large-textareaAlert"
+                  placeholder="...motivo de remoção..."
+                  value={removalReason}
+                  onChange={(e) => setRemovalReason(e.target.value)}
+                  maxLength="240"
+                />
+                <div className="character-count">{removalReason.length}/240</div>
+              </div>
+              <div className="modal-buttons">
+                <button className="cancel-button_hide" onClick={handleCancelHide}>Cancelar</button>
+                <button className="hide-button" onClick={handleConfirmHide}>Ocultar</button>
+              </div>
+            </div>
+          )}
+          {showSuccessMessageHide && <div className="modal-backdrop"></div>}
+          {showSuccessMessageHide && (
+            <div className="success-message_delete">
+              <div className="success-message-icon"></div>
+              <h1>Ação aplicada com sucesso!</h1>
+              <button onClick={() => setShowSuccessMessageHide(false)}>Continuar</button>
+            </div>
+          )}
+          {showSuccessMessageDelete && <div className="modal-backdrop"></div>}
+          {showSuccessMessageDelete && (
+            <div className="success-message_delete">
+              <div className="success-message-icon"></div>
+              <h1>Ação aplicada com sucesso!</h1>
+              <button onClick={() => setShowSuccessMessageDelete(false)}>Continuar</button>
+            </div>
+          )}
+        </td>
+      </tr>
+    );
+  })}
+</tbody>
 
-                    </div>
-                    {showDeleteModal && (
-                      <div className="modal">
-                        <div className="modal-icon">❌</div>
-                        <div className="modal-header">Eliminar Publicação?</div>
-                        <div className="modal-body">
-                          O user que criou esta publicação irá ser notificado sobre a sua ação!
-                        </div>
-                        <div className="modal-buttons">
-                          <button className="delete-button" onClick={handleConfirmDelete}>Eliminar</button>
-                          <button className="cancel-button_delete" onClick={handleCancelDelete}>Cancelar</button>
-                        </div></div>)}
-                    {showHideModal && (
-                          <div className="modal_hide">
-                            <div className="modal-icon_hide">👁️</div>
-                            <div className="modal-header_hide">Ocultar Publicação</div>
-                            <div className="modal-body_hide">
-                              <p>Ao ocultar Publicação, este irá ser oculto aos utilizadores mas não será eliminado.</p>
-                              <p>Insira abaixo o motivo por qual removeu o comentário deste utilizador, o qual vai ser notificado da sua ação.</p>
-                              <textarea
-                                placeholder="...motivo de remoção..."
-                                value={removalReason}
-                                onChange={(e) => setRemovalReason(e.target.value)}
-                                maxLength="240"
-                              />
-                              <div className="character-count">{removalReason.length}/240</div>
-                            </div>
-                            <div className="modal-buttons">
-                              <button className="cancel-button_hide" onClick={handleCancelHide}>Cancelar</button>
-                              <button className="hide-button" onClick={handleConfirmHide}>Ocultar</button>
-                            </div>
-                          </div>
-                        )}
-                        {showSuccessMessageHide && <div className="modal-backdrop"></div>}
-                          {showSuccessMessageHide && (
-                            <div className="success-message_delete">
-                              <div className="success-message-icon"></div>
-                              <h1>Ação aplicada com sucesso!</h1>
-                              <button onClick={() => setShowSuccessMessageHide(false)}>Continuar</button>
-                            </div>
-                          )}
-                        {showSuccessMessageDelete && <div className="modal-backdrop"></div>}
-                          {showSuccessMessageDelete && (
-                            <div className="success-message_delete">
-                              <div className="success-message-icon"></div>
-                              <h1>Ação aplicada com sucesso!</h1>
-                              <button onClick={() => setShowSuccessMessageDelete(false)}>Continuar</button>
-                            </div>
-                          )}
-
-
-
-
-                  </td>
-                </tr>
-              ))}
-            </tbody>
           </table>
         </div>
       )}

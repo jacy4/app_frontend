@@ -762,6 +762,8 @@
   background-color: #fff;
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
+  max-height: 70vh; /* Altura máxima para permitir espaço para a rolagem */
+  overflow-y: auto; /* Adicionar rolagem vertical */
 }
 
 .denuncia-card {
@@ -1060,16 +1062,15 @@
 
 .gallery {
   display: flex;
-  flex-wrap: wrap;
-  max-height: 400px; /* Ajuste conforme necessário */
-  overflow-y: auto; /* Adiciona a barra de rolagem vertical */
-  margin-bottom: 20px;
+  flex-wrap: wrap; /* Permitir que as imagens quebrem para a próxima linha */
   gap: 10px; /* Espaço entre as imagens */
+  margin-bottom: 20px;
 }
 
 .gallery-image {
-  flex: 0 0 auto; /* Impede que as imagens se ajustem ao contêiner flexível */
-  width: 30%;
+  flex: 1 1 calc(33.333% - 10px); /* Ajuste para mostrar 3 imagens por linha */
+  max-width: calc(33.333% - 10px); /* Garantir que a imagem não ultrapasse a largura do contêiner */
+  height: auto;
   border-radius: 8px;
 }
 
@@ -1197,4 +1198,45 @@
   padding: 5px 10px; /* Adicione padding para o botão cancelar */
   border-radius: 4px; /* Adicione borda arredondada para combinar com o botão Enviar */
   margin-right: 10px; /* Adicione margem direita para separar os botões */
+}
+
+.description, .additional-info {
+  margin-top: 20px;
+}
+
+.publications-approve-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #28a745; /* Verde para aprovar */
+}
+
+.publications-reject-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #dc3545; /* Vermelho para rejeitar */
+}
+
+
+.custom-icon {
+  width: 27px; /* Ajuste a largura conforme necessário */
+  height: 27px; /* Ajuste a altura conforme necessário */
+}
+
+.comentarios-section {
+  margin-top: 20px;
+}
+
+.comentarios-list .comentario {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.comentarios-list .comentario p {
+  margin: 5px 0;
+}
+
+.comentarios-list .comentario p strong {
+  color: #333;
 }

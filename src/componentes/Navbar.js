@@ -11,12 +11,17 @@ const Navbar = () => {
   const [centroId, setCentroId] = useState(null);
   const [centroName, setCentroName] = useState('');
   const [selectedMenu, setSelectedMenu] = useState('Página Inicial');
+  const [isNavbarOpen, setIsNavbarOpen] = useState(false);
 
   const toggleSubMenu = (menu) => {
     setSubMenuOpen((prevState) => ({
       ...prevState,
       [menu]: !prevState[menu],
     }));
+  };
+
+  const toggleNavbar = () => {
+    setIsNavbarOpen(!isNavbarOpen);
   };
 
   useEffect(() => {
@@ -41,7 +46,7 @@ const Navbar = () => {
       <nav className="navbar">
         <div className="navbar-container">
           <div className="navbar-logo-container">
-            <div className="menu-icon">
+            <div className="menu-icon" onClick={toggleNavbar}>
               <i className="fas fa-bars"></i>
             </div>
             <a href="/" className="navbar-logo font-extrabold text-blue-500">SOFTINSA</a>
@@ -68,7 +73,7 @@ const Navbar = () => {
         </div>
       </nav>
       
-      <div className="sidebar">
+      <div className={`sidebar ${isNavbarOpen ? 'open' : ''}`}>
         <ul className="sidebar-menu">
           <li>
             <Link
