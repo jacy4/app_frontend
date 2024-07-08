@@ -414,30 +414,6 @@
   border-radius: 8px;
 }
 
-.upload-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 150px;
-  height: 150px;
-  border: 2px dashed #ccc;
-  border-radius: 8px;
-  background-color: #fff;
-  cursor: pointer;
-  margin-bottom: 10px;
-}
-
-.upload-icon {
-  font-size: 24px;
-  color: #ccc;
-}
-
-.upload-text {
-  font-size: 16px;
-  color: #ccc;
-}
-
 .gallery-info {
   font-size: 14px;
   color: #888;
@@ -1228,15 +1204,168 @@
   margin-top: 20px;
 }
 
-.comentarios-list .comentario {
+
+
+/* Adicione isso ao seu arquivo CSS */
+.dropzone {
+  border: 2px dashed #007bff;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+
+
+.upload-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.upload-icon {
+  font-size: 24px;
+  color: #ccc;
+}
+
+
+.upload-text {
+  font-size: 16px;
+  color: #ccc;
+}
+
+.uploaded-images {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.image-preview {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.image-preview img {
+  max-width: 100px;
+  max-height: 100px;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.horario-inputs {
+  display: flex;
+  gap: 10px;
+}
+
+.horario-inputs input {
+  flex: 1;
+}
+.comentarios-section {
+  margin-top: 20px;
+}
+
+.comentario {
+  border: 1px solid #ddd;
   padding: 10px;
-  border-bottom: 1px solid #ddd;
+  margin-bottom: 10px;
+  border-radius: 5px;
 }
 
-.comentarios-list .comentario p {
-  margin: 5px 0;
+.comentario-header {
+  display: flex;
+  align-items: center;
 }
 
-.comentarios-list .comentario p strong {
-  color: #333;
+.comentario-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.comentario-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.comentario-autor {
+  font-weight: bold;
+}
+
+.comentario-data {
+  font-size: 0.8em;
+  color: #999;
+}
+
+.comentario-conteudo {
+  margin-top: 10px;
+}
+
+.add-comentario {
+  margin-bottom: 5px; /* Espaço entre a área de texto e o botão */
+}
+
+.comment-textarea {
+  width: 100%; /* Largura total */
+  height: 80px; /* Altura fixa */
+  resize: none; /* Desativa o redimensionamento */
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  box-sizing: border-box; /* Para incluir padding e border na largura total */
+}
+
+
+.btn-comentar {
+  background-color: white; /* Fundo branco */
+  color: green; /* Texto verde */
+  border: 2px solid green; /* Borda verde */
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-comentar:hover {
+  background-color: green;
+  color: white;
+}
+
+
+.btn-comentarios {
+  background-color: white;
+  color: green;
+  border: 1px solid green;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-comentarios:hover {
+  background-color: green;
+  color: white;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.margin-bottom {
+  margin-bottom: 20px; /* Ajuste este valor conforme necessário */
+}
+
+.comment-box {
+  border: 1px solid #ccc; /* ou outro estilo que você esteja usando */
+  padding: 10px; /* ou outro estilo que você esteja usando */
+  border-radius: 5px; /* ou outro estilo que você esteja usando */
+  margin-top: 10px; /* Ajuste este valor conforme necessário */
+}
+
+.comment-button-container {
+  display: flex;
+  justify-content: flex-end; /* Alinha o botão à direita */
 }

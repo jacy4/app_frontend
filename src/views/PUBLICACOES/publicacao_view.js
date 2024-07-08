@@ -6,6 +6,9 @@ import CreatePublicationButton from '../../componentes/botao_view_publicacoes/cr
 import { GoogleMap, LoadScript, Marker, useJsApiLoader } from '@react-google-maps/api';
 import moment from 'moment';
 import 'moment/locale/pt'; // Importar o locale português
+import { useNavigate } from 'react-router-dom';
+import { useDropzone } from 'react-dropzone';
+
 
 moment.locale('pt'); // Definir o locale para português
 
@@ -52,6 +55,32 @@ const PublicacoesView = () => {
   const [showReportedModal, setShowReportedModal] = useState(false);
   const [comentarios, setComentarios] = useState([]);
   const [novoComentario, setNovoComentario] = useState('');
+  const [descricao, setDescricao] = useState('');
+  const [paginaweb, setPaginaweb] = useState('');
+  const [telemovel, setTelemovel] = useState('');
+  const [email, setEmail] = useState('');
+  const [horario, setHorario] = useState({
+    "Segunda-feira": { inicio: '', fim: '', fechado: false },
+    "Terça-feira": { inicio: '', fim: '', fechado: false },
+    "Quarta-feira": { inicio: '', fim: '', fechado: false },
+    "Quinta-feira": { inicio: '', fim: '', fechado: false },
+    "Sexta-feira": { inicio: '', fim: '', fechado: false },
+    "Sábado": { inicio: '', fim: '', fechado: false },
+    "Domingo": { inicio: '', fim: '', fechado: false },
+});
+  
+
+  
+  const [localizacao, setLocalizacao] = useState('');
+  const navigate = useNavigate();
+  const [imageSrc, setImageSrc] = useState(null); // Estado para imagem escolhida
+  const [galeria, setGaleria] = useState([]); // Estado para a galeria de imagens
+  const [topicos, setTopicos] = useState([]);
+  const areaId = 1; // Defina o ID da área aqui
+
+  const [showAllComentarios, setShowAllComentarios] = useState(false);
+  const comentariosExibidos = showAllComentarios ? comentarios : comentarios.slice(0, 1);
+
 
   const [isOpen, setIsOpen] = useState(false); 
   // Form states
@@ -179,10 +208,63 @@ const PublicacoesView = () => {
     setShowPublicationList(false);
     setSelectedButton('create'); // Set the selected button
   };
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    handleCreatePublicationSubmit({ titulo, topico });
-  };
+    
+    console.log('Iniciando handleSubmit'); // Log para verificar se a função está sendo chamada
+
+    // Formatando o horário para o formato desejado
+    const formattedHorario = {};
+    for (const [dia, { inicio, fim, fechado }] of Object.entries(horario)) {
+        if (fechado) {
+            formattedHorario[dia] = 'Fechado';
+        } else {
+            formattedHorario[dia] = `${inicio}-${fim}`;
+        }
+    }
+
+    const publicacaoData = {
+        topico_id: topico,
+        titulo,
+        descricao,
+        horario: formattedHorario,
+        localizacao,
+        paginaweb,
+        telemovel,
+        email,
+        galeria: galeria.map((img) => img.url), // Envia apenas as URLs das imagens
+        centro_id: centroId, // Inclui o centro_id recuperado
+    };
+
+    console.log('Dados da Publicação:', publicacaoData); // Log dos dados que serão enviados
+
+    try {
+        const response = await axios.post('http://localhost:3000/publicacoes/create', publicacaoData, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        console.log('Resposta do Backend:', response); // Log da resposta do backend
+
+        if (response.status === 201) { // Ajuste o código de status para 201 Created
+            setShowSuccessMessage(true); // Mostrar modal de sucesso
+        } else {
+            console.error('Erro na resposta do Backend:', response); // Log de erro caso a resposta não seja 201
+            // Lógica de erro
+        }
+    } catch (error) {
+        console.error('Erro ao criar publicação:', error); // Log do erro
+    }
+};
+
+
+
+  
+  
+  
+  
   
   const handleShowPublicationListClick = () => {
     setShowCreateForm(false);
@@ -275,9 +357,24 @@ const PublicacoesView = () => {
   };
   
   
-  const filteredPublicacoes = publicacoes.filter(publicacao => 
-    publicacao.titulo.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredPublicacoes = publicacoes.filter(publicacao => {
+  // Filtro por título
+  const matchesTitle = publicacao.titulo.toLowerCase().includes(searchTerm.toLowerCase());
+
+  // Filtro por estado
+  let matchesState = true; // Default to true for 'all'
+  if (filter === 'por validar') {
+    matchesState = publicacao.estado === 'Por validar';
+  } else if (filter === 'ativa') {
+    matchesState = publicacao.estado === 'Ativa';
+  } else if (filter === 'denunciada') {
+    matchesState = publicacao.estado === 'Denunciada';
+  }
+
+  // Combina ambos os filtros
+  return matchesTitle && matchesState;
+});
+  
   
   const countPublicacoesPorValidar = publicacoes.filter(p => p.estado.toLowerCase() === 'por validar').length;
   const countPublicacoesAtivas = publicacoes.filter(p => p.estado.toLowerCase() === 'ativa').length;
@@ -410,7 +507,7 @@ const handleReportedClick = (publicacao) => {
 };
 
 useEffect(() => {
-  const fetchComentarios = async () => {
+  const Comentarios = async () => {
     if (selectedPublication) {
       try {
         const response = await axios.get(`http://localhost:3000/comentarios/listarComentarios/${selectedPublication.id}`);
@@ -421,7 +518,7 @@ useEffect(() => {
     }
   };
 
-  fetchComentarios();
+  Comentarios();
 }, [selectedPublication]);
 
 const handleAddComentario = async () => {
@@ -451,7 +548,71 @@ const handleToggleVisibility = async (publicacao) => {
   }
 };
 
+const handleCancel = () => {
+  navigate(-1); // Volta para a página anterior
+};
 
+const handleContinue = () => {
+  const tabs = ['descricao', 'galeria', 'horario', 'localizacao', 'comentarios', 'mais_informacoes'];
+  const currentIndex = tabs.indexOf(activeTab);
+  if (currentIndex < tabs.length - 1) {
+    setActiveTab(tabs[currentIndex + 1]);
+  }
+};
+
+const handleImageChange = (event) => {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    setImageSrc(reader.result);
+  };
+  if (file) {
+    reader.readAsDataURL(file);
+  }
+};
+
+const uploadImage = async (file) => {
+  const formData = new FormData();
+  formData.append('key', '4d755673a2dc94483064445f4d5c54e9'); // substitua pela sua chave da API imgbb
+  formData.append('image', file);
+
+  const response = await axios.post('https://api.imgbb.com/1/upload', formData);
+  return response.data.data.url; // Certifique-se de que está retornando a URL correta
+};
+
+
+const onDrop = async (acceptedFiles) => {
+  const uploadedImages = await Promise.all(
+    acceptedFiles.map(async (file) => {
+      const url = await uploadImage(file);
+      return { file, preview: URL.createObjectURL(file), url };
+    })
+  );
+  setGaleria([...galeria, ...uploadedImages]);
+};
+
+
+const { getRootProps, getInputProps } = useDropzone({
+  onDrop,
+  accept: 'image/*'
+});
+
+
+
+
+useEffect(() => {
+  // Função para buscar os tópicos da API
+  const Topicos = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/topicos/topicosdeumaarea/${areaId}`); // Substitua areaId pelo id da área
+      setTopicos(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar tópicos:', error);
+    }
+  };
+
+  Topicos();
+}, [areaId]);
 
   return (
     <div className="publicacoes-div_princ"> 
@@ -568,144 +729,173 @@ const handleToggleVisibility = async (publicacao) => {
     </button>
   </div>
   <div className="tab-content">
-    {activeTab === 'descricao' && (
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Tópico do Local</label>
-          <select value={topico} onChange={(e) => setTopico(e.target.value)}>
-            <option value="">selecionar tópico</option>
-            <option value="futebol">Futebol</option>
-            <option value="basquete">Basquete</option>
-          </select>
-        </div>
-        <div className="form-group">
-          <label>Nome do local</label>
-          <input type="text" placeholder="inserir nome do local" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
-        </div>
-        <div className="form-group">
-          <label>Descrição do local</label>
-          <textarea placeholder="inserir uma breve descrição do local"></textarea>
-        </div>
-        <div className="form-buttons">
-          <button type="button" className="cancel-button">Cancelar</button>
-          <button className="save-button"><i className="fas fa-save"></i>Guardar Alterações</button>
-        </div>
-      </form>
-    )}
-    {activeTab === 'galeria' && (
-    <div className="tab-content_galeria">
-      <h2>Galeria do local</h2>
-      <div className="gallery-upload">
-        <div className="upload-box">
-          <span className="upload-icon">+</span>
-          <span className="upload-text">Upload</span>
-        </div>
-        <p className="gallery-info">
-          <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do local
-        </p>
+  {activeTab === 'descricao' && (
+          <form onSubmit={handleSubmit}>
+            
+            <div className="form-group">
+              <label>Tópico do Local</label>
+              <select value={topico} onChange={(e) => setTopico(e.target.value)}>
+                <option value="">selecionar tópico</option>
+                <option value="futebol">Futebol</option>
+                <option value="basquete">Basquete</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Nome do local</label>
+              <input type="text" placeholder="inserir nome do local" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label>Descrição do local</label>
+              <input type="text" placeholder="inserir uma breve descrição do local" value={descricao} onChange={(e) => setDescricao(e.target.value)}/>
+            </div>
+            <div className="form-buttons">
+              <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
+              <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+            </div>
+          </form>
+        )}
+
+{activeTab === 'galeria' && (
+  <div className="tab-content_galeria">
+    <h2>Galeria do local</h2>
+    <div {...getRootProps({ className: 'dropzone' })} className="gallery-upload">
+      <input {...getInputProps()} />
+      <div className="upload-box">
+        <span className="upload-icon">+</span>
+        <span className="upload-text">Upload</span>
       </div>
-      <div className="form-buttons">
-        <button type="button" className="cancel-button">Cancelar</button>
-        <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
-      </div>
+      <p className="gallery-info">
+        <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do local
+      </p>
     </div>
-  )}
+    <div className="uploaded-images">
+      {galeria.map((file, index) => (
+        <div key={index} className="image-preview">
+          <img src={file.preview} alt={`preview ${index}`} />
+        </div>
+      ))}
+    </div>
+    <div className="form-buttons">
+      <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
+      <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+    </div>
+  </div>
+)}
 
-    {activeTab === 'horario' && (
-      <div>
-        <h2>Horário do local</h2>
-        {['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'].map((dia, index) => (
-          <div key={index} className="form-group_horario">
-            <label>{dia}</label>
-            <input type="text" placeholder="hora" />
-          </div>
-        ))}
-        <div className="form-buttons">
-          <button type="button" className="cancel-button">Cancelar</button>
-          <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
-        </div>
-      </div>
-    )}
-    {activeTab === 'localizacao' && (
-      <div className="tab-content_localizacao">
-        <h2>Localização do local</h2>
-        <div className="localizacao-content">
-          <div className="form-group">
-            <label>Endereço do local:</label>
-            <input
-              type="text"
-              placeholder="inserir local"
-              value={address}
-              onChange={handleAddressChange}
-              onKeyDown={handleAddressSubmit}
-            />
-          </div>
-          <div className="map-placeholder">
-            <LoadScript googleMapsApiKey={API_KEY}>
-              <GoogleMap
-                mapContainerStyle={containerStyle}
-                center={mapCenter}
-                zoom={10}
-              >
-                <Marker position={mapCenter} />
-              </GoogleMap>
-            </LoadScript>
-          </div>
-        </div>
-        <div className="form-buttons">
-          <button type="button" className="cancel-button">Cancelar</button>
-          <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
-        </div>
-      </div>
-    )}
 
-    {activeTab === 'comentarios' && (
-      <div className="tab-content_comentarios">
-        <div className="search-container_comentarios">
-        <div className="search-wrapper_comentarios">
+
+{activeTab === 'horario' && (
+  <div>
+    <h2>Horário do local</h2>
+    {['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'].map((dia) => (
+      <div key={dia} className="form-group_horario">
+        <label>{dia}</label>
+        <div className="horario-inputs">
           <input
             type="text"
-            placeholder="Procurar por Comentário..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="search-input"
+            placeholder="Início HH:mm"
+            value={horario[dia].inicio}
+            onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], inicio: e.target.value } })}
           />
-          <i className="fas fa-search search-icon"></i>
-        </div>
-        </div>
-        <div className="no-comments">
-          <i className="fas fa-comment-slash no-comments-icon"></i>
-          <p>Ainda sem comentários</p>
-        </div>
-        <div className="form-buttons">
-          <button type="button" className="cancel-button">Cancelar</button>
-          <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+          <input
+            type="text"
+            placeholder="Fim HH:mm"
+            value={horario[dia].fim}
+            onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], fim: e.target.value } })}
+          />
         </div>
       </div>
-    )}
-
-  {activeTab === 'mais_informacoes' && (
-    <div className="tab-content_mais_informacoes">
-      <form>
-        <div className="form-group">
-          <label>Pagina Web</label>
-          <input type="text" placeholder="inserir site" />
-        </div>
-        <div className="form-group">
-          <label>Telemovel/telefone</label>
-          <input type="text" placeholder="inserir contacto telefónico" />
-        </div>
-        <div className="form-group">
-          <label>Email oficial</label>
-          <input type="text" placeholder="...inserir email..." />
-        </div>
-        <div className="form-buttons">
-          <button type="button" className="cancel-button">Cancelar</button>
-          <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
-        </div>
-      </form>
+    ))}
+    <div className="form-buttons">
+      <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
+      <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
     </div>
-  )}
+  </div>
+)}
+
+        {activeTab === 'localizacao' && (
+          <div className="tab-content_localizacao">
+            <h2>Localização do local</h2>
+            <div className="localizacao-content">
+              <div className="form-group">
+                <label>Endereço do local:</label>
+                <input
+                  type="text"
+                  placeholder="inserir local"
+                  value={localizacao}
+                  onChange={(e) => setLocalizacao(e.target.value)}
+                />
+              </div>
+              <div className="map-placeholder">
+                <LoadScript googleMapsApiKey={API_KEY}>
+                  <GoogleMap
+                    mapContainerStyle={containerStyle}
+                    center={center}
+                    zoom={10}
+                  >
+                    <Marker position={center} />
+                  </GoogleMap>
+                </LoadScript>
+              </div>
+            </div>
+            <div className="form-buttons">
+              <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
+              <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+            </div>
+          </div>
+        )}
+
+{activeTab === 'comentarios' && (
+              <div className="tab-content_comentarios">
+                <div className="no-comments">
+                  <i className="fas fa-comment-slash no-comments-icon"></i>
+                  <p>Ainda sem comentários</p>
+                </div>
+                <div className="form-buttons">
+                  <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
+                  <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+                </div>
+              </div>
+            )}
+
+
+        {activeTab === 'mais_informacoes' && (
+          <div className="tab-content_mais_informacoes">
+            <form>
+              <div className="form-group">
+                <label>Pagina Web</label>
+                <input
+                  type="text"
+                  placeholder="inserir site"
+                  value={paginaweb}
+                  onChange={(e) => setPaginaweb(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label>Contacto</label>
+                <input
+                  type="text"
+                  placeholder="inserir contacto telefónico"
+                  value={telemovel}
+                  onChange={(e) => setTelemovel(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label>Email oficial</label>
+                <input
+                  type="text"
+                  placeholder="...inserir email..."
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="form-buttons">
+                <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
+                <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+              </div>
+            </form>
+          </div>
+        )}
   
 
   </div>
@@ -798,25 +988,49 @@ const handleToggleVisibility = async (publicacao) => {
         </>
       )}
       {/* Seção de Comentários */}
-      <button className="tab active"><i className="fas fa-comments tab-icon"></i> Comentários</button>
-      <div className="comentarios-section">
-        <div className="comentarios-list">
-          {comentarios.map((comentario) => (
-            <div key={comentario.id} className="comentario">
-              <p><strong>Autor: </strong>{comentario.autor}</p>
-              <p>{comentario.conteudo}</p>
-            </div>
-          ))}
+      
+<button className="tab active"><i className="fas fa-comments tab-icon"></i> Comentários</button>
+<div className="comentarios-section">
+  <div className="comentarios-list">
+    {comentariosExibidos.map((comentario) => (
+      <div key={comentario.id} className="comentario">
+        <div className="comentario-header">
+          <img src={comentario.avatar} alt={comentario.autor} className="comentario-avatar" />
+          <div className="comentario-info">
+            <span className="comentario-autor">{comentario.autor}</span>
+            <span className="comentario-data">{comentario.data}</span>
+          </div>
         </div>
-        {/* <div className="add-comentario">
-          <textarea
-            placeholder="Adicionar um comentário..."
-            value={novoComentario}
-            onChange={(e) => setNovoComentario(e.target.value)}
-          />
-          <button onClick={handleAddComentario}>Enviar</button>
-        </div> */}
+        <div className="comentario-conteudo">
+          <p>{comentario.conteudo}</p>
+        </div>
       </div>
+    ))}
+  </div>
+  
+  <button className="btn-comentarios margin-bottom" onClick={() => setShowAllComentarios(!showAllComentarios)}>
+  {showAllComentarios ? 'Esconder Comentários' : 'Mostrar todos os Comentários'}
+</button>
+
+
+<div className="add-comentario">
+  <textarea
+    className="comment-textarea"
+    placeholder="Adicionar um comentário..."
+    value={novoComentario}
+    onChange={(e) => setNovoComentario(e.target.value)}
+  />
+</div>
+<div className="comment-button-container">
+  <button className="btn-comentar" onClick={handleAddComentario}>Comentar</button>
+</div>
+
+
+
+
+</div>
+
+
     </div>
   </div>
 )}
@@ -1149,136 +1363,197 @@ const handleToggleVisibility = async (publicacao) => {
             </button>
           </div>
           <div className="tab-content">
-            {activeTab === 'descricao' && (
-              <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label>Área do Local</label>
-                    <input type="text" value="Desporto" readOnly />
-                  </div>
-                <div className="form-group">
-                  <label>Tópico do Local</label>
-                  <select value={topico} onChange={(e) => setTopico(e.target.value)}>
-                    <option value="">selecionar tópico</option>
-                    <option value="futebol">Futebol</option>
-                    <option value="basquete">Basquete</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Nome do local</label>
-                  <input type="text" placeholder="inserir nome do local" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
-                </div>
-                <div className="form-group">
-                  <label>Descrição do local</label>
-                  <textarea placeholder="inserir uma breve descrição do local"></textarea>
-                </div>
-                <div className="form-buttons">
-                  <button type="button" className="cancel-button">Cancelar</button>
-                  <button type="submit" className="submit-button">Continuar</button>
-                </div>
-              </form>
-            )}
-            {activeTab === 'galeria' && (
-            <div className="tab-content_galeria">
-              <h2>Galeria do local</h2>
-              <div className="gallery-upload">
-                <div className="upload-box">
-                  <span className="upload-icon">+</span>
-                  <span className="upload-text">Upload</span>
-                </div>
-                <p className="gallery-info">
-                  <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do local
-                </p>
+                  {activeTab === 'descricao' && (
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+                <label>Área do Local</label>
+                <input type="text" value="Desporto" readOnly />
               </div>
-              <div className="form-buttons">
-                <button type="button" className="cancel-button">Cancelar</button>
-                <button type="submit" className="submit-button">Continuar</button>
+              <div className="form-group">
+            <label>Tópico do Local</label>
+              <select value={topico} onChange={(e) => setTopico(e.target.value)}>
+                <option value="">selecionar tópico</option>
+                {topicos.map((topico) => (
+                  <option key={topico.id} value={topico.id}>{topico.nome}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Nome do local</label>
+              <input type="text" placeholder="inserir nome do local" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label>Descrição do local</label>
+              <input type="text" placeholder="inserir uma breve descrição do local" value={descricao} onChange={(e) => setDescricao(e.target.value)}/>
+            </div>
+            <div className="form-buttons">
+              <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
+              <button type="submit" className="submit-button" onClick={handleContinue} >Continuar</button>
+            </div>
+          </form>
+        )}
+
+{activeTab === 'galeria' && (
+  <div className="tab-content_galeria">
+    <h2>Galeria do local</h2>
+    <div {...getRootProps({ className: 'dropzone' })} className="gallery-upload">
+      <input {...getInputProps()} />
+      <div className="upload-box">
+        <span className="upload-icon">+</span>
+        <span className="upload-text">Upload</span>
+      </div>
+      <p className="gallery-info">
+        <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do local
+      </p>
+    </div>
+    <div className="uploaded-images">
+      {galeria.map((file, index) => (
+        <div key={index} className="image-preview">
+          <img src={file.preview} alt={`preview ${index}`} />
+        </div>
+      ))}
+    </div>
+    <div className="form-buttons">
+      <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
+      <button type="button" className="submit-button" onClick={handleContinue}>Continuar</button>
+    </div>
+  </div>
+)}
+
+
+
+{activeTab === 'horario' && (
+  <div>
+    <h2>Horário do local</h2>
+    {Object.keys(horario).map((dia) => (
+      <div key={dia} className="form-group_horario">
+        <label>{dia}</label>
+        <div className="horario-inputs">
+          <input
+            type="text"
+            placeholder="Início HH:mm"
+            value={horario[dia].inicio}
+            disabled={horario[dia].fechado}
+            onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], inicio: e.target.value } })}
+          />
+          <input
+            type="text"
+            placeholder="Fim HH:mm"
+            value={horario[dia].fim}
+            disabled={horario[dia].fechado}
+            onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], fim: e.target.value } })}
+          />
+          <label>
+            <input
+              type="checkbox"
+              checked={horario[dia].fechado}
+              onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], fechado: e.target.checked, inicio: '', fim: '' } })}
+            />
+          </label>
+        </div>
+      </div>
+    ))}
+    <div className="form-buttons">
+      <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
+      <button type="submit" className="submit-button" onClick={handleContinue}>Continuar</button>
+    </div>
+  </div>
+)}
+
+        {activeTab === 'localizacao' && (
+          <div className="tab-content_localizacao">
+            <h2>Localização do local</h2>
+            <div className="localizacao-content">
+              <div className="form-group">
+                <label>Endereço do local:</label>
+                <input
+                  type="text"
+                  placeholder="inserir local"
+                  value={localizacao}
+                  onChange={(e) => setLocalizacao(e.target.value)}
+                />
+              </div>
+              <div className="map-placeholder">
+                <LoadScript googleMapsApiKey={API_KEY}>
+                  <GoogleMap
+                    mapContainerStyle={containerStyle}
+                    center={center}
+                    zoom={10}
+                  >
+                    <Marker position={center} />
+                  </GoogleMap>
+                </LoadScript>
               </div>
             </div>
-          )}
+            <div className="form-buttons">
+              <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
+              <button type="submit" className="submit-button" onClick={handleContinue} >Continuar</button>
+            </div>
+          </div>
+        )}
 
-            {activeTab === 'horario' && (
-              <div>
-                <h2>Horário do local</h2>
-                {['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'].map((dia, index) => (
-                  <div key={index} className="form-group_horario">
-                    <label>{dia}</label>
-                    <input type="text" placeholder="hora" />
-                  </div>
-                ))}
-                <div className="form-buttons">
-                  <button type="button" className="cancel-button">Cancelar</button>
-                  <button type="submit" className="submit-button">Continuar</button>
-                </div>
-              </div>
-            )}
-            {activeTab === 'localizacao' && (
-              <div className="tab-content_localizacao">
-                <h2>Localização do local</h2>
-                <div className="localizacao-content">
-                  <div className="form-group">
-                    <label>Endereço do local:</label>
-                    <input type="text" placeholder="inserir local" />
-                  </div>
-                  <div className="map-placeholder">
-                    <LoadScript googleMapsApiKey={API_KEY}>
-                      <GoogleMap
-                        mapContainerStyle={containerStyle}
-                        center={center}
-                        zoom={10}
-                      >
-                        <Marker position={center} />
-                      </GoogleMap>
-                    </LoadScript>
-                  </div>
-                </div>
-                <div className="form-buttons">
-                  <button type="button" className="cancel-button">Cancelar</button>
-                  <button type="submit" className="submit-button">Continuar</button>
-                </div>
-              </div>
-            )}
-            {activeTab === 'comentarios' && (
+{activeTab === 'comentarios' && (
               <div className="tab-content_comentarios">
                 <div className="no-comments">
                   <i className="fas fa-comment-slash no-comments-icon"></i>
                   <p>Ainda sem comentários</p>
                 </div>
                 <div className="form-buttons">
-                  <button type="button" className="cancel-button">Cancelar</button>
-                  <button type="submit" className="submit-button">Continuar</button>
+                  <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
+                  <button type="submit" className="submit-button" onClick={handleContinue} >Continuar</button>
                 </div>
               </div>
             )}
 
-          {activeTab === 'mais_informacoes' && (
-            <div className="tab-content_mais_informacoes">
-              <form>
-                <div className="form-group">
-                  <label>Pagina Web</label>
-                  <input type="text" placeholder="inserir site" />
-                </div>
-                <div className="form-group">
-                  <label>Telemovel/telefone</label>
-                  <input type="text" placeholder="inserir contacto telefónico" />
-                </div>
-                <div className="form-group">
-                  <label>Email oficial</label>
-                  <input type="text" placeholder="...inserir email..." />
-                </div>
-                <div className="form-buttons">
-                  <button type="button" className="cancel-button">Cancelar</button>
-                  <button type="submit" className="submit-button_maisinfos" onClick={() => setShowSuccessMessage(true)}>Publicar</button>
-                </div>
-              </form>
-            </div>
-          )}
-          {showSuccessMessage ? (
-            <div className="success-message">
+
+        {activeTab === 'mais_informacoes' && (
+          <div className="tab-content_mais_informacoes">
+            <form>
+              <div className="form-group">
+                <label>Pagina Web</label>
+                <input
+                  type="text"
+                  placeholder="inserir site"
+                  value={paginaweb}
+                  onChange={(e) => setPaginaweb(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label>Contacto</label>
+                <input
+                  type="text"
+                  placeholder="inserir contacto telefónico"
+                  value={telemovel}
+                  onChange={(e) => setTelemovel(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label>Email oficial</label>
+                <input
+                  type="text"
+                  placeholder="...inserir email..."
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="form-buttons">
+                <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
+                <button type="button" className="submit-button_maisinfos" onClick={handleSubmit}>Publicar</button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {showSuccessMessage && <div className="modal-backdrop"></div>}
+          {showSuccessMessage && (
+            <div className="success-message_delete">
+              <div className="success-message-icon"></div>
               <h1>Publicação criada com sucesso!</h1>
-              <p>Como você é o administrador do seu centro, não será necessário passar pelo processo de validação.</p>
+              <p>Como é o administrador do seu centro, não será necessário passar pelo processo de validação.</p>
               <button onClick={() => setShowSuccessMessage(false)}>Continuar</button>
             </div>
-          ) : null}
+          )}
 
           </div>
         </div>
