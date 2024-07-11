@@ -652,29 +652,7 @@ useEffect(() => {
   }
 }, []);
 
-useEffect(() => {
-  const Media = async () => {
-    try {
-      const response = await axios.get(`http://localhost:3000/avaliacao/media/${publicacaoId}`);
-      setMedia(response.data.media);
-      setTotal(response.data.total);
-    } catch (error) {
-      console.error('Erro ao buscar média de avaliações:', error);
-    }
-  };
 
-  Media();
-}, [publicacaoId]);
-
-const handleAvaliacao = async (estrelas) => {
-  try {
-    const userId = sessionStorage.getItem('user_id');
-    await axios.post('http://localhost:3000/avaliacao/create', { publicacao_id: publicacaoId, user_id: userId, estrelas });
-    Media(); // Atualiza a média após a avaliação
-  } catch (error) {
-    console.error('Erro ao criar avaliação:', error);
-  }
-};
 
   return (
     <div className="publicacoes-div_princ"> 
