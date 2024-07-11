@@ -70,7 +70,6 @@ const PublicacoesView = () => {
 });
   
 
-  
   const [localizacao, setLocalizacao] = useState('');
   const navigate = useNavigate();
   const [imageSrc, setImageSrc] = useState(null); // Estado para imagem escolhida
@@ -86,6 +85,14 @@ const PublicacoesView = () => {
   // Form states
   const [titulo, setTitulo] = useState('');
   const [topico, setTopico] = useState('');
+  const autor_id = sessionStorage.getItem('user_id');
+
+  const [userId, setUserId] = useState(null);
+  const [user, setUser] = useState({ nome: '', sobrenome: '', caminho_foto: ''  });
+  
+  const [estrelas, setEstrelas] = useState(0);
+  const [media, setMedia] = useState(0);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     const storedCentroId = sessionStorage.getItem('centro_id');
@@ -234,9 +241,10 @@ const PublicacoesView = () => {
         telemovel,
         email,
         galeria: galeria.map((img) => img.url), // Envia apenas as URLs das imagens
-        centro_id: centroId, // Inclui o centro_id recuperado
+        centro_id: centroId,
+        autor_id: sessionStorage.getItem('user_id') 
     };
-
+    
     console.log('Dados da Publicação:', publicacaoData); // Log dos dados que serão enviados
 
     try {
@@ -508,35 +516,45 @@ const handleReportedClick = (publicacao) => {
 
 useEffect(() => {
   const Comentarios = async () => {
-    if (selectedPublication) {
-      try {
-        const response = await axios.get(`http://localhost:3000/comentarios/listarComentarios/${selectedPublication.id}`);
-        setComentarios(response.data);
-      } catch (error) {
-        console.error('Erro ao buscar comentários:', error);
-      }
+    try {
+      const response = await axios.get(`http://localhost:3000/comentarios/publicacao/${selectedPublication.id}`);
+      console.log(response.data);
+      setComentarios(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar comentários:', error);
     }
   };
 
-  Comentarios();
+  if (selectedPublication) {
+    Comentarios();
+  }
 }, [selectedPublication]);
 
 const handleAddComentario = async () => {
-  if (!novoComentario.trim()) {
-    return;
-  }
+  const autor_id = sessionStorage.getItem('user_id'); // Obtendo o user_id do sessionStorage
+  const comentarioData = {
+    publicacao_id: selectedPublication.id,
+    conteudo: novoComentario,
+    autor_id
+  };
+
   try {
-    const response = await axios.post(`http://localhost:3000/comentarios/add`, {
-      publicacao_id: selectedPublication.id,
-      autor: 'Autor do Comentário', // Substitua pelo nome do autor do comentário
-      conteudo: novoComentario
+    const response = await axios.post('http://localhost:3000/comentarios/create', comentarioData, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
-    setComentarios([...comentarios, response.data]);
-    setNovoComentario('');
+
+    if (response.status === 201) {
+      // Lógica de sucesso
+    } else {
+      console.error('Erro na resposta do Backend:', response);
+    }
   } catch (error) {
-    console.error('Erro ao adicionar comentário:', error);
+    console.error('Erro ao criar comentário:', error);
   }
 };
+
 
 const handleToggleVisibility = async (publicacao) => {
   try {
@@ -613,6 +631,50 @@ useEffect(() => {
 
   Topicos();
 }, [areaId]);
+
+const fetchUser = async (id) => {
+  try {
+    const response = await axios.get(`http://localhost:3000/users/user/${id}`);
+    console.log("Resposta da API:", response.data); // Adicione este log
+    setUser(response.data);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+  }
+};
+
+
+useEffect(() => {
+  const id = sessionStorage.getItem('user_id'); // ou de onde quer que você esteja obtendo o ID do usuário
+  console.log("ID do usuário logado:", id);
+  if (id) {
+    setUserId(id);
+    fetchUser(id);
+  }
+}, []);
+
+useEffect(() => {
+  const Media = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/avaliacao/media/${publicacaoId}`);
+      setMedia(response.data.media);
+      setTotal(response.data.total);
+    } catch (error) {
+      console.error('Erro ao buscar média de avaliações:', error);
+    }
+  };
+
+  Media();
+}, [publicacaoId]);
+
+const handleAvaliacao = async (estrelas) => {
+  try {
+    const userId = sessionStorage.getItem('user_id');
+    await axios.post('http://localhost:3000/avaliacao/create', { publicacao_id: publicacaoId, user_id: userId, estrelas });
+    Media(); // Atualiza a média após a avaliação
+  } catch (error) {
+    console.error('Erro ao criar avaliação:', error);
+  }
+};
 
   return (
     <div className="publicacoes-div_princ"> 
@@ -909,9 +971,11 @@ useEffect(() => {
       <h1 className="header-title">{selectedPublication.titulo}</h1>
       <div className="author">
         <div className="authorName"><span>Autor :</span></div>
-        <img src="https://i.ibb.co/7G5m74B/author.png" alt="Autor" className="author-icon" />
-        <span>{selectedPublication.autor}</span>
+        <img src={selectedPublication.autor.caminho_foto} alt={selectedPublication.autor.nome} className="author-icon" />
+        <span>{selectedPublication.autor.nome} {selectedPublication.autor.sobrenome}</span>
+    
       </div>
+
     </div>
     <div className="tab-content2">
       {selectedPublication.galeria && selectedPublication.galeria.length > 0 && (
@@ -991,19 +1055,25 @@ useEffect(() => {
       
 <button className="tab active"><i className="fas fa-comments tab-icon"></i> Comentários</button>
 <div className="comentarios-section">
-  <div className="comentarios-list">
-    {comentariosExibidos.map((comentario) => (
-      <div key={comentario.id} className="comentario">
-        <div className="comentario-header">
-          <img src={comentario.avatar} alt={comentario.autor} className="comentario-avatar" />
-          <div className="comentario-info">
-            <span className="comentario-autor">{comentario.autor}</span>
-            <span className="comentario-data">{comentario.data}</span>
-          </div>
+<div className="comentarios-list">
+  {comentariosExibidos.map((comentario) => (
+    <div key={comentario.id} className="comentario">
+      <div className="comentario-header">
+      {comentario.autor && comentario.autor.caminho_foto && (
+          <img src={comentario.autor.caminho_foto} alt={`${comentario.autor.nome} ${comentario.autor.sobrenome}`} className="comentario-avatar" />
+        )}
+        <div className="comentario-info">
+        {comentario.autor && (
+            <>
+              <span className="comentario-autor">{comentario.autor.nome} {comentario.autor.sobrenome}</span>
+              <span className="comentario-data">{new Date(comentario.createdat).toLocaleDateString()}</span>
+            </>
+          )}
         </div>
-        <div className="comentario-conteudo">
-          <p>{comentario.conteudo}</p>
-        </div>
+      </div>
+      <div className="comentario-conteudo">
+        <p>{comentario.conteudo}</p>
+      </div>
       </div>
     ))}
   </div>
@@ -1319,10 +1389,10 @@ useEffect(() => {
           <div className="header">
             <h1 className="header-title">Nome do local</h1>
             <div className="author">
-            <div className= "authorName"><span>Autor :</span></div>
-              <img src="https://i.ibb.co/7G5m74B/author.png" alt="Eu" className="author-icon" />
-              <span>Eu</span>
-            </div>
+            <div className="authorName"><span>Autor :</span></div>
+            <img src={user.caminho_foto} alt="Eu" className="author-icon" />
+    <span>{user.nome} {user.sobrenome}</span> 
+  </div>
           </div>
           <div className="tabs">
             <button

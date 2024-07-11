@@ -19,6 +19,8 @@ const Login = ({ onLogin }) => {
 
       if (response.ok) {
         sessionStorage.setItem('centro_id', data.centro_id);
+        sessionStorage.setItem('user_id', data.user_id);
+        console.log('User ID salvo no sessionStorage:', data.user_id); // Adicione este log
         onLogin();
       } else {
         alert(data.error || 'Credenciais inválidas!');
