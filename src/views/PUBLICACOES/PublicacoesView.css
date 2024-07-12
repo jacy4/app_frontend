@@ -1369,3 +1369,55 @@
   display: flex;
   justify-content: flex-end; /* Alinha o botão à direita */
 }
+
+
+.stars {
+  display: flex;
+  align-items: center;
+}
+
+.stars i {
+  font-size: 1.5rem;
+  color: #FFD700; /* Cor dourada */
+}
+
+.rating-container {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+}
+
+.rating-value {
+  font-size: 2rem;
+  margin-right: 0.5rem;
+}
+
+.rating-count {
+  margin-left: 0.5rem;
+}
+
+select {
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+}
+
+button {
+  font-size: 1.2rem;
+  padding: 0.5rem 1rem;
+}
+
+.estrelasubmit-button {
+  border: 2px solid #ffffff; /* Amarelo torrado */
+  border-radius: 20px;
+  background-color: white;
+  color: #000000; /* Amarelo torrado */
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.estrelasubmit-button:hover {
+  background-color: #FFA500; /* Amarelo torrado */
+  color: white;
+}

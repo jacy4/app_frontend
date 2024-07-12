@@ -91,8 +91,7 @@ const PublicacoesView = () => {
   const [user, setUser] = useState({ nome: '', sobrenome: '', caminho_foto: ''  });
   
   const [estrelas, setEstrelas] = useState(0);
-  const [media, setMedia] = useState(0);
-  const [total, setTotal] = useState(0);
+  const [mediaAvaliacoes, setMediaAvaliacoes] = useState(null);
 
   useEffect(() => {
     const storedCentroId = sessionStorage.getItem('centro_id');
@@ -654,6 +653,43 @@ useEffect(() => {
 
 
 
+const handleAvaliacaoChange = (e) => {
+  setEstrelas(e.target.value);
+};
+
+const handleAvaliacaoSubmit = async (e) => {
+  e.preventDefault();
+  const userId = sessionStorage.getItem('user_id');
+  const publicacaoId = selectedPublication.id;
+
+  try {
+    const response = await axios.post('http://localhost:3000/avaliacao/create', {
+      publicacao_id: publicacaoId,
+      autor_id: userId,
+      estrelas: estrelas
+    });
+    console.log('Avaliação criada:', response.data);
+    // Atualizar a UI ou fazer outras ações necessárias após criar a avaliação
+  } catch (error) {
+    console.error('Erro ao criar avaliação:', error);
+  }
+};
+
+const MediaAvaliacoes = async () => {
+  try {
+    const response = await axios.get(`http://localhost:3000/avaliacao/average/${selectedPublication.id}`);
+    setMediaAvaliacoes(response.data);
+  } catch (error) {
+    console.error('Erro ao buscar média de avaliações:', error);
+  }
+};
+
+useEffect(() => {
+  if (selectedPublication) {
+    MediaAvaliacoes();
+  }
+}, [selectedPublication]);
+
   return (
     <div className="publicacoes-div_princ"> 
       {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de Publicações deste Centro</h1>}
@@ -974,6 +1010,34 @@ useEffect(() => {
           </div>
         </>
       )}
+      {mediaAvaliacoes && (
+  <div className="rating-container">
+    <span className="rating-value">{mediaAvaliacoes.media}</span>
+    <div className="stars">
+      {Array.from({ length: 5 }, (_, index) => (
+        <i
+          key={index}
+          className={`fas fa-star${index < Math.round(mediaAvaliacoes.media) ? '' : '-o'}`}
+        />
+      ))}
+    </div>
+    <span className="rating-count">com base em {mediaAvaliacoes.total} avaliações</span>
+  </div>
+)}
+
+<form onSubmit={handleAvaliacaoSubmit}>
+        <label>
+          <select value={estrelas} onChange={handleAvaliacaoChange}>
+            <option value="1">★ </option>
+            <option value="2">★★ </option>
+            <option value="3">★★★ </option>
+            <option value="4">★★★★ </option>
+            <option value="5">★★★★★ </option>
+          </select>
+        </label>
+        <button type="submit" className="estrelasubmit-button">Enviar Avaliação</button>
+      </form>
+
       {selectedPublication.horario && (
         <>
           <button className="tab active"><i className="fas fa-clock tab-icon"></i> Horário do Local</button>
@@ -1075,7 +1139,6 @@ useEffect(() => {
 
 
 
-
 </div>
 
 
@@ -1095,8 +1158,9 @@ useEffect(() => {
       <h1 className="header-title">Nome: {publicationDetail.titulo}</h1>
       <div className="author">
         <div className="authorName"><span>Autor :</span></div>
-        <img src="https://i.ibb.co/7G5m74B/author.png" alt="Autor" className="author-icon" />
-        <span>{publicationDetail.autor}</span>
+        <img src={publicationDetail.autor.caminho_foto} alt={publicationDetail.autor.nome} className="author-icon" />
+        <span>{publicationDetail.autor.nome} {publicationDetail.autor.sobrenome}</span>
+    
       </div>
     </div>
     <div className="tab-content2">
@@ -1188,8 +1252,8 @@ useEffect(() => {
       <h1 className="header-title">{publicationDetailDenunciada.titulo}</h1>
       <div className="author">
         <div className="authorName"><span>Autor :</span></div>
-        <img src="https://i.ibb.co/7G5m74B/author.png" alt="Eu" className="author-icon" />
-        <span>{publicationDetailDenunciada.autor}</span>
+        <img src={publicationDetailDenunciada.autor.caminho_foto} alt={publicationDetailDenunciada.autor.nome} className="author-icon" />
+        <span>{publicationDetailDenunciada.autor.nome} {publicationDetailDenunciada.autor.sobrenome}</span>
       </div>
     </div>
     <div className="tab-content2">
