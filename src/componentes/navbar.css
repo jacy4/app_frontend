@@ -38,13 +38,13 @@ body {
 .navbar-admin-panel-container {
   display: flex !important;
   align-items: center !important;
-  margin-left: 200px !important; /* Adicionado para ajustar a distância */
+  margin-left: 200px !important;
 }
 
 .navbar-admin-panel {
   font-size: 14px !important;
   color: #888 !important;
-  margin-right: 10px !important; /* Adicionado para espaçamento entre "PAINEL DE ADMINISTRAÇÃO" e "VISEU" */
+  margin-right: 10px !important;
 }
 
 .navbar-location {
@@ -123,24 +123,18 @@ body {
 }
 
 .sidebar {
-  height: calc(100% - 60px);
-  width: 250px;
-  position: fixed;
-  top: 60px;
-  left: -250px; /* Escondido inicialmente */
-  background-color: #ffffff;
-  overflow-x: hidden;
-  padding-top: 5px;
-  z-index: 999;
-  display: flex;
-  flex-direction: column;
-  transition: left 0.3s ease; /* Animação suave para mostrar e esconder */
+  height: calc(100% - 60px) !important;
+  width: 250px !important;
+  position: fixed !important;
+  top: 60px !important;
+  left: 0 !important;
+  background-color: #ffffff !important;
+  overflow-x: hidden !important;
+  padding-top: 0px !important;
+  z-index: 999 !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
-
-.sidebar.open {
-  left: 0; /* Mostrar a sidebar quando 'open' é verdadeiro */
-}
-
 
 .sidebar-menu {
   list-style-type: none !important;
@@ -148,7 +142,7 @@ body {
 }
 
 .sidebar-menu li {
-  padding: 10px 20px !important;
+  padding: 6px 20px !important;
 }
 
 .sidebar-menu a {
@@ -156,7 +150,7 @@ body {
   text-decoration: none !important;
   display: block !important;
   font-weight: 600 !important;
-  padding: 15px 20px !important; /* Aumenta o padding para aumentar a altura */
+  padding: 5px 20px !important;
   border-radius: 5px !important;
 }
 
@@ -176,7 +170,7 @@ body {
 }
 
 .sub-menu li {
-  padding: 5px 0 !important;
+  padding: 2px 0 !important; /* Ajusta o espaçamento entre os itens do submenu */
 }
 
 .main-content {
@@ -187,27 +181,22 @@ body {
 
 .bottom-menu {
   margin-top: auto !important;
-  padding-bottom: 20px !important;
+  padding-bottom: 0px !important; /* Ajusta o espaçamento do menu inferior */
 }
 
 @media screen and (max-width: 768px) {
   .navbar-menu {
-    display: none;
+    display: none !important;
   }
 
   .sidebar {
-    width: 100%;
-    height: calc(100% - 60px);
-    top: 60px;
-    left: -100%; /* Escondido inicialmente em telas menores */
-  }
-
-  .sidebar.open {
-    left: 0; /* Mostrar a sidebar quando 'open' é verdadeiro em telas menores */
+    width: 100% !important;
+    height: calc(100% - 60px) !important;
+    top: 60px !important;
   }
 
   .main-content {
-    margin-left: 0;
-    padding-top: 100px;
+    margin-left: 0 !important;
+    padding-top: 100px !important;
   }
 }
