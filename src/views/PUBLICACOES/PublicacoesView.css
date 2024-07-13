@@ -356,7 +356,7 @@
 }
 
 .tab-content_comentarios {
-  text-align: center;
+  text-align: left;
   padding: 20px;
 }
 
@@ -1246,11 +1246,32 @@
   margin-top: 20px;
 }
 
+
 .image-preview {
-  margin-right: 10px;
-  margin-bottom: 10px;
+  position: relative;
+  display: inline-block;
+  margin: 10px;
 }
 
+.remove-image {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(255, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.remove-image:hover {
+  background-color: rgba(255, 0, 0, 1);
+}
 .image-preview img {
   max-width: 100px;
   max-height: 100px;
@@ -1268,43 +1289,6 @@
 }
 .comentarios-section {
   margin-top: 20px;
-}
-
-.comentario {
-  border: 1px solid #ddd;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-}
-
-.comentario-header {
-  display: flex;
-  align-items: center;
-}
-
-.comentario-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.comentario-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.comentario-autor {
-  font-weight: bold;
-}
-
-.comentario-data {
-  font-size: 0.8em;
-  color: #999;
-}
-
-.comentario-conteudo {
-  margin-top: 10px;
 }
 
 .add-comentario {
@@ -1326,7 +1310,7 @@
   background-color: white; /* Fundo branco */
   color: green; /* Texto verde */
   border: 2px solid green; /* Borda verde */
-  padding: 10px 20px;
+  padding: 5px 20px;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
@@ -1342,7 +1326,7 @@
   background-color: white;
   color: green;
   border: 1px solid green;
-  padding: 10px 20px;
+  padding: 1px 20px;
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
@@ -1420,4 +1404,72 @@ button {
 .estrelasubmit-button:hover {
   background-color: #FFA500; /* Amarelo torrado */
   color: white;
+}
+
+.description {
+  margin-bottom: 20px; /* Espaço entre a descrição e o próximo elemento */
+}
+
+.comentarios-list {
+  margin-top: 20px;
+}
+
+.comentario {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.comentario-header {
+  display: flex;
+  align-items: center;
+}
+
+.comentario-avatar {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+.comentario-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.comentario-autor {
+  font-weight: bold;
+}
+
+.comentario-data {
+  font-size: 0.9em;
+  color: #777;
+}
+
+.comentario-conteudo {
+  margin-top: 10px;
+}
+
+.remove-comentario {
+  background: none;
+  border: 1px solid red; /* Borda vermelha */
+  color: red;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: auto;
+  border-radius: 50%; /* Borda circular */
+  width: 24px; /* Tamanho da bola */
+  height: 24px; /* Tamanho da bola */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; /* Remove padding */
+  transition: background-color 0.3s, color 0.3s; /* Transições suaves */
+}
+
+.remove-comentario:hover {
+  background-color: red; /* Fundo vermelho ao passar o mouse */
+  color: white; /* X branco ao passar o mouse */
 }

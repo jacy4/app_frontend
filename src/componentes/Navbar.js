@@ -146,13 +146,14 @@ const Navbar = () => {
                           </Link>
                         </li>
                         <li>
-                          <Link
-                            to={`/publicacoes/${area.id}`}
+                        <Link
+                            to={area.id === 1 ? "/criar_publicacao" : `/publicacoes/${area.id}`}
                             className={selectedMenu === 'Publicações' ? 'active' : ''}
                             onClick={() => handleMenuClick('Publicações', area.name)}
                           >
                             Publicações
                           </Link>
+
                         </li>
                         <li>
                           <Link

@@ -90,7 +90,7 @@ const PublicacoesView = () => {
   const [userId, setUserId] = useState(null);
   const [user, setUser] = useState({ nome: '', sobrenome: '', caminho_foto: ''  });
   
-  const [estrelas, setEstrelas] = useState(0);
+  const [estrelas, setEstrelas] = useState(1);
   const [mediaAvaliacoes, setMediaAvaliacoes] = useState(null);
 
   useEffect(() => {
@@ -690,6 +690,89 @@ useEffect(() => {
   }
 }, [selectedPublication]);
 
+useEffect(() => {
+  if (publicationToEdit) {
+    setTitulo(publicationToEdit.titulo);
+    setDescricao(publicationToEdit.descricao);
+    setTopico(publicationToEdit.topico_id);
+    setPaginaweb(publicationToEdit.paginaweb);
+    setTelemovel(publicationToEdit.telemovel);
+    setEmail(publicationToEdit.email);
+    setLocalizacao(publicationToEdit.localizacao);
+    
+    // Inicializa o estado do horário com os dados da publicação
+    if (publicationToEdit.horario) {
+      const initialHorario = Object.keys(publicationToEdit.horario).reduce((acc, dia) => {
+        const [inicio, fim] = publicationToEdit.horario[dia] === 'Fechado' ? ['', ''] : publicationToEdit.horario[dia].split('-');
+        acc[dia] = {
+          inicio: inicio || '',
+          fim: fim || '',
+          fechado: publicationToEdit.horario[dia] === 'Fechado',
+        };
+        return acc;
+      }, {});
+      setHorario(initialHorario);
+    }
+
+    // Inicializa o estado da galeria com os dados da publicação
+    if (publicationToEdit.galeria) {
+      setGaleria(publicationToEdit.galeria.map((url) => ({ url, preview: url })));
+    }
+  }
+}, [publicationToEdit]);
+
+
+const handleRemoveImage = (index) => {
+  const updatedGaleria = [...galeria];
+  updatedGaleria.splice(index, 1);
+  setGaleria(updatedGaleria);
+};
+
+const handleRemoveComentario = async (comentarioId) => {
+  try {
+    await axios.delete(`http://localhost:3000/comentarios/delete/${comentarioId}`);
+    setComentarios(comentarios.filter(comentario => comentario.id !== comentarioId));
+  } catch (error) {
+    console.error('Erro ao remover comentário:', error);
+  }
+};
+
+const handleSubmitEdit = async (e) => {
+  e.preventDefault();
+
+  const formattedHorario = {};
+  for (const [dia, { inicio, fim, fechado }] of Object.entries(horario)) {
+    formattedHorario[dia] = fechado ? 'Fechado' : `${inicio}-${fim}`;
+  }
+
+  const publicacaoData = {
+    topico_id: topico,
+    titulo,
+    descricao,
+    horario: formattedHorario,
+    localizacao,
+    paginaweb,
+    telemovel,
+    email,
+    galeria: galeria.map((img) => img.url), // Envia apenas as URLs das imagens
+    centro_id: centroId,
+    autor_id: sessionStorage.getItem('user_id')
+  };
+
+  try {
+    const response = await axios.put(`http://localhost:3000/publicacoes/update/${publicationToEdit.id}`, publicacaoData, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    console.log('Publicação atualizada:', response.data);
+  } catch (error) {
+    console.error('Erro ao atualizar publicação:', error);
+  }
+};
+
+
+
   return (
     <div className="publicacoes-div_princ"> 
       {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de Publicações deste Centro</h1>}
@@ -760,12 +843,15 @@ useEffect(() => {
   <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Editar informações do Local</h1>
   <div className="header">
   <h1 className="header-title">{selectedPublication.titulo}</h1>
-    <div className="author">
-    <div className= "authorName"><span>Autor :</span></div>
-      <img src="https://i.ibb.co/7G5m74B/author.png" alt="Eu" className="author-icon" />
-      <span>Eu</span>
+  <div className="author">
+        <div className="authorName"><span>Autor :</span></div>
+        <img src={selectedPublication.autor.caminho_foto} alt={selectedPublication.autor.nome} className="author-icon" />
+        <span>{selectedPublication.autor.nome} {selectedPublication.autor.sobrenome}</span>
+    
+      </div>
+
     </div>
-  </div>
+
   <div className="tabs">
     <button
       className={`tab ${activeTab === 'descricao' ? 'active' : ''}`}
@@ -809,11 +895,12 @@ useEffect(() => {
           <form onSubmit={handleSubmit}>
             
             <div className="form-group">
-              <label>Tópico do Local</label>
+            <label>Tópico do Local</label>
               <select value={topico} onChange={(e) => setTopico(e.target.value)}>
                 <option value="">selecionar tópico</option>
-                <option value="futebol">Futebol</option>
-                <option value="basquete">Basquete</option>
+                {topicos.map((topico) => (
+                  <option key={topico.id} value={topico.id}>{topico.nome}</option>
+                ))}
               </select>
             </div>
             <div className="form-group">
@@ -848,6 +935,7 @@ useEffect(() => {
       {galeria.map((file, index) => (
         <div key={index} className="image-preview">
           <img src={file.preview} alt={`preview ${index}`} />
+          <button className="remove-image" onClick={() => handleRemoveImage(index)}>x</button>
         </div>
       ))}
     </div>
@@ -860,10 +948,11 @@ useEffect(() => {
 
 
 
+
 {activeTab === 'horario' && (
   <div>
     <h2>Horário do local</h2>
-    {['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'].map((dia) => (
+    {Object.keys(horario).map((dia) => (
       <div key={dia} className="form-group_horario">
         <label>{dia}</label>
         <div className="horario-inputs">
@@ -871,14 +960,23 @@ useEffect(() => {
             type="text"
             placeholder="Início HH:mm"
             value={horario[dia].inicio}
+            disabled={horario[dia].fechado}
             onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], inicio: e.target.value } })}
           />
           <input
             type="text"
             placeholder="Fim HH:mm"
             value={horario[dia].fim}
+            disabled={horario[dia].fechado}
             onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], fim: e.target.value } })}
           />
+          <label>
+            <input
+              type="checkbox"
+              checked={horario[dia].fechado}
+              onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], fechado: e.target.checked, inicio: '', fim: '' } })}
+            />
+          </label>
         </div>
       </div>
     ))}
@@ -922,17 +1020,44 @@ useEffect(() => {
         )}
 
 {activeTab === 'comentarios' && (
-              <div className="tab-content_comentarios">
-                <div className="no-comments">
-                  <i className="fas fa-comment-slash no-comments-icon"></i>
-                  <p>Ainda sem comentários</p>
+  <div className="tab-content_comentarios">
+    {comentarios.length === 0 ? (
+      <div className="no-comments">
+        <i className="fas fa-comment-slash no-comments-icon"></i>
+        <p>Ainda sem comentários</p>
+      </div>
+    ) : (
+      <div className="comentarios-list">
+        {comentarios.map((comentario) => (
+          <div key={comentario.id} className="comentario">
+            <div className="comentario-header">
+              {comentario.autor && comentario.autor.caminho_foto && (
+                <img src={comentario.autor.caminho_foto} alt={`${comentario.autor.nome} ${comentario.autor.sobrenome}`} className="comentario-avatar" />
+              )}
+              <div className="comentario-info">
+                {comentario.autor && (
+                  <>
+                    <span className="comentario-autor">{comentario.autor.nome} {comentario.autor.sobrenome}</span>
+                    <span className="comentario-data">{new Date(comentario.createdat).toLocaleDateString()}</span>
+                    </>
+                    )}
+                  </div>
+                  <button className="remove-comentario" onClick={() => handleRemoveComentario(comentario.id)}>x</button>
                 </div>
-                <div className="form-buttons">
-                  <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-                  <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
-                </div>
-              </div>
-            )}
+            <div className="comentario-conteudo">
+              <p>{comentario.conteudo}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+    <div className="form-buttons">
+      <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
+      <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+    </div>
+  </div>
+)}
+
 
 
         {activeTab === 'mais_informacoes' && (
@@ -967,7 +1092,7 @@ useEffect(() => {
               </div>
               <div className="form-buttons">
                 <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-                <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+                <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
               </div>
             </form>
           </div>
@@ -1002,6 +1127,51 @@ useEffect(() => {
           </div>
         </>
       )}
+
+<button className="tab active">
+  <i className="fas fa-star tab-icon"></i> Avaliação do Local
+</button>
+<div className="description">
+  {mediaAvaliacoes ? (
+    <div className="rating-container">
+      <span className="rating-value">
+        {mediaAvaliacoes.total > 0 ? mediaAvaliacoes.media : "Sê o primeiro a avaliar este Local!"}
+      </span>
+      {mediaAvaliacoes.total > 0 && (
+        <>
+          <div className="stars">
+            {Array.from({ length: 5 }, (_, index) => (
+              <i
+                key={index}
+                className={`fas fa-star${index < Math.round(mediaAvaliacoes.media) ? '' : '-o'}`}
+              />
+            ))}
+          </div>
+          <span className="rating-count">
+              com base em {mediaAvaliacoes.total} {mediaAvaliacoes.total === 1 ? 'avaliação' : 'avaliações'}
+            </span>
+
+        </>
+      )}
+    </div>
+  ) : (
+    <span className="rating-value">Sê o primeiro a avaliar este Local!</span>
+  )}
+
+  <form onSubmit={handleAvaliacaoSubmit} className="avaliacao-form">
+    <label>
+      <select value={estrelas} onChange={handleAvaliacaoChange}>
+        <option value="1">★ </option>
+        <option value="2">★★ </option>
+        <option value="3">★★★ </option>
+        <option value="4">★★★★ </option>
+        <option value="5">★★★★★ </option>
+      </select>
+    </label>
+    <button type="submit" className="estrelasubmit-button">Enviar Avaliação</button>
+  </form>
+</div>
+
       {selectedPublication.descricao && (
         <>
           <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Local</button>
@@ -1010,33 +1180,7 @@ useEffect(() => {
           </div>
         </>
       )}
-      {mediaAvaliacoes && (
-  <div className="rating-container">
-    <span className="rating-value">{mediaAvaliacoes.media}</span>
-    <div className="stars">
-      {Array.from({ length: 5 }, (_, index) => (
-        <i
-          key={index}
-          className={`fas fa-star${index < Math.round(mediaAvaliacoes.media) ? '' : '-o'}`}
-        />
-      ))}
-    </div>
-    <span className="rating-count">com base em {mediaAvaliacoes.total} avaliações</span>
-  </div>
-)}
-
-<form onSubmit={handleAvaliacaoSubmit}>
-        <label>
-          <select value={estrelas} onChange={handleAvaliacaoChange}>
-            <option value="1">★ </option>
-            <option value="2">★★ </option>
-            <option value="3">★★★ </option>
-            <option value="4">★★★★ </option>
-            <option value="5">★★★★★ </option>
-          </select>
-        </label>
-        <button type="submit" className="estrelasubmit-button">Enviar Avaliação</button>
-      </form>
+      
 
       {selectedPublication.horario && (
         <>
@@ -1461,12 +1605,7 @@ useEffect(() => {
             >
               <i className="fas fa-map-marker-alt tab-icon"></i> Localização
             </button>
-            <button
-              className={`tab ${activeTab === 'comentarios' ? 'active' : ''}`}
-              onClick={() => handleTabClick('comentarios')}
-            >
-              <i className="fas fa-comments tab-icon"></i> Comentários
-            </button>
+            
             <button
               className={`tab ${activeTab === 'mais_informacoes' ? 'active' : ''}`}
               onClick={() => handleTabClick('mais_informacoes')}
@@ -1523,6 +1662,7 @@ useEffect(() => {
       {galeria.map((file, index) => (
         <div key={index} className="image-preview">
           <img src={file.preview} alt={`preview ${index}`} />
+          <button className="remove-image" onClick={() => handleRemoveImage(index)}>x</button>
         </div>
       ))}
     </div>
@@ -1604,19 +1744,6 @@ useEffect(() => {
             </div>
           </div>
         )}
-
-{activeTab === 'comentarios' && (
-              <div className="tab-content_comentarios">
-                <div className="no-comments">
-                  <i className="fas fa-comment-slash no-comments-icon"></i>
-                  <p>Ainda sem comentários</p>
-                </div>
-                <div className="form-buttons">
-                  <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-                  <button type="submit" className="submit-button" onClick={handleContinue} >Continuar</button>
-                </div>
-              </div>
-            )}
 
 
         {activeTab === 'mais_informacoes' && (
