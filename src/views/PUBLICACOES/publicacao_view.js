@@ -94,7 +94,7 @@ const PublicacoesView = () => {
   const [mediaAvaliacoes, setMediaAvaliacoes] = useState(null);
 
   const [comentariosParaRemover, setComentariosParaRemover] = useState([]);
-
+  
 
   useEffect(() => {
     const storedCentroId = sessionStorage.getItem('centro_id');
@@ -435,6 +435,7 @@ const handleInfoClick = (publication) => {
 
 const handleApproveClick = () => {
   setShowApproveModal(true);
+  approveLocal(publicationDetail.id); // Chame a função aqui
 };
 
 const handleConfirmApprove = () => {
@@ -446,6 +447,21 @@ const handleConfirmApprove = () => {
 
 const handleRejectClick = () => {
   setShowRejectModal(true);
+  handleRejectAndDelete();
+};
+
+const handleRejectAndDelete = async () => {
+  try {
+    const response = await axios.delete(`http://localhost:3000/publicacoes/delete/${publicationDetail.id}`);
+    if (response.status === 200) {
+      console.log('Publicação eliminada com sucesso:', response.data);
+      // Adicione qualquer lógica adicional, como redirecionamento ou atualização da UI
+    } else {
+      console.error('Erro ao eliminar publicação:', response);
+    }
+  } catch (error) {
+    console.error('Erro ao eliminar publicação:', error);
+  }
 };
 
 const handleRejectApprove = () => {
@@ -794,7 +810,26 @@ const marcarComentarioParaRemover = (comentarioId) => {
 };
 
 
-
+const approveLocal = async (publicationId) => {
+  try {
+    const response = await axios.put(`http://localhost:3000/publicacoes/update/${publicationId}`, {
+      estado: 'Ativa',
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if (response.status === 200) {
+      console.log('Publicação aprovada com sucesso');
+      // Atualize o estado local se necessário, por exemplo:
+      setSelectedPublication((prev) => ({ ...prev, estado: 'Ativo' }));
+    } else {
+      console.error('Erro ao aprovar publicação:', response);
+    }
+  } catch (error) {
+    console.error('Erro ao aprovar publicação:', error);
+  }
+};
 
   return (
     <div className="publicacoes-div_princ"> 
@@ -1160,6 +1195,8 @@ const marcarComentarioParaRemover = (comentarioId) => {
         </>
       )}
 
+{selectedPublication && selectedPublication.estado === 'Ativa' && (
+  <div>
 <button className="tab active">
   <i className="fas fa-star tab-icon"></i> Avaliação do Local
 </button>
@@ -1203,6 +1240,8 @@ const marcarComentarioParaRemover = (comentarioId) => {
     <button type="submit" className="estrelasubmit-button">Enviar Avaliação</button>
   </form>
 </div>
+</div>
+)}
 
       {selectedPublication.descricao && (
         <>
@@ -1270,7 +1309,8 @@ const marcarComentarioParaRemover = (comentarioId) => {
         </>
       )}
       {/* Seção de Comentários */}
-      
+      {selectedPublication && selectedPublication.estado === 'Ativa' && (
+  <div> 
 <button className="tab active"><i className="fas fa-comments tab-icon"></i> Comentários</button>
 <div className="comentarios-section">
 <div className="comentarios-list">
@@ -1316,7 +1356,8 @@ const marcarComentarioParaRemover = (comentarioId) => {
 
 
 </div>
-
+</div>
+)}
 
     </div>
   </div>
@@ -1329,31 +1370,98 @@ const marcarComentarioParaRemover = (comentarioId) => {
 
 {showApprovalView && publicationDetail && (
   <div className="publicacoes_div_princ">
-    <h1 className="publicacoes-title2">Aprovação do Local</h1>
-    <div className="header">
-      <h1 className="header-title">Nome: {publicationDetail.titulo}</h1>
-      <div className="author">
-        <div className="authorName"><span>Autor :</span></div>
-        <img src={publicationDetail.autor.caminho_foto} alt={publicationDetail.autor.nome} className="author-icon" />
-        <span>{publicationDetail.autor.nome} {publicationDetail.autor.sobrenome}</span>
-    
-      </div>
+  <h1 className="publicacoes-title2">Informações do Local</h1>
+  <div className="header">
+    <h1 className="header-title">{publicationDetail.titulo}</h1>
+    <div className="author">
+      <div className="authorName"><span>Autor :</span></div>
+      <img src={publicationDetail.autor.caminho_foto} alt={publicationDetail.autor.nome} className="author-icon" />
+      <span>{publicationDetail.autor.nome} {publicationDetail.autor.sobrenome}</span>
+  
     </div>
-    <div className="tab-content2">
-      <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Local</button>
-      <div className="gallery">
-        {publicationDetail.galeria && publicationDetail.galeria.length > 0 ? (
-          publicationDetail.galeria.map((image, index) => (
+
+  </div>
+  <div className="tab-content2">
+    {publicationDetail.galeria && publicationDetail.galeria.length > 0 && (
+      <>
+        <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Local</button>
+        <div className="gallery">
+          {publicationDetail.galeria.map((image, index) => (
             <img key={index} src={image} alt={`Galeria ${index}`} className="gallery-image" />
-          ))
-        ) : (
-          <p>Galeria indisponível</p>
-        )}
-      </div>
-      <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Local</button>
-      <div className="description">
-        <p>{publicationDetail.descricao}</p>
-      </div>
+          ))}
+        </div>
+      </>
+    )}
+
+
+
+    {publicationDetail.descricao && (
+      <>
+        <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Local</button>
+        <div className="description">
+          <p>{publicationDetail.descricao}</p>
+        </div>
+      </>
+    )}
+    
+
+    {publicationDetail.horario && (
+      <>
+        <button className="tab active"><i className="fas fa-clock tab-icon"></i> Horário do Local</button>
+        <div className="additional-info">
+          <div className="status">
+            <i className="fas fa-check-circle"></i> {isOpen ? 'Aberto Agora' : 'Fechado Agora'}
+          </div>
+          <div className="schedule">
+            {weekDays.map((dia) => (
+              <p key={dia}><strong>{dia}:</strong> {publicationDetail.horario[dia] || 'Fechado'}</p>
+            ))}
+          </div>
+        </div>
+      </>
+    )}
+    {publicationDetail.estado && (
+      <>
+        <button className="tab active"><i className="fas fa-tasks tab-icon"></i> Estado da Publicação</button>
+        <div className="estado">
+          <p><strong>Estado:</strong> {publicationDetail.estado}</p>
+        </div>
+      </>
+    )}
+    {publicationDetail.localizacao && (
+      <>
+        <button className="tab active"><i className="fas fa-map-marker-alt tab-icon"></i> Localização</button>
+        <div className="location">
+          <p><strong>Localização:</strong> {publicationDetail.localizacao}</p>
+        </div>
+      </>
+    )}
+    {publicationDetail.paginaweb && (
+      <>
+        <button className="tab active"><i className="fas fa-globe tab-icon"></i> Página Web</button>
+        <div className="website">
+          <p><strong>Página web:</strong> {publicationDetail.paginaweb}</p>
+        </div>
+      </>
+    )}
+    {publicationDetail.telemovel && (
+      <>
+        <button className="tab active"><i className="fas fa-phone tab-icon"></i> Telefone</button>
+        <div className="phone">
+          <p><strong>Telemóvel/Telefone: </strong>{publicationDetail.telemovel}</p>
+        </div>
+      </>
+    )}
+    {publicationDetail.email && (
+      <>
+        <button className="tab active"><i className="fas fa-envelope tab-icon"></i> Email</button>
+        <div className="email">
+          <p><strong>Email:</strong> {publicationDetail.email}</p>
+        </div>
+      </>
+    )}
+    
+
       <div className="form-buttons">
       <button className="reject-button" onClick={handleRejectClick}>
         <i className="fas fa-times"></i> Rejeitar Local

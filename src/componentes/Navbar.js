@@ -119,13 +119,13 @@ const Navbar = () => {
                     {subMenuOpen[area.name] && (
                       <ul className="sub-menu">
                         <li>
-                          <Link
-                            to={`/topicos/${area.id}`}
-                            className={selectedMenu === 'Tópicos' ? 'active' : ''}
-                            onClick={() => handleMenuClick('Tópicos', area.name)}
-                          >
-                            Tópicos
-                          </Link>
+                        <Link
+    to={area.id === 1 ? "/desporto" : `/topicos/${area.id}`}
+    className={selectedMenu === 'Tópicos' ? 'active' : ''}
+    onClick={() => handleMenuClick('Tópicos', area.name)}
+  >
+    Tópicos
+  </Link>
                         </li>
                         <li>
                           <Link
