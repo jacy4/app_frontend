@@ -93,6 +93,9 @@ const PublicacoesView = () => {
   const [estrelas, setEstrelas] = useState(1);
   const [mediaAvaliacoes, setMediaAvaliacoes] = useState(null);
 
+  const [comentariosParaRemover, setComentariosParaRemover] = useState([]);
+
+
   useEffect(() => {
     const storedCentroId = sessionStorage.getItem('centro_id');
     if (storedCentroId) {
@@ -756,7 +759,8 @@ const handleSubmitEdit = async (e) => {
     email,
     galeria: galeria.map((img) => img.url), // Envia apenas as URLs das imagens
     centro_id: centroId,
-    autor_id: sessionStorage.getItem('user_id')
+    // autor_id: sessionStorage.getItem('user_id')
+    autor_id: publicationToEdit.autor_id || sessionStorage.getItem('user_id') // Mantém o autor original se já definido
   };
 
   try {
@@ -765,11 +769,30 @@ const handleSubmitEdit = async (e) => {
         'Content-Type': 'application/json',
       },
     });
+
+    // Remover os comentários marcados
+    for (const comentarioId of comentariosParaRemover) {
+      await axios.delete(`http://localhost:3000/comentarios/delete/${comentarioId}`);
+    }
+
+    if (response.status === 201) { // Ajuste o código de status para 201 
+      setShowSuccessMessage(true); // Mostrar modal de sucesso
+    } else {
+      console.error('Erro na resposta do Backend:', response); // Log de erro caso a resposta não seja 201
+      // Lógica de erro adicional, se necessário
+    }
     console.log('Publicação atualizada:', response.data);
+    
   } catch (error) {
     console.error('Erro ao atualizar publicação:', error);
   }
 };
+
+const marcarComentarioParaRemover = (comentarioId) => {
+  setComentariosParaRemover([...comentariosParaRemover, comentarioId]);
+  setComentarios(comentarios.filter(comentario => comentario.id !== comentarioId));
+};
+
 
 
 
@@ -913,7 +936,7 @@ const handleSubmitEdit = async (e) => {
             </div>
             <div className="form-buttons">
               <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-              <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+              <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
             </div>
           </form>
         )}
@@ -941,7 +964,7 @@ const handleSubmitEdit = async (e) => {
     </div>
     <div className="form-buttons">
       <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-      <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+      <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
     </div>
   </div>
 )}
@@ -982,7 +1005,7 @@ const handleSubmitEdit = async (e) => {
     ))}
     <div className="form-buttons">
       <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-      <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+      <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
     </div>
   </div>
 )}
@@ -1014,7 +1037,7 @@ const handleSubmitEdit = async (e) => {
             </div>
             <div className="form-buttons">
               <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-              <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+              <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
             </div>
           </div>
         )}
@@ -1042,7 +1065,7 @@ const handleSubmitEdit = async (e) => {
                     </>
                     )}
                   </div>
-                  <button className="remove-comentario" onClick={() => handleRemoveComentario(comentario.id)}>x</button>
+                  <button className="remove-comentario" onClick={() => marcarComentarioParaRemover(comentario.id)}>x</button>
                 </div>
             <div className="comentario-conteudo">
               <p>{comentario.conteudo}</p>
@@ -1053,7 +1076,7 @@ const handleSubmitEdit = async (e) => {
     )}
     <div className="form-buttons">
       <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-      <button className="save-button"><i className="fas fa-save"></i>Alterações</button>
+      <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
     </div>
   </div>
 )}
@@ -1097,6 +1120,15 @@ const handleSubmitEdit = async (e) => {
             </form>
           </div>
         )}
+
+{showSuccessMessage && <div className="modal-backdrop"></div>}
+          {showSuccessMessage && (
+            <div className="success-message_delete">
+              <div className="success-message-icon"></div>
+              <h1>Publicação editada com sucesso!</h1>
+              <button onClick={() => setShowSuccessMessage(false)}>Continuar</button>
+            </div>
+          )}
   
 
   </div>
