@@ -33,7 +33,7 @@ const UsuariosView = () => {
       }
       console.log(`Buscando usuários para centroId: ${centroId}`);
       try {
-        const response = await axios.get(`http://localhost:3000/users/listarUsers/${centroId}`);
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/listarUsers/${centroId}`);
         if (response.data && Array.isArray(response.data)) {
           console.log(response.data);
           setUsuarios(response.data);
@@ -94,7 +94,7 @@ const UsuariosView = () => {
       const fileInput = document.querySelector('input[type="file"]');
       if (fileInput.files.length > 0) {
         const imageUrl = await uploadImage(fileInput.files[0]);
-        const response = await axios.post('http://localhost:3000/users/create', {
+        const response = await axios.post('https://backend-teste-q43r.onrender.com/users/create', {
           nome,
           sobrenome,
           email,

@@ -15,7 +15,7 @@ export const TopicsProvider = ({ children }) => {
     useEffect(() => {
         const fetchTopicos = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/topicos/topicosdeumaarea/1');
+                const response = await axios.get('https://backend-teste-q43r.onrender.com/topicos/topicosdeumaarea/1');
                 setTopicos(response.data);
                 setError(null); // Limpando qualquer erro anterior ao carregar os tópicos
             } catch (error) {
@@ -31,7 +31,7 @@ export const TopicsProvider = ({ children }) => {
 
     const addTopic = async (newTopic) => {
         try {
-            const response = await axios.post('http://localhost:3000/topicos/adicionar', newTopic);
+            const response = await axios.post('https://backend-teste-q43r.onrender.com/topicos/adicionar', newTopic);
             setTopicos(prevTopicos => [...prevTopicos, response.data]);
             setError(null); // Limpando qualquer erro anterior ao adicionar o tópico
         } catch (error) {
@@ -42,7 +42,7 @@ export const TopicsProvider = ({ children }) => {
 
     const updateTopic = async (updatedTopic) => {
         try {
-            const response = await axios.put(`http://localhost:3000/topicos/atualizar/${updatedTopic.id}`, updatedTopic);
+            const response = await axios.put(`https://backend-teste-q43r.onrender.com/topicos/atualizar/${updatedTopic.id}`, updatedTopic);
             setTopicos(prevTopicos =>
                 prevTopicos.map(topico =>
                     topico.id === updatedTopic.id ? response.data : topico
@@ -57,7 +57,7 @@ export const TopicsProvider = ({ children }) => {
 
     const removeTopic = async (topicId) => {
         try {
-            const response = await axios.delete(`http://localhost:3000/topicos/apagar/${topicId}`);
+            const response = await axios.delete(`https://backend-teste-q43r.onrender.com/topicos/apagar/${topicId}`);
             if (response.status === 200) {
                 setTopicos(prevTopicos =>
                     prevTopicos.filter(topico => topico.id !== topicId)

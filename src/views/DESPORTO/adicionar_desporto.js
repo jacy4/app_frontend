@@ -33,7 +33,7 @@ const AdicionarDesporto = () => {
     // Função para buscar os tópicos da API
     const fetchTopics = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/topicos'); // Endpoint para buscar os tópicos
+            const response = await axios.get('https://backend-teste-q43r.onrender.com/topicos'); // Endpoint para buscar os tópicos
             setTopicos(response.data); // Atualiza o estado dos tópicos com os dados da API
         } catch (error) {
             console.error('Erro ao buscar tópicos:', error);
@@ -54,7 +54,7 @@ const AdicionarDesporto = () => {
     
         try {
             const selectedIcon = iconOptions.find(option => option.value === topicIcon);
-            const response = await axios.post('http://localhost:3000/topicos/createTopico', {
+            const response = await axios.post('https://backend-teste-q43r.onrender.com/topicos/createTopico', {
                 nome: topicName,
                 area_id: area,
                 topico_icon: selectedIcon ? selectedIcon.icon : ''
