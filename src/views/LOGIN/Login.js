@@ -1,41 +1,46 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import './Login.css';
+import logo from './logotipo-softinsa.png'; // Ajuste o caminho conforme necessário
 
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    setLoading(true);
     try {
-      const response = await fetch('https://backend-teste-q43r.onrender.com/admin/login', {
-        method: 'POST',
+      const response = await axios.post('https://backend-teste-q43r.onrender.com/admin/login', {
+        email,
+        password,
+      }, {
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
+        }
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (response.status === 200) {
+        const data = response.data;
         sessionStorage.setItem('centro_id', data.centro_id);
         sessionStorage.setItem('user_id', data.user_id);
         console.log('User ID salvo no sessionStorage:', data.user_id); // Adicione este log
         onLogin();
       } else {
-        alert(data.error || 'Credenciais inválidas!');
+        alert(response.data.error || 'Credenciais inválidas!');
       }
     } catch (error) {
       console.error('Erro ao fazer login:', error);
       alert('Erro ao fazer login, tente novamente mais tarde');
+    } finally {
+      setLoading(false); 
     }
   };
 
   return (
     <div className="container">
       <div className="loginBox">
-        <h1 className="title">SOFTINSA</h1>
-        <p className="subtitle">AN IBM SUBSIDIARY</p>
+        <img src={logo} alt="Softinsa Logo" className="login-logo" />
         <p className="instruction">Por favor, insira os seus dados de administrador</p>
         <input
           className="input"
@@ -55,7 +60,9 @@ const Login = ({ onLogin }) => {
           <input type="checkbox" id="rememberMe" />
           <label htmlFor="rememberMe" className="checkboxLabel">Lembrar de mim</label>
         </div>
-        <button className="button" onClick={handleLogin}>Entrar</button>
+        <button className="button" onClick={handleLogin} disabled={loading}>
+          {loading ? <div className="loader"></div> : 'Entrar'}
+        </button>
         <p className="forgotPassword">Esqueceu-se da palavra-passe?</p>
       </div>
     </div>

@@ -1,0 +1,31 @@
+
+.div_princ_foruns{
+    display: flex;
+    flex-direction: column;
+    width: calc(100vh - 10vh); /* Ajustar a largura para descontar o menu lateral */
+    /*background-color: #20384b; */
+    padding: 10px;
+    box-sizing: border-box; /* Inclui padding e border no cálculo da largura e altura */
+    overflow: auto;
+    flex: 1;
+    min-height: calc(100vh - 10vh); /* Ajustar para ocupar a altura da tela menos a navbar */
+    margin-left: 250px; 
+    margin-top: 60px;
+    margin-right: 1px;
+  }
+  
+  
+  
+  .title2 {
+    color: rgb(255, 255, 255); /* Cor do texto */
+    font-size: 36px; /* Tamanho da fonte */
+    text-align: left; /* Alinha o texto à esquerda */
+    margin: 0; /* Remove margens adicionais */
+    padding: 10px 0; /* Adiciona espaçamento acima e abaixo do título */
+  }
+  
+
+  
+  
+ 
+  

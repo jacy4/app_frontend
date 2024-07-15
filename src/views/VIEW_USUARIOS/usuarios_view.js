@@ -33,7 +33,7 @@ const UsuariosView = () => {
       }
       console.log(`Buscando usuários para centroId: ${centroId}`);
       try {
-        const response = await axios.get(`https://backend-teste-q43r.onrender.com/listarUsers/${centroId}`);
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/users/listarUsers/${centroId}`);
         if (response.data && Array.isArray(response.data)) {
           console.log(response.data);
           setUsuarios(response.data);
@@ -82,7 +82,7 @@ const UsuariosView = () => {
     const formData = new FormData();
     formData.append('key', '4d755673a2dc94483064445f4d5c54e9'); // substitua pela sua chave da API imgbb
     formData.append('image', file);
-    formData.append('name', nome); // ou qualquer outro nome que você queira dar para a imagem
+    formData.append('name', nome); 
 
     const response = await axios.post('https://api.imgbb.com/1/upload', formData);
     return response.data.data.url;
@@ -214,7 +214,7 @@ const UsuariosView = () => {
                 <tr key={usuarios.id}>
                   <td>{index + 1}</td>
                   <td>
-                    <div className="user-info">
+                    <div className="user-info2">
                       <img src={usuarios.caminho_foto} alt={usuarios.name} className="user-avatar" />
                       {usuarios.nome + ' '}{usuarios.sobrenome}
                     </div>

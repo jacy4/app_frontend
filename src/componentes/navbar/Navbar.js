@@ -3,17 +3,17 @@ import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './navbar.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import portugueseFlag from '../componentes/logo192.png';
-import userAvatar from '../componentes/logo192.png';
+import portugueseFlag from '../portugal.png';
+import userAvatar from '../logo192.png';
 
 const areas = [
   { name: 'Desporto', id: 1 },
   { name: 'Saúde', id: 2 },
   { name: 'Gastronomia', id: 3 },
   { name: 'Formação', id: 4 },
-  { name: 'Alojamento', id: 5 },
+  { name: 'Alojamento', id: 7 },
   { name: 'Transportes', id: 6 },
-  { name: 'Lazer', id: 7 },
+  { name: 'Lazer', id: 5 },
 ];
 
 const Navbar = () => {
@@ -22,6 +22,9 @@ const Navbar = () => {
   const [centroName, setCentroName] = useState('');
   const [selectedMenu, setSelectedMenu] = useState('');
   const location = useLocation();
+  const [userName, setUserName] = useState('');
+  const [userSurname, setUserSurname] = useState('');
+  const [userPhoto, setUserPhoto] = useState('');
 
   const toggleSubMenu = (menu) => {
     setSubMenuOpen((prevState) => ({
@@ -32,9 +35,13 @@ const Navbar = () => {
 
   useEffect(() => {
     const storedCentroId = sessionStorage.getItem('centro_id');
+    const storedUserId = sessionStorage.getItem('user_id');
     if (storedCentroId) {
       setCentroId(storedCentroId);
       fetchCentroName(storedCentroId);
+    }
+    if (storedUserId) {
+      fetchUserDetails(storedUserId);
     }
   }, []);
 
@@ -54,7 +61,16 @@ const Navbar = () => {
       console.error('Erro ao fazer a requisição:', error);
     }
   };
-
+  const fetchUserDetails = async (userId) => {
+    try {
+      const response = await axios.get(`https://backend-teste-q43r.onrender.com/users/detalhes_user/${userId}`);
+      setUserName(response.data.nome);
+      setUserSurname(response.data.sobrenome);
+      setUserPhoto(response.data.caminho_foto);
+    } catch (error) {
+      console.error('Erro ao buscar detalhes do usuário:', error);
+    }
+  };
   const handleMenuClick = (menu, parentMenu) => {
     setSelectedMenu(menu);
     // Keep the parent menu open
@@ -83,17 +99,20 @@ const Navbar = () => {
           <div className="navbar-right">
             <div className="navbar-notifications">
               <i className="fas fa-bell"></i>
-              <span className="notification-count">4</span>
+              <span className="notification-count">0</span>
             </div>
             <div className="navbar-language">
               <img src={portugueseFlag} alt="Portuguese flag" />
               <span>Português</span>
             </div>
             <div className="navbar-user">
-              <img src={userAvatar} alt="User avatar" className="user-avatar" />
-              <span className="user-name">Diogo Ferreira</span>
-              <span className="user-role">Gestor</span>
-            </div>
+  {userPhoto && <img src={userPhoto} alt="User avatar" className="user-avatar" />}
+  <div className="user-info">
+    <span className="user-name">{`${userName} ${userSurname}`}</span>
+    <span className="user-role">Gestor</span>
+  </div>
+</div>
+
           </div>
         </div>
       </nav>
@@ -119,17 +138,17 @@ const Navbar = () => {
                     {subMenuOpen[area.name] && (
                       <ul className="sub-menu">
                         <li>
-                        <Link
-    to={area.id === 1 ? "/desporto" : `/topicos/${area.id}`}
-    className={selectedMenu === 'Tópicos' ? 'active' : ''}
-    onClick={() => handleMenuClick('Tópicos', area.name)}
-  >
-    Tópicos
-  </Link>
+                          <Link
+                            to={`/listar_topicos/${area.id}`}
+                            className={selectedMenu === 'Tópicos' ? 'active' : ''}
+                            onClick={() => handleMenuClick('Tópicos', area.name)}
+                          >
+                            Tópicos
+                          </Link>
                         </li>
                         <li>
                           <Link
-                            to={`/eventos/${area.id}`}
+                            to={`/pagina_eventos`}
                             className={selectedMenu === 'Eventos' ? 'active' : ''}
                             onClick={() => handleMenuClick('Eventos', area.name)}
                           >
@@ -138,7 +157,7 @@ const Navbar = () => {
                         </li>
                         <li>
                           <Link
-                            to={`/foruns/${area.id}`}
+                            to={`/pagina_foruns`}
                             className={selectedMenu === 'Fóruns' ? 'active' : ''}
                             onClick={() => handleMenuClick('Fóruns', area.name)}
                           >
@@ -146,8 +165,8 @@ const Navbar = () => {
                           </Link>
                         </li>
                         <li>
-                        <Link
-                            to={area.id === 1 ? "/criar_publicacao" : `/publicacoes/${area.id}`}
+                          <Link
+                            to={ "/criar_publicacao" }
                             className={selectedMenu === 'Publicações' ? 'active' : ''}
                             onClick={() => handleMenuClick('Publicações', area.name)}
                           >
@@ -157,7 +176,7 @@ const Navbar = () => {
                         </li>
                         <li>
                           <Link
-                            to={`/albuns/${area.id}`}
+                            to={`/pagina_partilhas`}
                             className={selectedMenu === 'Álbuns' ? 'active' : ''}
                             onClick={() => handleMenuClick('Álbuns', area.name)}
                           >
@@ -166,7 +185,7 @@ const Navbar = () => {
                         </li>
                         <li>
                           <Link
-                            to={`/grupos/${area.id}`}
+                            to={`/pagina_grupos`}
                             className={selectedMenu === 'Grupos' ? 'active' : ''}
                             onClick={() => handleMenuClick('Grupos', area.name)}
                           >
@@ -175,7 +194,7 @@ const Navbar = () => {
                         </li>
                         <li>
                           <Link
-                            to={`/calendario/${area.id}`}
+                            to={`/pagina_calendario`}
                             className={selectedMenu === 'Calendário' ? 'active' : ''}
                             onClick={() => handleMenuClick('Calendário', area.name)}
                           >
@@ -203,7 +222,7 @@ const Navbar = () => {
             </li>
             <li>
               <Link
-                to="/criar_publicacao"
+                to="/defenicoes"
                 className={selectedMenu === 'Definições' ? 'active' : ''}
                 onClick={() => handleMenuClick('Definições')}
               >

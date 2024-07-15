@@ -1,35 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTopics } from './TopicsContext';
-import { FaFutbol, FaDumbbell, FaBicycle, FaSwimmer, FaBasketballBall, FaRunning } from 'react-icons/fa';
-import { GiTennisRacket, GiVolleyballBall } from 'react-icons/gi';
-import { IoIosFitness, IoMdPhotos } from 'react-icons/io';
+import { IoMdPhotos } from 'react-icons/io';
 import { FiAlignLeft } from "react-icons/fi";
+import axios from 'axios';
 import './desporto.css';
 
-const iconComponents = {
-    'futebol': FaFutbol,
-    'tenis': GiTennisRacket,
-    'academia': FaDumbbell,
-    'ciclismo': FaBicycle,
-    'fitness': IoIosFitness,
-    'voleibol': GiVolleyballBall,
-    'natacao': FaSwimmer,
-    'basquete': FaBasketballBall,
-    'atletismo': FaRunning,
-};
 
-const iconOptions = [
-    { value: 'futebol', label: 'Futebol', icon: 'https://i.ibb.co/kXpD9Hs/bola.png' },
-    { value: 'tenis', label: 'Tênis', icon: "https://i.ibb.co/zPLrfrx/topico-tenis.png" },
-    { value: 'academia', label: 'Ginásios', icon: 'https://i.ibb.co/KmFqXNn/ginasio-1.png' },
-    { value: 'ciclismo', label: 'Ciclismo', icon: 'https://i.ibb.co/Vpghmf1/topico-ciclismo.png' },
-    { value: 'fitness', label: 'Fitness', icon: 'https://i.ibb.co/RCqV5WK/ginasta-fazendo-abdominais-para-fortalecer-os-musculos-abdominais.png' },
-    { value: 'voleibol', label: 'Voleibol', icon: 'https://i.ibb.co/QdKPrKV/voleibol.png' },
-    { value: 'natacao', label: 'Natação', icon: 'https://i.ibb.co/QPVxMMw/natacao.png' },
-    { value: 'basquete', label: 'Basquete', icon: "https://i.ibb.co/rtZ7wnr/topico-basket.png" },
-    { value: 'atletismo', label: 'Atletismo', icon: 'https://i.ibb.co/wYrkrg6/perseguir.png' },
-];
 
 const EditarDesporto = () => {
     const location = useLocation();
@@ -37,15 +14,17 @@ const EditarDesporto = () => {
     const { updateTopic } = useTopics();
     const [topicName, setTopicName] = useState('');
     const [topicIcon, setTopicIcon] = useState('');
+    const [customIcon, setCustomIcon] = useState(null);
+    const [customIconUrl, setCustomIconUrl] = useState('');
     const [activeTab, setActiveTab] = useState('descricao');
-    const [description, setDescription] = useState('');
-    const [showCreateForm, setShowCreateForm] = useState(false);
+    const { areaId, areaColor } = location.state;
 
     useEffect(() => {
         if (location.state) {
-            const { name, icon } = location.state;
-            setTopicName(name);
-            setTopicIcon(icon);
+            const { nome, topico_icon } = location.state;
+            setTopicName(nome);
+            setTopicIcon(topico_icon);
+            setCustomIconUrl(topico_icon); // Define customIconUrl com o ícone existente
         }
     }, [location.state]);
 
@@ -53,27 +32,64 @@ const EditarDesporto = () => {
         setActiveTab(tab);
     };
 
-    const handleSubmit = (event) => {
+    const uploadImage = async (file) => {
+        const formData = new FormData();
+        formData.append('key', '4d755673a2dc94483064445f4d5c54e9'); // substitua pela sua chave da API imgbb
+        formData.append('image', file);
+
+        const response = await axios.post('https://api.imgbb.com/1/upload', formData);
+        return response.data.data.url;
+    };
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        const updatedTopic = { id: location.state.id, name: topicName, icon: topicIcon };
-        updateTopic(updatedTopic); // Chama a função para atualizar o tópico
-        navigate('/desporto'); // Redireciona para a página Desporto após atualizar
+        let iconUrl = '';
+
+        if (customIcon) {
+            iconUrl = await uploadImage(customIcon);
+        } else {
+            iconUrl = topicIcon;
+        }
+
+        const updatedTopic = { id: location.state.id, nome: topicName, topico_icon: iconUrl };
+        await updateTopic(updatedTopic);
+        navigate(`/listar_topicos/${areaId}`);
     };
 
     const handleIconChange = (e) => {
-        setTopicIcon(e.target.value); // Atualiza o estado do ícone selecionado
+        setTopicIcon(e.target.value);
+        setCustomIcon(null);
+        setCustomIconUrl('');
+    };
+
+    const handleIconUpload = (e) => {
+        const file = e.target.files[0];
+        setCustomIcon(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setCustomIconUrl(reader.result);
+        };
+        reader.readAsDataURL(file);
     };
 
     return (
         <div className="add-topic-page">
             <div className="topic-form-container">
-                <h2>{topicName || 'Editar Tópico'}</h2>
-                <div className='tabs'>
-                    <button className={`tab ${activeTab === 'descricao' ? 'active' : ''}`} onClick={() => handleTabClick('descricao')}>
-                        <FiAlignLeft className='icon' /> Descrição
+                <h2 style={{ backgroundColor: areaColor, color: 'white', padding: '10px', borderRadius: '5px' }}>{topicName || 'Editar Tópico'}</h2>
+                <div className="tabs">
+                    <button
+                        className={`tab ${activeTab === 'descricao' ? 'active' : ''}`}
+                        onClick={() => handleTabClick('descricao')}
+                        style={activeTab === 'descricao' ? { borderBottom: `2px solid ${areaColor}` } : {}}
+                    >
+                        <FiAlignLeft className="icon" /> Descrição
                     </button>
-                    <button className={`tab ${activeTab === 'galeria' ? 'active' : ''}`} onClick={() => handleTabClick('galeria')}>
-                        <IoMdPhotos className='icon' />Galeria
+                    <button
+                        className={`tab ${activeTab === 'galeria' ? 'active' : ''}`}
+                        onClick={() => handleTabClick('galeria')}
+                        style={activeTab === 'galeria' ? { borderBottom: `2px solid ${areaColor}` } : {}}
+                    >
+                        <IoMdPhotos className="icon" /> Galeria
                     </button>
                 </div>
                 {activeTab === 'descricao' && (
@@ -89,30 +105,26 @@ const EditarDesporto = () => {
                                 placeholder="Inserir nome do tópico"
                             />
                         </div>
+                        
                         <div className="form-group">
-                            <label htmlFor="topicIcon">Ícone do Tópico:</label>
-                            <select
-                                id="topicIcon"
-                                value={topicIcon}
-                                onChange={handleIconChange}
-                                required
-                            >
-                                <option value="" disabled>Selecionar ícone de tópico</option>
-                                {iconOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </select>
+                            <label htmlFor="customIcon">Ícone do Tópico:</label>
+                            <input
+                                type="file"
+                                id="customIcon"
+                                onChange={handleIconUpload}
+                                accept="image/*"
+                            />
                         </div>
                         <div className="icon-preview">
-                            {topicIcon && (
-                                <img src={iconOptions.find((option) => option.value === topicIcon)?.icon} alt="Ícone Selecionado" />
+                            {customIconUrl ? (
+                                <img src={customIconUrl} alt="Ícone Personalizado" />
+                            ) : (
+                                <img src={topicIcon} alt="Ícone Atual" />
                             )}
                         </div>
                         <div className="button-group">
-                            <button type="button" className="cancel-button" onClick={() => navigate('/desporto')}>Cancelar</button>
-                            <button type="submit" className="submit-button">Atualizar</button>
+                            <button type="button" className="cancel-button" onClick={() => navigate(`/listar_topicos/${areaId}`)} style={{ borderColor: areaColor, color: areaColor }}>Cancelar</button>
+                            <button type="submit" className="submit-button" style={{ backgroundColor: areaColor, borderColor: areaColor }}>Atualizar</button>
                         </div>
                     </form>
                 )}
@@ -130,8 +142,8 @@ const EditarDesporto = () => {
                             </p>
                         </div>
                         <div className="form-buttons">
-                            <button type="button" className="cancel-button" onClick={() => navigate('/desporto')}>Cancelar</button>
-                            <button className="save-button"><i className="fas fa-save"></i>Salvar Alterações</button>
+                            <button type="button" className="cancel-button" onClick={() => navigate(`/listar_topicos/${areaId}`)} style={{ borderColor: areaColor, color: areaColor }}>Cancelar</button>
+                            <button className="save-button" style={{ backgroundColor: areaColor, borderColor: areaColor }}><i className="fas fa-save"></i>Salvar Alterações</button>
                         </div>
                     </div>
                 )}
