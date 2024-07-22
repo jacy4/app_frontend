@@ -16,6 +16,7 @@ import CalendarioView from './views/CALENDARIO/calendario';
 import EventosView from './views/EVENTOS/eventos';
 import ForunsView from './views/FORUNS/foruns';
 import GruposView from './views/GRUPOS/grupos';
+import EventosView from './views/EVENTOS/eventos';
 
 import './App.css'; 
 
