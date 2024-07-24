@@ -95,6 +95,8 @@ const PublicacoesView = () => {
 
   const [comentariosParaRemover, setComentariosParaRemover] = useState([]);
   
+  const [denuncias, setDenuncias] = useState([]);
+  const [denunciasParaRemover, setDenunciasParaRemover] = useState([]);
 
   useEffect(() => {
     const storedCentroId = sessionStorage.getItem('centro_id');
@@ -831,6 +833,26 @@ const approveLocal = async (publicationId) => {
   }
 };
 
+useEffect(() => {
+  const fetchDenuncias = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/denuncias/publicacao/${publicationDetailDenunciada?.id}`);
+      setDenuncias(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar denúncias:', error);
+    }
+  };
+
+  if (publicationDetailDenunciada) {
+    fetchDenuncias();
+  }
+}, [publicationDetailDenunciada?.id]);
+
+const toggleOptions = (denunciaId) => {
+  // Lógica para abrir/fechar o menu de opções para a denúncia específica
+};
+
+
   return (
     <div className="publicacoes-div_princ"> 
       {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de Publicações deste Centro</h1>}
@@ -1529,74 +1551,65 @@ const approveLocal = async (publicationId) => {
 
 
 
-{showDetailViewDenunciada ? (
+{showDetailViewDenunciada && publicationDetailDenunciada && (
   <div className="publicacoes_div_princ">
     <h1 className="publicacoes-title2">Denúncias do Local</h1>
     <div className="header">
       <h1 className="header-title">{publicationDetailDenunciada.titulo}</h1>
       <div className="author">
         <div className="authorName"><span>Autor :</span></div>
-        <img src={publicationDetailDenunciada.autor.caminho_foto} alt={publicationDetailDenunciada.autor.nome} className="author-icon" />
-        <span>{publicationDetailDenunciada.autor.nome} {publicationDetailDenunciada.autor.sobrenome}</span>
+        {publicationDetailDenunciada.autor?.caminho_foto && (
+          <img src={publicationDetailDenunciada.autor.caminho_foto} alt={publicationDetailDenunciada.autor.nome} className="author-icon" />
+        )}
+        {publicationDetailDenunciada.autor && (
+          <span>{publicationDetailDenunciada.autor.nome} {publicationDetailDenunciada.autor.sobrenome}</span>
+        )}
       </div>
     </div>
     <div className="tab-content2">
       <div className="denuncia-header2">
         <h2>Lista de Denúncias</h2>
-        <span className="total-denuncias">Total: 1 Denúncia</span>
+        <span className="total-denuncias">Total: {denuncias.length} Denúncia(s)</span>
       </div>
-      <div className="denuncia-lista">
-        <div className="denuncia-card">
-          <div className="denuncia-header">
-            <img src="https://via.placeholder.com/40" alt="User" className="user-icon" />
-            <div className="denuncia-info">
-              <strong>Vitor Ferreira</strong>
-              <p>29/01/2023</p>
+      <div className="denuncias-list">
+        {denuncias.map((denuncia) => (
+          <div key={denuncia.id} className="denuncia">
+            <div className="denuncia-header">
+              {denuncia.denunciante?.caminho_foto && (
+                <img src={denuncia.denunciante.caminho_foto} alt={`${denuncia.denunciante.nome} ${denuncia.denunciante.sobrenome}`} className="denuncia-avatar" />
+              )}
+              <div className="denuncia-info">
+                {denuncia.denunciante && (
+                  <>
+                    <span className="denuncia-autor">{denuncia.denunciante.nome} {denuncia.denunciante.sobrenome}</span>
+                    <span className="denuncia-data">{new Date(denuncia.createdat).toLocaleDateString()}</span>
+                  </>
+                )}
+              </div>
+              <div className="denuncia-actions">
+                <div className="options-button" onClick={() => toggleOptions(denuncia.id)}>
+                  <i className="fas fa-ellipsis-v"></i>
+                </div>
+                {denuncia.resolvida && (
+                  <span className="denuncia-resolvida">Denúncia Resolvida</span>
+                )}
+              </div>
+            </div>
+            <div className="denuncia-conteudo">
+              <p><strong>Motivo:</strong> {denuncia.motivo}</p>
+              <p><strong>Informação Adicional:</strong> {denuncia.informacao_adicional}</p>
             </div>
           </div>
-          <div className="denuncia-content">
-            <p><strong>Motivo da denúncia :</strong> Informação Errada ou Não Fidedigna</p>
-            <p><strong>Informação adicional :</strong></p>
-            <p>Boa tarde, não é que o local seja indevido mas eu moro perto e a morada não é essa, é tal tal tal, tal qualquer coisa! Obrigado pela atenção</p>
-          </div>
-        </div>
-        <div className="denuncia-card">
-          <div className="denuncia-header">
-            <img src="https://via.placeholder.com/40" alt="User" className="user-icon" />
-            <div className="denuncia-info">
-              <strong>Vitor Ferreira</strong>
-              <p>29/01/2023</p>
-            </div>
-          </div>
-          <div className="denuncia-content">
-            <p><strong>Motivo da denúncia :</strong> Informação Errada ou Não Fidedigna</p>
-            <p><strong>Informação adicional :</strong></p>
-            <p>Boa tarde, não é que o local seja indevido mas eu moro perto e a morada não é essa, é tal tal tal, tal qualquer coisa! Obrigado pela atenção</p>
-          </div>
-        </div>
-        <div className="denuncia-card">
-          <div className="denuncia-header">
-            <img src="https://via.placeholder.com/40" alt="User" className="user-icon" />
-            <div className="denuncia-info">
-              <strong>Vitor Ferreira</strong>
-              <p>29/01/2023</p>
-            </div>
-          </div>
-          <div className="denuncia-content">
-            <p><strong>Motivo da denúncia :</strong> Informação Errada ou Não Fidedigna</p>
-            <p><strong>Informação adicional :</strong></p>
-            <p>Boa tarde, não é que o local seja indevido mas eu moro perto e a morada não é essa, é tal tal tal, tal qualquer coisa! Obrigado pela atenção</p>
-          </div>
-        </div>
+        ))}
       </div>
       <div className="form-buttons">
         <button type="button" className="cancel-button" onClick={() => setShowDetailViewDenunciada(false)}>Cancelar</button>
         <button type="button" className="save-button" onClick={handleMedidasClick}>Tomar Medidas</button>
       </div>
     </div>
-  </div>
-) : null}
-
+    </div>
+  
+)}
 
 
 

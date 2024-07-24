@@ -742,32 +742,6 @@
   overflow-y: auto; /* Adicionar rolagem vertical */
 }
 
-.denuncia-card {
-  border: 1px solid #ccc;
-  padding: 15px;
-  border-radius: 8px;
-  background-color: #fff;
-  margin-top: 15px;
-}
-
-.denuncia-header {
-  display: flex;
-  align-items: center;
-}
-
-.denuncia-header2 {
-  display: flex;
-  justify-content: space-between; /* Adiciona espaço entre o título e o total de denúncias */
-  align-items: center;
-}
-
-.denuncia-info {
-  font-size: 14px;
-}
-
-.denuncia-content {
-  margin-top: 10px;
-}
 
 .form-buttons {
   display: flex;
@@ -776,12 +750,7 @@
   margin-top: 20px;
 }
 
-.denuncia-lista {
-  max-height: 300px; /* Define uma altura máxima para a lista de denúncias */
-  overflow-y: auto; /* Adiciona rolagem vertical */
-  margin-top: 20px; /* Adiciona espaço entre o título e a lista de denúncias */
-  padding-right: 10px; /* Ajusta para evitar que o conteúdo fique muito colado na borda */
-}
+
 /* CSS adicional para garantir a centralização do modal */
 .modal {
   position: fixed;
@@ -1473,3 +1442,69 @@ button {
   background-color: red; /* Fundo vermelho ao passar o mouse */
   color: white; /* X branco ao passar o mouse */
 }
+
+
+.denuncias-list {
+  margin-top: 20px;
+}
+
+.denuncia {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.denuncia-header {
+  display: flex;
+  align-items: center;
+}
+
+.denuncia-avatar {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+.denuncia-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.denuncia-autor {
+  font-weight: bold;
+}
+
+.denuncia-data {
+  font-size: 0.9em;
+  color: #777;
+}
+
+.denuncia-conteudo {
+  margin-top: 10px;
+}
+
+.denuncia-actions {
+  display: flex;
+  align-items: center;
+}
+
+.options-button {
+  background: none;
+  border: none;
+  color: #000;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.denuncia-resolvida {
+  margin-left: 10px;
+  font-size: 12px;
+  color: green;
+  font-weight: bold;
+}
+
+
