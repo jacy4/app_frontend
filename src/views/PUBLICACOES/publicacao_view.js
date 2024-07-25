@@ -96,7 +96,11 @@ const PublicacoesView = () => {
   const [comentariosParaRemover, setComentariosParaRemover] = useState([]);
   
   const [denuncias, setDenuncias] = useState([]);
-  const [denunciasParaRemover, setDenunciasParaRemover] = useState([]);
+
+  const [optionsOpen, setOptionsOpen] = useState(null);
+
+  const [menuAberto, setMenuAberto] = useState(null);
+
 
   useEffect(() => {
     const storedCentroId = sessionStorage.getItem('centro_id');
@@ -849,8 +853,37 @@ useEffect(() => {
 }, [publicationDetailDenunciada?.id]);
 
 const toggleOptions = (denunciaId) => {
-  // Lógica para abrir/fechar o menu de opções para a denúncia específica
+  setOptionsOpen(prevId => (prevId === denunciaId ? null : denunciaId));
 };
+
+const marcarDenunciaComoResolvida = async (denunciaId) => {
+  try {
+    const response = await axios.put(`http://localhost:3000/denuncias/update/${denunciaId}`, { resolvida: true });
+    if (response.status === 200) {
+      setDenuncias(prevDenuncias => prevDenuncias.map(denuncia => 
+        denuncia.id === denunciaId ? { ...denuncia, resolvida: true } : denuncia
+      ));
+      setOptionsOpen(null); // Fecha o menu de opções após marcar como resolvida
+    }
+  } catch (error) {
+    console.error('Erro ao marcar denúncia como resolvida:', error);
+  }
+};
+
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (!event.target.closest('.denuncia-actions')) {
+      setOptionsOpen(null);
+    }
+  };
+
+  document.addEventListener('click', handleClickOutside);
+  return () => {
+    document.removeEventListener('click', handleClickOutside);
+  };
+}, []);
+
+
 
 
   return (
@@ -1551,6 +1584,7 @@ const toggleOptions = (denunciaId) => {
 
 
 
+
 {showDetailViewDenunciada && publicationDetailDenunciada && (
   <div className="publicacoes_div_princ">
     <h1 className="publicacoes-title2">Denúncias do Local</h1>
@@ -1569,36 +1603,46 @@ const toggleOptions = (denunciaId) => {
     <div className="tab-content2">
       <div className="denuncia-header2">
         <h2>Lista de Denúncias</h2>
-        <span className="total-denuncias">Total: {denuncias.length} Denúncia(s)</span>
+        <span className="total-denuncias">Total: {denuncias.length} {denuncias.length === 1 ? 'Denúncia' : 'Denúncias'}</span>
       </div>
       <div className="denuncias-list">
         {denuncias.map((denuncia) => (
           <div key={denuncia.id} className="denuncia">
-            <div className="denuncia-header">
-              {denuncia.denunciante?.caminho_foto && (
-                <img src={denuncia.denunciante.caminho_foto} alt={`${denuncia.denunciante.nome} ${denuncia.denunciante.sobrenome}`} className="denuncia-avatar" />
-              )}
-              <div className="denuncia-info">
-                {denuncia.denunciante && (
-                  <>
-                    <span className="denuncia-autor">{denuncia.denunciante.nome} {denuncia.denunciante.sobrenome}</span>
-                    <span className="denuncia-data">{new Date(denuncia.createdat).toLocaleDateString()}</span>
-                  </>
+             <div className="denuncia-header">
+             <div className="denunciante-info">
+          {denuncia.denunciante?.caminho_foto && (
+            <img src={denuncia.denunciante.caminho_foto} alt={`${denuncia.denunciante.nome} ${denuncia.denunciante.sobrenome}`} className="denuncia-avatar" />
+          )}
+          <div className="denunciante-texto">
+          {denuncia.denunciante && (
+            <>
+              <span className="denuncia-autor">{denuncia.denunciante.nome} {denuncia.denunciante.sobrenome}</span>
+              <span className="denuncia-data">{new Date(denuncia.createdat).toLocaleDateString()}</span>
+            </>
+          )}
+        </div> </div>
+        <div className="denuncia-actions">
+                {!denuncia.resolvida && (
+                  <div className="options-button" onClick={() => toggleOptions(denuncia.id)}>
+                    <i className="fas fa-ellipsis-v"></i>
+                  </div>
                 )}
-              </div>
-              <div className="denuncia-actions">
-                <div className="options-button" onClick={() => toggleOptions(denuncia.id)}>
-                  <i className="fas fa-ellipsis-v"></i>
-                </div>
+                {optionsOpen === denuncia.id && (
+                  <div className="options-menu">
+                    <button onClick={() => marcarDenunciaComoResolvida(denuncia.id)}>
+                    <i className="fas fa-check-circle custom-check-icon"></i> Marcar como Resolvida
+                    </button>
+                  </div>
+                )}
                 {denuncia.resolvida && (
                   <span className="denuncia-resolvida">Denúncia Resolvida</span>
                 )}
               </div>
             </div>
-            <div className="denuncia-conteudo">
-              <p><strong>Motivo:</strong> {denuncia.motivo}</p>
-              <p><strong>Informação Adicional:</strong> {denuncia.informacao_adicional}</p>
-            </div>
+      <div className="denuncia-conteudo">
+        <p><strong>Motivo:</strong> {denuncia.motivo}</p>
+        <p><strong>Informação Adicional:</strong> {denuncia.informacao_adicional}</p>
+      </div>
           </div>
         ))}
       </div>
@@ -1627,7 +1671,7 @@ const toggleOptions = (denunciaId) => {
           <span>Eliminar Local</span>
         </div>
         <div className="option" onClick={() => handleEditClick(publicationDetailDenunciada)}>
-          <img src="https://i.ibb.co/9hm2v8B/Captura-de-ecr-2024-06-26-171921.png" alt="Captura-de-ecr-2024-06-26-171921" />
+        <img src="https://i.ibb.co/4tGGzmt/Captura-de-ecr-2024-06-26-171921.png" alt="Captura-de-ecr-2024-06-26-171921"/>
           <span>Editar Local</span>
         </div>
         <div className="option" onClick={handleAlertClick}>
