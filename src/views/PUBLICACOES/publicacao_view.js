@@ -840,7 +840,7 @@ const approveLocal = async (publicationId) => {
 useEffect(() => {
   const fetchDenuncias = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/denuncias/publicacao/${publicationDetailDenunciada?.id}`);
+      const response = await axios.get(`https://backend-teste-q43r.onrender.com/denuncias/publicacao/${publicationDetailDenunciada?.id}`);
       setDenuncias(response.data);
     } catch (error) {
       console.error('Erro ao buscar denúncias:', error);
@@ -858,7 +858,7 @@ const toggleOptions = (denunciaId) => {
 
 const marcarDenunciaComoResolvida = async (denunciaId) => {
   try {
-    const response = await axios.put(`http://localhost:3000/denuncias/update/${denunciaId}`, { resolvida: true });
+    const response = await axios.put(`https://backend-teste-q43r.onrender.com/denuncias/update/${denunciaId}`, { resolvida: true });
     if (response.status === 200) {
       setDenuncias(prevDenuncias => prevDenuncias.map(denuncia => 
         denuncia.id === denunciaId ? { ...denuncia, resolvida: true } : denuncia

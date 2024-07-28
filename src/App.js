@@ -16,6 +16,7 @@ import CalendarioView from './views/CALENDARIO/calendario';
 import EventosView from './views/EVENTOS/eventos';
 import ForunsView from './views/FORUNS/foruns';
 import GruposView from './views/GRUPOS/grupos';
+import axios from 'axios';
 
 import './App.css'; 
 
@@ -34,6 +35,21 @@ function App() {
   const handleLogin = () => {
     setIsAuthenticated(true);
   };
+
+// Configure o axios para incluir o token JWT em todas as requisições
+axios.interceptors.request.use(
+  config => {
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  }
+);
+
 
   return (
     <Router>
