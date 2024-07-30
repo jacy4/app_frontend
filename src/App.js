@@ -11,7 +11,7 @@ import Desporto from './views/DESPORTO/desporto';
 import EditarDesporto from './views/DESPORTO/editar_desporto';    
 import AdicionarDesporto from './views/DESPORTO/adicionar_desporto';
 import DefinicoesView from './views/DEFENICOES/defenicoes';
-import PartilhasView from './views/ALBUNS_DE_PARTILHAS/partilhas';
+import PartilhasView from './views/AlbumPartilha/AlbumPartilha';
 import CalendarioView from './views/CALENDARIO/calendario';
 import EventosView from './views/EVENTOS/eventos';
 import ForunsView from './views/FORUNS/foruns';
