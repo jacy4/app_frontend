@@ -1,4 +1,4 @@
-.publicacoes-div_princ {
+.ap-div-princ {
   display: flex;
   flex-direction: column;
   width: calc(100% - 250px);
@@ -11,7 +11,7 @@
   margin-top: 60px;
 }
 
-.publicacoes-title2 {
+.ap-title2 {
   color: white;
   font-size: 26px;
   margin: 0;
@@ -19,13 +19,13 @@
   text-align: left;
 }
 
-.edit-buttons-container {
+.ap-edit-buttons-container {
   display: flex;
   align-items: center;
 }
 
-.edit-btn,
-.publications-edit-btn {
+.ap-edit-btn,
+.ap-publications-edit-btn {
   background: none;
   border: none;
   cursor: pointer;
@@ -37,7 +37,7 @@
   justify-content: center;
 }
 
-.edit-btn {
+.ap-edit-btn {
   background-color: #007bff;
   color: white;
   border-radius: 50%;
@@ -45,37 +45,37 @@
   height: 30px;
 }
 
-.publications-edit-btn:hover {
+.ap-publications-edit-btn:hover {
   color: #156fca;
 }
 
-.publicacoes-button-container {
+.ap-button-container {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
 }
 
-.left-buttons {
+.ap-left-buttons {
   display: flex;
   gap: 20px;
 }
 
-.right-button {
+.ap-right-button {
   margin-left: auto;
 }
 
-.create-publication-form {
+.ap-create-publication-form {
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;
 }
 
-.create-publication-form label {
+.ap-create-publication-form label {
   display: block;
   margin-bottom: 10px;
 }
 
-.create-publication-form input {
+.ap-create-publication-form input {
   width: 100%;
   padding: 8px;
   margin-top: 4px;
@@ -84,8 +84,8 @@
   border-radius: 4px;
 }
 
-.create-publication-form button,
-.submit-button {
+.ap-create-publication-form button,
+.ap-submit-button {
   padding: 10px 20px;
   background-color: #156fca;
   color: #fff;
@@ -94,17 +94,17 @@
   cursor: pointer;
 }
 
-.create-publication-form button:hover,
-.submit-button:hover {
+.ap-create-publication-form button:hover,
+.ap-submit-button:hover {
   background-color: #135a9c;
 }
 
-.publications-view {
+.ap-publications-view {
   background-color: #f9f9f9;
   border-radius: 10px;
 }
 
-.publications-table {
+.ap-publications-table {
   color: #718EBF;
   width: 100%;
   border-collapse: collapse;
@@ -114,50 +114,49 @@
   overflow: hidden;
 }
 
-.publications-table th,
-.publications-table td {
+.ap-publications-table th,
+.ap-publications-table td {
   padding: 12px;
   border-bottom: 1px solid #ddd;
 }
 
-.publications-table th {
+.ap-publications-table th {
   background-color: #f4f4f4;
 }
 
-.publications-table td {
+.ap-publications-table td {
   color: black;
 }
 
-.publications-status {
+.ap-status-badge {
   padding: 4px 8px;
   border-radius: 4px;
   color: #fff;
   font-size: 12px;
 }
 
-.publications-status.ativa {
+.ap-status-badge.ativa {
   background-color: #28a745;
 }
 
-.publications-status.por-validar {
+.ap-status-badge.por-validar {
   background-color: #f7d694;
 }
 
-.publications-status.denunciada {
+.ap-status-badge.denunciada {
   background-color: #dc3545;
 }
 
-.search-container {
+.ap-search-container {
   margin-bottom: 20px;
 }
 
-.search-wrapper {
+.ap-search-wrapper {
   position: relative;
   max-width: 200px;
 }
 
-
-.search-bar {
+.ap-search-bar {
   display: flex;
   background-color: #fff;
   border-radius: 30px;
@@ -167,7 +166,7 @@
   max-width: 300px; /* Limita o tamanho */
 }
 
-.search-bar input {
+.ap-search-bar input {
   border: none;
   outline: none;
   padding: 8px;
@@ -175,43 +174,39 @@
   flex: 1;
 }
 
-.search-icon {
+.ap-search-icon {
   color: #8c9aa1;
   margin-right: 8px;
   font-size: 16px; /* Ajusta o tamanho do ícone */
 }
 
-
-
-
-
-.form-group {
+.ap-form-group {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.form-group label {
+.ap-form-group label {
   flex: 0.2;
   margin-right: 10px;
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
+.ap-form-group input,
+.ap-form-group select,
+.ap-form-group textarea {
   flex: 2;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
-.form-buttons {
+.ap-form-buttons {
   display: flex;
   justify-content: flex-end;
   gap: 20px;
 }
 
-.cancel-button {
+.ap-cancel-button {
   background: none;
   color: red;
   border: none;
@@ -221,7 +216,7 @@
   font-size: 17px;
 }
 
-.save-button {
+.ap-save-button {
   background-color: #4CAF50;
   color: white;
   border: none;
@@ -232,26 +227,26 @@
   align-items: center;
 }
 
-.save-button i {
+.ap-save-button i {
   margin-right: 8px;
 }
 
-.save-button:hover {
+.ap-save-button:hover {
   background-color: #45a049;
 }
 
-.hidden-title {
+.ap-hidden-title {
   visibility: hidden;
 }
 
-.tabs {
+.ap-tabs {
   display: flex;
   justify-content: space-between;
   margin: 0;
   background-color: #f1f1ef;
 }
 
-.tab {
+.ap-tab {
   padding: 10px 20px;
   cursor: pointer;
   background-color: #f5f5f5;
@@ -261,37 +256,37 @@
   align-items: center;
 }
 
-.tab.active {
+.ap-tab.active {
   background-color: #4caf50;
   color: #fff;
 }
 
-.tab-content {
+.ap-tab-content {
   padding: 20px;
   background-color: #fff;
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
 }
 
-.form-group_horario {
+.ap-form-group_horario {
   display: flex;
   align-items: center;
   margin-bottom: 15px;
 }
 
-.form-group_horario label {
+.ap-form-group_horario label {
   width: 100px;
   margin-right: 10px;
 }
 
-.form-group_horario input {
+.ap-form-group_horario input {
   width: 100px;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
-.gallery-upload {
+.ap-gallery-upload {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -300,7 +295,7 @@
   border-radius: 8px;
 }
 
-.upload-box {
+.ap-upload-box {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -314,22 +309,22 @@
   margin-bottom: 10px;
 }
 
-.upload-icon {
+.ap-upload-icon {
   font-size: 24px;
   color: #ccc;
 }
 
-.upload-text {
+.ap-upload-text {
   font-size: 16px;
   color: #ccc;
 }
 
-.localizacao-content {
+.ap-localizacao-content {
   display: flex;
   flex-direction: column;
 }
 
-.map-placeholder {
+.ap-map-placeholder {
   width: 100%;
   height: 200px;
   background-color: #f5f5f5;
@@ -339,14 +334,14 @@
   justify-content: center;
 }
 
-.map-placeholder img {
+.ap-map-placeholder img {
   width: 100%;
   height: auto;
   border-radius: 8px;
 }
 
-.success-message,
-.success-message_delete {
+.ap-success-message,
+.ap-success-message_delete {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -362,20 +357,20 @@
   z-index: 1000;
 }
 
-.success-message h1,
-.success-message_delete h1 {
+.ap-success-message h1,
+.ap-success-message_delete h1 {
   font-size: 24px;
   margin-bottom: 20px;
 }
 
-.success-message p,
-.success-message_delete button {
+.ap-success-message p,
+.ap-success-message_delete button {
   font-size: 16px;
   margin-bottom: 30px;
 }
 
-.success-message button,
-.success-message_delete button {
+.ap-success-message button,
+.ap-success-message_delete button {
   padding: 10px 20px;
   background-color: #4caf50;
   color: white;
@@ -385,13 +380,13 @@
   font-size: 16px;
 }
 
-.success-message button:hover,
-.success-message_delete button:hover {
+.ap-success-message button:hover,
+.ap-success-message_delete button:hover {
   background-color: #388e3c;
 }
 
-.delete-modal,
-.modal {
+.ap-delete-modal,
+.ap-modal {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -404,26 +399,26 @@
   z-index: 1000;
 }
 
-.delete-modal .modal-header,
-.modal .modal-header {
+.ap-delete-modal .modal-header,
+.ap-modal .modal-header {
   font-size: 20px;
   margin-bottom: 10px;
 }
 
-.delete-modal .modal-body,
-.modal .modal-body {
+.ap-delete-modal .modal-body,
+.ap-modal .modal-body {
   font-size: 16px;
   margin-bottom: 20px;
 }
 
-.delete-modal .modal-footer,
-.modal .modal-footer {
+.ap-delete-modal .modal-footer,
+.ap-modal .modal-footer {
   display: flex;
   justify-content: flex-end;
 }
 
-.delete-modal .modal-footer button,
-.modal .modal-footer button {
+.ap-delete-modal .modal-footer button,
+.ap-modal .modal-footer button {
   padding: 10px 20px;
   background-color: #f44336;
   color: white;
@@ -432,27 +427,28 @@
   cursor: pointer;
 }
 
-.delete-modal .modal-footer button.cancel,
-.modal .modal-footer button.cancel {
+.ap-delete-modal .modal-footer button.cancel,
+.ap-modal .modal-footer button.cancel {
   background-color: #9e9e9e;
   margin-right: 10px;
 }
 
-.delete-modal .modal-footer button.confirm,
-.modal .modal-footer button.confirm {
+.ap-delete-modal .modal-footer button.confirm,
+.ap-modal .modal-footer button.confirm {
   background-color: #d32f2f;
 }
-.clickable-icon {
+
+.ap-clickable-icon {
   cursor: pointer;
   color: #007bff;
   margin: 0 5px;
 }
 
-.clickable-icon:hover {
+.ap-clickable-icon:hover {
   color: #0056b3;
 }
 
-.modal-detalhes {
+.ap-modal-detalhes {
   width: 80%;
   max-width: 800px;
   height: 80%;
@@ -467,30 +463,30 @@
   overflow-y: auto;
 }
 
-.modal-detalhes .modal-detalhes-content {
+.ap-modal-detalhes .ap-modal-detalhes-content {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.modal-detalhes .galeria {
+.ap-modal-detalhes .ap-galeria {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
 }
 
-.modal-detalhes .publicacao-detalhes-imagem {
+.ap-modal-detalhes .ap-publicacao-detalhes-imagem {
   max-width: 200px;
   max-height: 200px;
   border-radius: 5px;
 }
 
-.modal-detalhes .descricao {
+.ap-modal-detalhes .ap-descricao {
   margin-top: 20px;
   text-align: center;
 }
 
-.modal-detalhes .modal-detalhes-buttons {
+.ap-modal-detalhes .ap-modal-detalhes-buttons {
   margin-top: 20px;
 }

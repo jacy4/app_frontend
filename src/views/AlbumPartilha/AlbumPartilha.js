@@ -161,11 +161,11 @@ const AlbumPartilha = () => {
     .filter(pub => pub.nome.toLowerCase().includes(searchTerm.toLowerCase()));
 
   const renderPublications = (publications) => (
-    <table className="publications-table">
+    <table className="ap-publications-table">
       <thead>
         <tr>
           <th>#</th>
-          <th>Nome da Publicação</th>
+          <th>Nome do album de partilhas</th>
           <th>Tópico</th>
           <th>Data de Criação</th>
           <th>Estado</th>
@@ -180,15 +180,15 @@ const AlbumPartilha = () => {
             <td>{publicacao.topico}</td>
             <td>{formatarData(publicacao.dataCriacao)}</td>
             <td>
-              <span className={`status-badge ${publicacao.status}`}>
+              <span className={`ap-status-badge ${publicacao.status}`}>
                 {publicacao.status === 'active' ? 'Ativo' : 'Oculto'}
               </span>
             </td>
             <td>
-              <FaInfoCircle className="info-icon clickable-icon" onClick={() => openDetalhes(publicacao)} />
-              <FaBan className="ban-icon clickable-icon" />
-              <FaPen className="edit-icon clickable-icon" onClick={() => handleEditClick(publicacao)} />
-              <FaTrashAlt className="delete-icon clickable-icon" onClick={() => handleDeleteClick(publicacao.id)} />
+              <FaInfoCircle className="ap-info-icon ap-clickable-icon" onClick={() => openDetalhes(publicacao)} />
+              <FaBan className="ap-ban-icon ap-clickable-icon" />
+              <FaPen className="ap-edit-icon ap-clickable-icon" onClick={() => handleEditClick(publicacao)} />
+              <FaTrashAlt className="ap-delete-icon ap-clickable-icon" onClick={() => handleDeleteClick(publicacao.id)} />
             </td>
           </tr>
         ))}
@@ -207,10 +207,10 @@ const AlbumPartilha = () => {
   };
 
   return (
-    <div className="div_princ">
+    <div className="ap-div-princ">
       {!showCreateForm && !publicacaoDetalhada && (
         <>
-          <h1 className="title2">Lista de Publicações</h1>
+          <h1 className="ap-title2">Lista de Albuns</h1>
 
           <FilterOptions
             selectedButton={selectedButton}
@@ -221,8 +221,8 @@ const AlbumPartilha = () => {
             handleCreatePublicationClick={handleCreatePublicationClick}
           />
 
-          <div className="search-bar">
-            <FaMagnifyingGlass className="search-icon" />
+          <div className="ap-search-bar">
+            <FaMagnifyingGlass className="ap-search-icon" />
             <input
               type="text"
               placeholder="Procurar por Publicação..."
@@ -242,9 +242,9 @@ const AlbumPartilha = () => {
       )}
 
       {showPublicationList && (
-        <div className="publications-view">
+        <div className="ap-publications-view">
           {filteredPublications.length === 0 ? (
-            <div className='empty-message'>Nenhuma publicação disponível.</div>
+            <div className='ap-empty-message'>Nenhuma publicação disponível.</div>
           ) : (
             renderPublications(filteredPublications)
           )}
