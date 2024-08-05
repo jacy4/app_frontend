@@ -13,6 +13,120 @@
     margin-right: 1px;
   }
   
+
+  .publicacoes-div_princ {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 250px); /* Ajustar a largura para descontar o menu lateral */
+    background-color: none; /* Cor de fundo azul */
+    padding: 20px;
+    box-sizing: border-box; /* Inclui padding e border no cálculo da largura e altura */
+    overflow: auto;
+    flex: 1;
+    min-height: calc(100vh - 90px); /* Ajustar para ocupar a altura da tela menos a navbar */
+    margin-left: 250px; /* Espaço para o menu lateral */
+    margin-top: 60px;
+  }
+  
+  .publicacoes-title2 {
+    color: white;
+    font-size: 26px;
+    margin: 0;
+    padding: 20px 0;
+    text-align: left;
+  }
+  
+  .edit-buttons-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .edit-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 4px; /* Ajuste o espaçamento entre os botões conforme necessário */
+  }
+  
+  .publications-edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0; /* Remover padding para evitar espaçamento excessivo */
+    margin-right: 6px; /* Ajuste o espaçamento entre os botões conforme necessário */
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  
+  .publicacoes-button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .left-buttons {
+    display: flex;
+    gap: 20px; /* Espaço entre os botões à esquerda */
+  }
+  
+  .right-button {
+    margin-left: auto; /* Coloca o botão à direita */
+  }
+  
+  .create-publication-form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  .create-publication-form h2 {
+    margin-top: 0;
+  }
+  
+  .create-publication-form label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .create-publication-form input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .create-publication-form button {
+    padding: 10px 20px;
+    background-color: #388e3c;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .create-publication-form button:hover {
+    background-color: #388e3c;
+  }
+  
+  .publications-view {
+    background-color: #f9f9f9;
+    margin-left: 0px;
+    margin-right: 0px;
+    border-radius: 10px;
+  }
+  
   
   
   .title2 {
@@ -20,6 +134,33 @@
     font-size: 36px; /* Tamanho da fonte */
     text-align: left; /* Alinha o texto à esquerda */
     margin: 0; /* Remove margens adicionais */
-    padding: 10px 0; /* Adiciona espaçamento acima e abaixo do título */
+    padding: 1px 0; /* Adiciona espaçamento acima e abaixo do título */
   }
+
+/* eventos.css */
+.topic-selector-container {
+  display: flex; /* Alinha os itens horizontalmente */
+  align-items: center; /* Alinha verticalmente os itens no centro */
+  margin-top: 480px; /* Ajuste conforme necessário */
+  gap: 20px; /* Espaço entre o dropdown e outros elementos, ajuste conforme necessário */
+}
+
+select {
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 4px; /* Adiciona borda arredondada */
+  border: 1px solid #ccc; /* Borda padrão */
+  background-color: #fff; /* Cor de fundo padrão */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Adiciona sombra leve */
+}
+
+.publicacoes-button-container {
+  display: flex;
+  flex-wrap: wrap; /* Permite que os botões se movam para a linha seguinte se necessário */
+  gap: 10px; /* Espaço entre os botões */
+}
+
+
+
+  
   

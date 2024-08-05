@@ -5,51 +5,48 @@ import handleSubmit from './criar_evento';
 import TopicSelector from './topicSelector'; // Import TopicSelector component
 import { useNavigate } from 'react-router-dom';
 import CreateEventoButton from '../../componentes/botao_view_eventos/criar_evento';
-import { GoogleMap, LoadScript, Marker, useJsApiLoader } from '@react-google-maps/api';
 import { useDropzone } from 'react-dropzone';
-import moment from 'moment';
-import 'moment/locale/pt'; // Importar o locale português
 
-moment.locale('pt'); // Definir o locale para português
 
 const EventosView = () => {
-    const [eventos, setEventos] = useState([]);
+    const [publicacoes, setPublicacoes] = useState([]);
     const [error, setError] = useState(null);
     const [showCreateForm, setShowCreateForm] = useState(false);
-    const [showEventosList, setShowEventosList] = useState(true);
+    const [showPublicationList, setShowPublicationList] = useState(true);
     const [selectedButton, setSelectedButton] = useState('list'); // Default to "list" button
     const [centroId, setCentroId] = useState(null);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [eventoToDelete, setEventoToDelete] = useState(null);
+    const [publicationToDelete, setPublicationToDelete] = useState(null);
     const [showHideModal, setShowHideModal] = useState(false);
-    const [eventoToHide, setEventoToHide] = useState(null);
+    const [publicationToHide, setPublicationToHide] = useState(null);
     const [removalReason, setRemovalReason] = useState('');
     const [showEditForm, setShowEditForm] = useState(false);
-    const [eventoToEdit, setEventoToEdit] = useState(null);
+    const [publicationToEdit, setPublicationToEdit] = useState(null);
     const [showSuccessMessageDelete, setShowSuccessMessageDelete] = useState(false);
     const [showSuccessMessageHide, setShowSuccessMessageHide] = useState(false);
     const [filter, setFilter] = useState('all');
     const [showDetailViewDenunciada, setShowDetailViewDenunciada] = useState(false);
-    const [eventoDetailDenunciada, setEventoDetailDenunciada] = useState(null);
+    const [publicationDetailDenunciada, setPublicationDetailDenunciada] = useState(null);
     const [showMedidasModal, setShowMedidasModal] = useState(false);
     const [showAlertModal, setShowAlertModal] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [showSuccessMessageAlert, setShowSuccessMessageAlert] = useState(false);
-    const [selectedEvento, setSelectedEvento] = useState(null);
+    const [selectedPublication, setSelectedPublication] = useState(null);
     const [showDeleteModalMedidas, setShowDeleteModalMedidas] = useState(false);
     const [deleteMessage, setDeleteMessage] = useState('');
     const [showSuccessMessageMedidas, setShowSuccessMessageMedidas] = useState(false);
     const [showApprovalView, setShowApprovalView] = useState(false);
-    const [eventoDetail, setEventoDetail] = useState(null);
+    const [publicationDetail, setPublicationDetail] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState('descricao');
     const [showApproveModal, setShowApproveModal] = useState(false);
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [rejectMessage, setRejectMessage] = useState('');
     const [showDetailView, setShowDetailView] = useState(false);
-    const [eventoDetailActive, setEventoDetailActive] = useState(null);
+    const [publicationDetailActive, setPublicationDetailActive] = useState(null);
     const weekDays = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+    const [selectedPublicacao, setSelectedPublicacao] = useState(null);
     const [showPendingModal, setShowPendingModal] = useState(false);
     const [showReportedModal, setShowReportedModal] = useState(false);
     const [comentarios, setComentarios] = useState([]);
@@ -57,9 +54,6 @@ const EventosView = () => {
     const [descricao, setDescricao] = useState('');
     const [paginaweb, setPaginaweb] = useState('');
     const [telemovel, setTelemovel] = useState('');
-    const [selectedField, setSelectedField] = useState('');
-    const [formFields, setFormFields] = useState([{ name: '' }]);
-    const [showFormModal, setShowFormModal] = useState(false);
     const [email, setEmail] = useState('');
     const [horario, setHorario] = useState({
     "Inicio": { inicioData: '', InicioHora: '' },
@@ -80,8 +74,7 @@ const comentariosExibidos = showAllComentarios ? comentarios : comentarios.slice
 
 const [isOpen, setIsOpen] = useState(false); 
 // Form states
-const [nome, setNome] = useState('');
-const [autor,setAutor] = useState({ nome: '', sobrenome: '', caminho_foto: ''});
+const [titulo, setTitulo] = useState('');
 const [topico, setTopico] = useState('');
 const autor_id = sessionStorage.getItem('user_id');
 
@@ -92,15 +85,7 @@ const [estrelas, setEstrelas] = useState(1);
 const [mediaAvaliacoes, setMediaAvaliacoes] = useState(null);
 
 const [comentariosParaRemover, setComentariosParaRemover] = useState([]);
-const [firstName, setFirstName] = useState('');
 
-const handleChange = (event) => {
-  setFirstName(event.target.value);
-};
-
-const handleClear = () => {
-  setFirstName('');
-};
 
 useEffect(() => {
   const storedCentroId = sessionStorage.getItem('centro_id');
@@ -134,7 +119,7 @@ useEffect(() => {
 }, [centroId]);
 
 
-const handleViewDetailsClick = (evento) => {
+const handleViewDetailsClick = (publication) => {
   setSelectedEvento(evento);
   setShowDetailView(true);
 };
@@ -142,12 +127,12 @@ const handleViewDetailsClick = (evento) => {
 
 
 const handlePendingViewClick = (evento) => {
-  setEventoDetail(evento);
+  setPublicationDetail(evento);
   setShowApprovalView(true);
 };
 
 const handleReportedViewClick = (evento) => {
-  setEventoDetailDenunciada(evento);
+  setPublicationDetailDenunciada(evento);
   setShowDetailViewDenunciada(true);
 };
 
@@ -155,15 +140,15 @@ const handleReportedViewClick = (evento) => {
 
 // Form states
 const handleHideClick = (evento) => {
-  setEventoToHide(evento);
+  setPublicationToHide(evento);
   setShowHideModal(true);
 };
 
 const handleEditClick = (evento) => {
-  setEventoToEdit(evento);
-  setSelectedEvento(evento );
+  setPublicationToEdit(evento);
+  setSelectedPublication(evento );
   setShowEditForm(true);
-  setShowEventosList(false);
+  setShowPublicationList(false);
   setShowMedidasModal(false);
   setShowDetailViewDenunciada(false); // Fechar o modal "Tomar Medidas"
 };
@@ -172,7 +157,7 @@ const handleEditClick = (evento) => {
 
 const handleCancelHide = () => {
   setShowHideModal(false);
-  setEventoToHide(null);
+  setPublicationToHide(null);
   setRemovalReason('');
 };
 
@@ -181,7 +166,7 @@ const handleTabClick = (tab) => {
 };
 
 const handleDeleteClick = (evento) => {
-  setEventoToDelete(evento);
+  setPublicationToDelete(evento);
   setShowDeleteModal(true);
 };
 
@@ -194,16 +179,16 @@ const handleDeleteConfirm = () => {
 
 const closeDeleteModal = () => {
   setShowDeleteModal(false);
-  setEventoToDelete(null);
+  setPublicationToDelete(null);
 };
 const handleCancelDelete = () => {
   setShowDeleteModal(false);
-  setEventoToDelete(null);
+  setPublicationToDelete(null);
 };
 const handleConfirmDelete = async () => {
   try {
-    await axios.delete(`https://backend-teste-q43r.onrender.com/eventos/delete/${eventoToDelete.id}`);
-    setEventos(eventos.filter(p => p.id !== eventoToDelete.id));
+    await axios.delete(`https://backend-teste-q43r.onrender.com/publicacoes/delete/${eventoToDelete.id}`);
+    setPublicacoes(eventos.filter(p => p.id !== eventoToDelete.id));
     setShowSuccessMessageDelete(true); // Exibir a mensagem de sucesso após a exclusão
   } catch (error) {
     console.error('Erro ao deletar publicação:', error);
@@ -214,49 +199,16 @@ const handleConfirmDelete = async () => {
 
 
 
-
-
-
-const openModal = () => {
-  setShowFormModal(true);
-};
-
-// Função para fechar a modal
-const closeModal = () => {
-  setShowFormModal(false);
-};
-
-
-
-const addFieldToForm = () => {
-  if (selectedField) {
-    setFormFields([...formFields, { type: selectedField, value: '' }]);
-    setSelectedField('');
-    closeModal();
-  }
-};
-
-
-
-
 const formatarData = (data) => {
   const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
   return new Date(data).toLocaleDateString('pt-PT', options);
 };
 
-const handleCreateEventoClick = () => {
+const handleCreateEventonClick = () => {
   setShowCreateForm(true);
-  setShowEventosList(false);
+  setShowEventoList(false);
   setSelectedButton('create'); // Set the selected button
 };
-
-
-const handleCreateForm = () => {
-
-  //setShowCreateForm(true);
-  setShowSuccessMessage(true);
-};
-
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -275,7 +227,7 @@ const handleSubmit = async (e) => {
 
   const eventoData = {
       topico_id: topico,
-      nome,
+      titulo,
       descricao,
       horario: formattedHorario,
       localizacao,
@@ -305,29 +257,35 @@ const handleSubmit = async (e) => {
           // Lógica de erro
       }
   } catch (error) {
-      console.error('Erro ao criar evento:', error); // Log do erro
+      console.error('Erro ao criar publicação:', error); // Log do erro
   }
 };
 
 
+
+
+
+
+
+
 const handleShowEventoListClick = () => {
   setShowCreateForm(false);
-  setShowEventosList(true);
+  setShowEventoList(true);
   setSelectedButton('list'); // Set the selected button
 };
 
-const handleCreateEventoSubmit = ({ nome, topico }) => {
+const handleCreateEventoSubmit = ({ titulo, topico }) => {
   // Adiciona a nova publicação aos dados estáticos
   const novoEvento = {
     id: eventos.length + 1,
-    nome,
+    titulo,
     topico,
     createdAt: new Date().toISOString(),
     estado: "Active"
   };
-  setEventos([...eventos, novoEvento]);
+  setPublicacoes([...eventos, novoEvento]);
   setShowCreateForm(false);
-  setShowEventosList(true);
+  setShowPublicationList(true);
 };
 
 const handleSearchChange = (event) => {
@@ -348,6 +306,7 @@ const handleConfirmHide = () => {
   setRemovalReason('');
   setShowSuccessMessageHide(true); // Exibir a mensagem de sucesso após ocultar
 };
+
 
 
 const containerStyle = {
@@ -393,50 +352,42 @@ const handleAddressSubmit = async (event) => {
 
 const handleButtonClick = (filter) => {
   setFilter(filter);
-  setShowEventosList(true);
+  setShowEventoList(true);
   setShowCreateForm(false);
   setShowEditForm(false);
   setSelectedButton(filter);
 };
 
+
 const filteredEventos = eventos.filter(evento => {
-  // Verifique se 'titulo' e 'estado' são definidos
-  if (!evento.nome || !evento.estado) return false;
+// Filtro por título
+const matchesTitle = evento.titulo.toLowerCase().includes(searchTerm.toLowerCase());
 
-  // Filtro por título
-  const matchesTitle = evento.nome.toLowerCase().includes(searchTerm.toLowerCase());
-
-  // Filtro por estado
-  let matchesState = true; // Default to true for 'all'
-  if (filter === 'por validar') {
-      matchesState = evento.estado === 'Por validar';
-  } else if (filter === 'ativa') {
-      matchesState = evento.estado === 'Ativa';
-  } else if (filter === 'denunciada') {
-      matchesState = evento.estado === 'Denunciada';
-  } else if (filter === 'inativo') {
-      matchesState = evento.estado === 'Inativo';
+// Filtro por estado
+let matchesState = true; // Default to true for 'all'
+if (filter === 'por validar') {
+  matchesState = evento.estado === 'Por validar';
+} else if (filter === 'ativa') {
+  matchesState = evento.estado === 'Ativa';
+} else if (filter === 'denunciada') {
+  matchesState = evento.estado === 'Denunciada';
 }
 
-  console.log('Filtro atual:', filter);
-console.log('Estado do evento:', evento.estado);
-
-
-  // Combina ambos os filtros
-  return matchesTitle && matchesState;
+// Combina ambos os filtros
+return matchesTitle && matchesState;
 });
 
-const countEventosPorValidar = eventos.filter(p => p.estado && p.estado.toLowerCase() === 'por validar').length;
-const countEventosAtivas = eventos.filter(p => p.estado && p.estado.toLowerCase() === 'ativa').length;
-const countEventosDenunciadas = eventos.filter(p => p.estado && p.estado.toLowerCase() === 'denunciada').length;
-const countEventosInativos = eventos.filter(p => p.estado && p.estado.toLowerCase() === 'Inativo').length;
+
+const countEventosPorValidar = eventos.filter(p => p.estado.toLowerCase() === 'por validar').length;
+const countEventosAtivas = eventos.filter(p => p.estado.toLowerCase() === 'ativa').length;
+const countEventosDenunciadas = eventos.filter(p => p.estado.toLowerCase() === 'denunciada').length;
 
 const handleMedidasClick = () => {
   setShowMedidasModal(true);
 };
 
 const handleCloseMedidasModal = () => {
-  setShowMedidasModal(false);      
+  setShowMedidasModal(false);
 };
 
 const handleAlertClick = () => {
@@ -476,7 +427,7 @@ setShowApprovalView(true);
 
 const handleApproveClick = () => {
 setShowApproveModal(true);
-
+approveLocal(eventonDetail.id); // Chame a função aqui
 };
 
 const handleConfirmApprove = () => {
@@ -495,13 +446,13 @@ const handleRejectAndDelete = async () => {
 try {
   const response = await axios.delete(`https://backend-teste-q43r.onrender.com/eventos/delete/${eventoDetail.id}`);
   if (response.status === 200) {
-    console.log('evento eliminada com sucesso:', response.data);
+    console.log('Publicação eliminada com sucesso:', response.data);
     // Adicione qualquer lógica adicional, como redirecionamento ou atualização da UI
   } else {
-    console.error('Erro ao eliminar evento:', response);
+    console.error('Erro ao eliminar publicação:', response);
   }
 } catch (error) {
-  console.error('Erro ao eliminar evento:', error);
+  console.error('Erro ao eliminar publicação:', error);
 }
 };
 
@@ -632,7 +583,6 @@ navigate(-1); // Volta para a página anterior
 const handleContinue = () => {
 const tabs = ['descricao', 'galeria', 'horario', 'localizacao', 'comentarios', 'mais_informacoes'];
 const currentIndex = tabs.indexOf(activeTab);
-console.log('Índice atual:', currentIndex);   
 if (currentIndex < tabs.length - 1) {
   setActiveTab(tabs[currentIndex + 1]);
 }
@@ -753,8 +703,7 @@ if (selectedEvento) {
 
 useEffect(() => {
 if (eventoToEdit) {
-  setNome(eventoToEdit.nome);
-  setAutor(eventoToEdit.autor_id);
+  setTitulo(eventoToEdit.titulo);
   setDescricao(eventoToEdit.descricao);
   setTopico(eventoToEdit.topico_id);
   setPaginaweb(eventoToEdit.paginaweb);
@@ -807,9 +756,9 @@ for (const [dia, { inicio, fim, fechado }] of Object.entries(horario)) {
   formattedHorario[dia] = fechado ? 'Fechado' : `${inicio}-${fim}`;
 }
 
-const eventoData = {
+const eventoToEdit = {
   topico_id: topico,
-  nome,
+  titulo,
   descricao,
   horario: formattedHorario,
   localizacao,
@@ -876,7 +825,7 @@ try {
 
 return (
   <div className="publicacoes-div_princ"> 
-    {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de Eventos deste Centro</h1>}
+    {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de Publicações deste Centro</h1>}
     {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView &&(
       <div className="publicacoes-button-container">
         <div className="left-buttons">
@@ -884,7 +833,7 @@ return (
             onClick={() => handleButtonClick('all')}
             iconSrc="https://i.ibb.co/P4nsk4w/Icon-criar.png"
             iconBgColor="#e0f7fa"
-            title="Eventos Totais"
+            title="Publicações Totais"
             subtitle={eventos.length.toString()}
             isSelected={selectedButton === 'all'}
           />
@@ -899,23 +848,15 @@ return (
           <CreateEventoButton
             iconSrc="https://i.ibb.co/D8QwJ6M/active-removebg-preview.png"
             iconBgColor="#CCFFCC"
-            title="Ativos"
+            title="Ativas"
             subtitle={countEventosAtivas.toString()}
             isSelected={selectedButton === 'ativa'}
             onClick={() => handleButtonClick('ativa')}
           />
           <CreateEventoButton
-            iconSrc="https://i.ibb.co/D8QwJ6M/active-removebg-preview.png"
-            iconBgColor="#CCFFCC"
-            title="Inativos"
-            subtitle={countEventosInativos.toString()}
-            isSelected={selectedButton === 'inativo'}
-            onClick={() => handleButtonClick('inativo')}
-          />
-          <CreateEventoButton
             iconSrc="https://i.ibb.co/RPC7vW8/Icon-denuncia.png"
             iconBgColor="#FFE0EB"
-            title="Denunciados"
+            title="Denunciadas"
             subtitle={countEventosDenunciadas.toString()}
             isSelected={selectedButton === 'denunciada'}
             onClick={() => handleButtonClick('denunciada')}
@@ -926,7 +867,7 @@ return (
             onClick={handleCreateEventoClick}
             iconSrc="https://i.ibb.co/P4nsk4w/Icon-criar.png"
             iconBgColor="#e0f7fa"
-            title="Criar Evento"
+            title="Criar Publicação"
             subtitle="Criar..."
             isSelected={selectedButton === 'create'}
           />
@@ -949,18 +890,18 @@ return (
     )}
     
     {showEditForm && (
-      <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Editar informações do Evento</h1>
+      <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Editar informações do Local</h1>
       <div className="header">
-      <h1 className="header-title">{selectedEvento.nome}</h1>
+      <h1 className="header-title">{selectedPublication.titulo}</h1>
       <div className="author">
-    <div className="authorName"><span>Autor :</span></div>
-    <img src={selectedEvento.autor.caminho_foto} alt={selectedEvento.autor.nome} className="author-icon" />
-    <span>{selectedEvento.autor.nome} {selectedEvento.autor.sobrenome}</span>
-    console.log(selectedEvento.autor);
-  </div>  
+            <div className="authorName"><span>Autor :</span></div>
+            <img src={selectedPublication.autor.caminho_foto} alt={selectedPublication.autor.nome} className="author-icon" />
+            <span>{selectedPublication.autor.nome} {selectedPublication.autor.sobrenome}</span>
+        
+          </div>
 
         </div>
-/______________________________________
+
     <div className="tabs">
       <button
         className={`tab ${activeTab === 'descricao' ? 'active' : ''}`}
@@ -996,218 +937,216 @@ return (
         className={`tab ${activeTab === 'mais_informacoes' ? 'active' : ''}`}
         onClick={() => handleTabClick('mais_informacoes')}
       >
-        <i className="fas fa-info tab-icon"></i> Formulário de Inscrição
+        <i className="fas fa-info tab-icon"></i> Mais Informações
       </button>
     </div>
     <div className="tab-content">
-
-    //---------------------------------------------------------------------------------
     {activeTab === 'descricao' && (
-          <form onSubmit={handleSubmit}>
-            
-            <div className="form-group">
-            <label>Tópico do Local</label>
-              <select value={topico} onChange={(e) => setTopico(e.target.value)}>
-                <option value="">selecionar tópico</option>
-                {topicos.map((topico) => (
-                  <option key={topico.id} value={topico.id}>{topico.nome}</option>
-                ))}
-              </select>
-            </div>
-            <div className="form-group">
-              <label>Nome do local</label>
-              <input type="text" placeholder="inserir nome do local" value={nome} onChange={(e) => setNome(e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label>Descrição do local</label>
-              <input type="text" placeholder="inserir uma breve descrição do local" value={descricao} onChange={(e) => setDescricao(e.target.value)}/>
-            </div>
-            <div className="form-buttons">
-              <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-              <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
-            </div>
-          </form>
-        )}
-
-{activeTab === 'galeria' && (
-  <div className="tab-content_galeria">
-    <h2>Galeria do local</h2>
-    <div {...getRootProps({ className: 'dropzone' })} className="gallery-upload">
-      <input {...getInputProps()} />
-      <div className="upload-box">
-        <span className="upload-icon">+</span>
-        <span className="upload-text">Upload</span>
-      </div>
-      <p className="gallery-info">
-        <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do local
-      </p>
-    </div>
-    <div className="uploaded-images">
-      {galeria.map((file, index) => (
-        <div key={index} className="image-preview">
-          <img src={file.preview} alt={`preview ${index}`} />
-          <button className="remove-image" onClick={() => handleRemoveImage(index)}>x</button>
-        </div>
-      ))}
-    </div>
-    <div className="form-buttons">
-      <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-      <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
-    </div>
-  </div>
-)}
-
-
-
-
-{activeTab === 'horario' && (
-  <div>
-    <h2>Horário do local</h2>
-    {Object.keys(horario).map((dia) => (
-      <div key={dia} className="form-group_horario">
-        <label>{dia}</label>
-        <div className="horario-inputs">
-          <input
-            type="text"
-            placeholder="Início HH:mm"
-            value={horario[dia].inicio}
-            disabled={horario[dia].fechado}
-            onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], inicio: e.target.value } })}
-          />
-          <input
-            type="text"
-            placeholder="Fim HH:mm"
-            value={horario[dia].fim}
-            disabled={horario[dia].fechado}
-            onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], fim: e.target.value } })}
-          />
-          <label>
-            <input
-              type="checkbox"
-              checked={horario[dia].fechado}
-              onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], fechado: e.target.checked, inicio: '', fim: '' } })}
-            />
-          </label>
-        </div>
-      </div>
-    ))}
-    <div className="form-buttons">
-      <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-      <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
-    </div>
-  </div>
-)}
-
-        {activeTab === 'localizacao' && (
-          <div className="tab-content_localizacao">
-            <h2>Localização do local</h2>
-            <div className="localizacao-content">
+            <form onSubmit={handleSubmit}>
+              
               <div className="form-group">
-                <label>Endereço do local:</label>
-                <input
-                  type="text"
-                  placeholder="inserir local"
-                  value={localizacao}
-                  onChange={(e) => setLocalizacao(e.target.value)}
-                />
-              </div>
-              <div className="map-placeholder">
-                <LoadScript googleMapsApiKey={API_KEY}>
-                  <GoogleMap
-                    mapContainerStyle={containerStyle}
-                    center={center}
-                    zoom={10}
-                  >
-                    <Marker position={center} />
-                  </GoogleMap>
-                </LoadScript>
-              </div>
-            </div>
-            <div className="form-buttons">
-              <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-              <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
-            </div>
-          </div>
-        )}
-
-{activeTab === 'comentarios' && (
-  <div className="tab-content_comentarios">
-    {comentarios.length === 0 ? (
-      <div className="no-comments">
-        <i className="fas fa-comment-slash no-comments-icon"></i>
-        <p>Ainda sem comentários</p>
-      </div>
-    ) : (
-      <div className="comentarios-list">
-        {comentarios.map((comentario) => (
-          <div key={comentario.id} className="comentario">
-            <div className="comentario-header">
-              {comentario.autor && comentario.autor.caminho_foto && (
-                <img src={comentario.autor.caminho_foto} alt={`${comentario.autor.nome} ${comentario.autor.sobrenome}`} className="comentario-avatar" />
-              )}
-              <div className="comentario-info">
-                {comentario.autor && (
-                  <>
-                    <span className="comentario-autor">{comentario.autor.nome} {comentario.autor.sobrenome}</span>
-                    <span className="comentario-data">{new Date(comentario.createdat).toLocaleDateString()}</span>
-                    </>
-                    )}
-                  </div>
-                  <button className="remove-comentario" onClick={() => marcarComentarioParaRemover(comentario.id)}>x</button>
-                </div>
-            <div className="comentario-conteudo">
-              <p>{comentario.conteudo}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    )}
-    <div className="form-buttons">
-      <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-      <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
-    </div>
-  </div>
-)}
-
-
-
-        {activeTab === 'mais_informacoes' && (
-          <div className="tab-content_mais_informacoes">
-            <form>
-              <div className="form-group">
-                <label>Pagina Web</label>
-                <input
-                  type="text"
-                  placeholder="inserir site"
-                  value={paginaweb}
-                  onChange={(e) => setPaginaweb(e.target.value)}
-                />
+              <label>Tópico do Local</label>
+                <select value={topico} onChange={(e) => setTopico(e.target.value)}>
+                  <option value="">selecionar tópico</option>
+                  {topicos.map((topico) => (
+                    <option key={topico.id} value={topico.id}>{topico.nome}</option>
+                  ))}
+                </select>
               </div>
               <div className="form-group">
-                <label>Contacto</label>
-                <input
-                  type="text"
-                  placeholder="inserir contacto telefónico"
-                  value={telemovel}
-                  onChange={(e) => setTelemovel(e.target.value)}
-                />
+                <label>Nome do local</label>
+                <input type="text" placeholder="inserir nome do local" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
               </div>
               <div className="form-group">
-                <label>Email oficial</label>
-                <input
-                  type="text"
-                  placeholder="...inserir email..."
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+                <label>Descrição do local</label>
+                <input type="text" placeholder="inserir uma breve descrição do local" value={descricao} onChange={(e) => setDescricao(e.target.value)}/>
               </div>
               <div className="form-buttons">
                 <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
                 <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
               </div>
             </form>
+          )}
+
+        {activeTab === 'galeria' && (
+          <div className="tab-content_galeria">
+            <h2>Galeria do local</h2>
+            <div {...getRootProps({ className: 'dropzone' })} className="gallery-upload">
+              <input {...getInputProps()} />
+              <div className="upload-box">
+                <span className="upload-icon">+</span>
+                <span className="upload-text">Upload</span>
+              </div>
+              <p className="gallery-info">
+                <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do local
+              </p>
+            </div>
+            <div className="uploaded-images">
+              {galeria.map((file, index) => (
+                <div key={index} className="image-preview">
+                  <img src={file.preview} alt={`preview ${index}`} />
+                  <button className="remove-image" onClick={() => handleRemoveImage(index)}>x</button>
+                </div>
+              ))}
+            </div>
+            <div className="form-buttons">
+              <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
+              <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
+            </div>
           </div>
         )}
+
+
+
+
+          {activeTab === 'horario' && (
+            <div>
+              <h2>Horário do local</h2>
+              {Object.keys(horario).map((dia) => (
+                <div key={dia} className="form-group_horario">
+                  <label>{dia}</label>
+                  <div className="horario-inputs">
+                    <input
+                      type="text"
+                      placeholder="Início HH:mm"
+                      value={horario[dia].inicio}
+                      disabled={horario[dia].fechado}
+                      onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], inicio: e.target.value } })}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Fim HH:mm"
+                      value={horario[dia].fim}
+                      disabled={horario[dia].fechado}
+                      onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], fim: e.target.value } })}
+                    />
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={horario[dia].fechado}
+                        onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], fechado: e.target.checked, inicio: '', fim: '' } })}
+                      />
+                    </label>
+                  </div>
+                </div>
+              ))}
+              <div className="form-buttons">
+                <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
+                <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'localizacao' && (
+            <div className="tab-content_localizacao">
+              <h2>Localização do local</h2>
+              <div className="localizacao-content">
+                <div className="form-group">
+                  <label>Endereço do local:</label>
+                  <input
+                    type="text"
+                    placeholder="inserir local"
+                    value={localizacao}
+                    onChange={(e) => setLocalizacao(e.target.value)}
+                  />
+                </div>
+                <div className="map-placeholder">
+                  <LoadScript googleMapsApiKey={API_KEY}>
+                    <GoogleMap
+                      mapContainerStyle={containerStyle}
+                      center={center}
+                      zoom={10}
+                    >
+                      <Marker position={center} />
+                    </GoogleMap>
+                  </LoadScript>
+                </div>
+              </div>
+              <div className="form-buttons">
+                <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
+                <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'comentarios' && (
+            <div className="tab-content_comentarios">
+              {comentarios.length === 0 ? (
+                <div className="no-comments">
+                  <i className="fas fa-comment-slash no-comments-icon"></i>
+                  <p>Ainda sem comentários</p>
+                </div>
+              ) : (
+                <div className="comentarios-list">
+                  {comentarios.map((comentario) => (
+                    <div key={comentario.id} className="comentario">
+                      <div className="comentario-header">
+                        {comentario.autor && comentario.autor.caminho_foto && (
+                          <img src={comentario.autor.caminho_foto} alt={`${comentario.autor.nome} ${comentario.autor.sobrenome}`} className="comentario-avatar" />
+                        )}
+                        <div className="comentario-info">
+                          {comentario.autor && (
+                            <>
+                              <span className="comentario-autor">{comentario.autor.nome} {comentario.autor.sobrenome}</span>
+                              <span className="comentario-data">{new Date(comentario.createdat).toLocaleDateString()}</span>
+                              </>
+                              )}
+                            </div>
+                            <button className="remove-comentario" onClick={() => marcarComentarioParaRemover(comentario.id)}>x</button>
+                          </div>
+                      <div className="comentario-conteudo">
+                        <p>{comentario.conteudo}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="form-buttons">
+                <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
+                <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
+              </div>
+            </div>
+          )}
+
+
+          {activeTab === 'mais_informacoes' && (
+            <div className="tab-content_mais_informacoes">
+              <form>
+                <div className="form-group">
+                  <label>Pagina Web</label>
+                  <input
+                    type="text"
+                    placeholder="inserir site"
+                    value={paginaweb}
+                    onChange={(e) => setPaginaweb(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Contacto</label>
+                  <input
+                    type="text"
+                    placeholder="inserir contacto telefónico"
+                    value={telemovel}
+                    onChange={(e) => setTelemovel(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Email oficial</label>
+                  <input
+                    type="text"
+                    placeholder="...inserir email..."
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <div className="form-buttons">
+                  <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
+                  <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
+                </div>
+              </form>
+            </div>
+          )}
+
   {showSuccessMessage && <div className="modal-backdrop"></div>}
             {showSuccessMessage && (
               <div className="success-message_delete">
@@ -1224,9 +1163,9 @@ return (
 
   {showDetailView && selectedEvento && (
     <div className="publicacoes_div_princ">
-      <h1 className="publicacoes-title2">Informações do evento</h1>
+      <h1 className="publicacoes-title2">Informações do Local</h1>
       <div className="header">
-        <h1 className="header-title">{selectedEvento.nome}</h1>
+        <h1 className="header-title">{selectedEvento.titulo}</h1>
         <div className="author">
           <div className="authorName"><span>Autor :</span></div>
           <img src={selectedEvento.autor.caminho_foto} alt={selectedEvento.autor.nome} className="author-icon" />
@@ -1238,7 +1177,7 @@ return (
   <div className="tab-content2">
     {selectedEvento.galeria && selectedEvento.galeria.length > 0 && (
       <>
-        <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do evento</button>
+        <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Local</button>
         <div className="gallery">
           {selectedEvento.galeria.map((image, index) => (
             <img key={index} src={image} alt={`Galeria ${index}`} className="gallery-image" />
@@ -1250,7 +1189,7 @@ return (
   {selectedEvento && selectedEvento.estado === 'Ativa' && (
     <div>
   <button className="tab active">
-    <i className="fas fa-star tab-icon"></i> Avaliação do evento
+    <i className="fas fa-star tab-icon"></i> Avaliação do Local
   </button>
   <div className="description">
     {mediaAvaliacoes ? (
@@ -1295,68 +1234,9 @@ return (
 </div>
 )}
 
-
-/* ---------- Detalhes do evento--------------- */--------------------------------------
-{selectedEvento.autor && (
-  <>
-    <button className="tab active">
-      <i className="fas fa-info-circle tab-icon"></i> Organizado por
-    </button>
-    <div className="description">
-      <div className="info-container">
-        <div className="author-info">
-          {selectedEvento.autor.caminho_foto && (
-            <img 
-              src={selectedEvento.autor.caminho_foto} 
-              alt={`${selectedEvento.autor.nome} ${selectedEvento.autor.sobrenome}`} 
-              className="author-icon" 
-            />
-          )}
-          <div className="author-details">
-            <p className="author-name">{selectedEvento.autor.nome} {selectedEvento.autor.sobrenome}</p>
-          </div>
-        </div>
-
-        <div className="participants-info">
-          <h3>Pessoas que vão:</h3>
-          <ul className="participants-list">
-            {selectedEvento.participantes && selectedEvento.participantes.map((pessoa, index) => (
-              <li key={index} className="participant-item">
-                {pessoa.nome} {pessoa.sobrenome}
-              </li>
-            ))}
-          </ul>
-        </div>
-        
-      </div>
-      
-    </div>
-  </>
-)}
- 
- {selectedEvento.horario && (
-  <>
-    <button className="tab active">
-      <i className="fas fa-clock tab-icon"></i> Horário do Evento
-    </button>
-    <div className="description">
-      <p><strong>Estado:</strong> {selectedEvento.estado}</p>
-      <div className="tab active">
-        {weekDays.map((dia) => (
-          <p key={dia}>
-            <strong>{dia}:</strong> {selectedEvento.horario[dia] || 'Fechado'}
-          </p>
-        ))}
-      </div>
-    </div>
-  </>
-)}
-
-
-
     {selectedEvento.descricao && (
       <>
-        <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Evento</button>
+        <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Local</button>
         <div className="description">
           <p>{selectedEvento.descricao}</p>
         </div>
@@ -1364,11 +1244,24 @@ return (
     )}
     
 
-   
-
+    {selectedEvento.horario && (
+      <>
+        <button className="tab active"><i className="fas fa-clock tab-icon"></i> Horário do Local</button>
+        <div className="additional-info">
+          <div className="status">
+            <i className="fas fa-check-circle"></i> {isOpen ? 'Aberto Agora' : 'Fechado Agora'}
+          </div>
+          <div className="schedule">
+            {weekDays.map((dia) => (
+              <p key={dia}><strong>{dia}:</strong> {selectedEvento.horario[dia] || 'Fechado'}</p>
+            ))}
+          </div>
+        </div>
+      </>
+    )}
     {selectedEvento.estado && (
       <>
-        <button className="tab active"><i className="fas fa-tasks tab-icon"></i> Estado do Evento</button>
+        <button className="tab active"><i className="fas fa-tasks tab-icon"></i> Estado da Publicação</button>
         <div className="estado">
           <p><strong>Estado:</strong> {selectedEvento.estado}</p>
         </div>
@@ -1451,6 +1344,8 @@ return (
 <button className="btn-comentar" onClick={handleAddComentario}>Comentar</button>
 </div>
 
+
+
 </div>
 </div>
 )}
@@ -1460,25 +1355,29 @@ return (
 )}
 
 
-{showApprovalView && eventoDetail && (
+
+
+
+
+{showApprovalView && eventonDetail && (
 <div className="publicacoes_div_princ">
-<h1 className="publicacoes-title2">Informações do Evento</h1>
+<h1 className="publicacoes-title2">Informações do Local</h1>
 <div className="header">
-  <h1 className="header-title">{eventoDetail.nome}</h1>
+  <h1 className="header-title">{eventonDetail.titulo}</h1>
   <div className="author">
     <div className="authorName"><span>Autor :</span></div>
-    <img src={eventoDetail.autor.caminho_foto} alt={eventoDetail.autor.nome} className="author-icon" />
-    <span>{eventoDetail.autor.nome} {eventoDetail.autor.sobrenome}</span>
+    <img src={eventonDetail.autor.caminho_foto} alt={eventonDetail.autor.nome} className="author-icon" />
+    <span>{eventonDetail.autor.nome} {eventonDetail.autor.sobrenome}</span>
 
   </div>
 
 </div>
 <div className="tab-content2">
-  {eventoDetail.galeria && eventoDetail.galeria.length > 0 && (
+  {eventonDetail.galeria && eventonDetail.galeria.length > 0 && (
     <>
-      <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Evento</button>
+      <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Local</button>
       <div className="gallery">
-        {eventoDetail.galeria.map((image, index) => (
+        {eventonDetail.galeria.map((image, index) => (
           <img key={index} src={image} alt={`Galeria ${index}`} className="gallery-image" />
         ))}
       </div>
@@ -1486,68 +1385,69 @@ return (
   )}
 
 
-  {eventoDetail.descricao && (
+
+  {eventonDetail.descricao && (
     <>
-      <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Evento</button>
+      <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Local</button>
       <div className="description">
-        <p>{eventoDetail.descricao}</p>
+        <p>{eventonDetail.descricao}</p>
       </div>
     </>
   )}
   
 
-  {eventoDetail.horario && (
+  {eventonDetail.horario && (
     <>
-      <button className="tab active"><i className="fas fa-clock tab-icon"></i> Horário do Evento</button>
+      <button className="tab active"><i className="fas fa-clock tab-icon"></i> Horário do Local</button>
       <div className="additional-info">
         <div className="status">
           <i className="fas fa-check-circle"></i> {isOpen ? 'Aberto Agora' : 'Fechado Agora'}
         </div>
         <div className="schedule">
           {weekDays.map((dia) => (
-            <p key={dia}><strong>{dia}:</strong> {eventoDetail.horario[dia] || 'Fechado'}</p>
+            <p key={dia}><strong>{dia}:</strong> {eventonDetail.horario[dia] || 'Fechado'}</p>
           ))}
         </div>
       </div>
     </>
   )}
-  {eventoDetail.estado && (
+  {eventonDetail.estado && (
     <>
-      <button className="tab active"><i className="fas fa-tasks tab-icon"></i> Estado do Evento</button>
+      <button className="tab active"><i className="fas fa-tasks tab-icon"></i> Estado da Publicação</button>
       <div className="estado">
-        <p><strong>Estado:</strong> {eventoDetail.estado}</p>
+        <p><strong>Estado:</strong> {eventonDetail.estado}</p>
       </div>
     </>
   )}
-  {eventoDetail.localizacao && (
+  {eventonDetail.localizacao && (
     <>
       <button className="tab active"><i className="fas fa-map-marker-alt tab-icon"></i> Localização</button>
       <div className="location">
-        <p><strong>Localização:</strong> {eventoDetail.localizacao}</p>
+        <p><strong>Localização:</strong> {eventonDetail.localizacao}</p>
       </div>
     </>
   )}
-  {eventoDetail.paginaweb && (
+  {eventonDetail.paginaweb && (
     <>
       <button className="tab active"><i className="fas fa-globe tab-icon"></i> Página Web</button>
       <div className="website">
-        <p><strong>Página web:</strong> {eventoDetail.paginaweb}</p>
+        <p><strong>Página web:</strong> {eventonDetail.paginaweb}</p>
       </div>
     </>
   )}
-  {eventoDetail.telemovel && (
+  {eventonDetail.telemovel && (
     <>
       <button className="tab active"><i className="fas fa-phone tab-icon"></i> Telefone</button>
       <div className="phone">
-        <p><strong>Telemóvel/Telefone: </strong>{eventoDetail.telemovel}</p>
+        <p><strong>Telemóvel/Telefone: </strong>{eventonDetail.telemovel}</p>
       </div>
     </>
   )}
-  {eventoDetail.email && (
+  {eventonDetail.email && (
     <>
       <button className="tab active"><i className="fas fa-envelope tab-icon"></i> Email</button>
       <div className="email">
-        <p><strong>Email:</strong> {eventoDetail.email}</p>
+        <p><strong>Email:</strong> {eventonDetail.email}</p>
       </div>
     </>
   )}
@@ -1622,9 +1522,9 @@ return (
 
 {showDetailViewDenunciada ? (
 <div className="publicacoes_div_princ">
-  <h1 className="publicacoes-title2">Denúncias do Evento</h1>
+  <h1 className="publicacoes-title2">Denúncias do Local</h1>
   <div className="header">
-    <h1 className="header-title">{eventoDetailDenunciada.nome}</h1>
+    <h1 className="header-title">{eventoDetailDenunciada.titulo}</h1>
     <div className="author">
       <div className="authorName"><span>Autor :</span></div>
       <img src={eventoDetailDenunciada.autor.caminho_foto} alt={eventoDetailDenunciada.autor.nome} className="author-icon" />
@@ -1710,7 +1610,7 @@ return (
       </div>
       <div className="option" onClick={handleAlertClick}>
         <img src="https://i.ibb.co/ZHC0zw5/Captura-de-ecr-2024-06-26-172004.png" alt="Captura-de-ecr-2024-06-26-172004" />
-        <span>Alertar Autor do Evento</span>
+        <span>Alertar Autor do Local</span>
       </div>
     </div>
     <div className="modal-footer">
@@ -1725,12 +1625,12 @@ return (
   <div className="modalDeleteMedidas">
     <div className="modalDeleteMedidas-header">
       <img src="https://i.ibb.co/4dfypxd/Captura-de-ecr-2024-06-28-111846.png" alt="Delete Icon" />
-      <span>Eliminar Evento?</span>
+      <span>Eliminar Publicação?</span>
     </div>
     <div className="modalDeleteMedidas-body">
       <p>
-        O user que criou este Evento irá ser notificado sobre a sua ação!
-        Insira abaixo o motivo por qual removeu o evento deste utilizador, o qual vai ser notificado da sua ação.
+        O user que criou esta Publicação irá ser notificado sobre a sua ação!
+        Insira abaixo o motivo por qual removeu o publicação deste utilizador, o qual vai ser notificado da sua ação.
       </p>
       <textarea
         className="large-textareaDeleteMedidas"
@@ -1771,7 +1671,7 @@ return (
   </div>
   <div className="modalAlert-body">
     <p>
-      Insira abaixo o que deseja alertar para o autor deste evento, para que este possa o mesmo editar
+      Insira abaixo o que deseja alertar para o autor desta publicação, para que este possa o mesmo editar
     </p>
     <textarea
       className="large-textareaAlert"
@@ -1802,9 +1702,9 @@ return (
 
 
 {showCreateForm && (
-      <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Criar Evento</h1>
+      <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Criar Publicação</h1>
         <div className="header">
-          <h1 className="header-title">Nome do evento</h1>
+          <h1 className="header-title">Nome do local</h1>
           <div className="author">
           <div className="authorName"><span>Autor :</span></div>
           <img src={user.caminho_foto} alt="Eu" className="author-icon" />
@@ -1836,28 +1736,23 @@ return (
           >
             <i className="fas fa-map-marker-alt tab-icon"></i> Localização
           </button>
-          <button
-            className={`tab ${activeTab === 'comentarios' ? 'active' : ''}`}
-            onClick={() => handleTabClick('comentarios')}
-          >
-            <i className="fas fa-comment tab-icon"></i> Comentários
-          </button>
+          
           <button
             className={`tab ${activeTab === 'mais_informacoes' ? 'active' : ''}`}
             onClick={() => handleTabClick('mais_informacoes')}
           >
-            <i className="fas fa-info tab-icon"></i> Formulário de Inscrição
+            <i className="fas fa-info tab-icon"></i> Mais Informações
           </button>
-         </div>
-          <div className="tab-content">
+        </div>
+        <div className="tab-content">
                 {activeTab === 'descricao' && (
-          <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
-              <label>Área do Evento</label>
+              <label>Área do Local</label>
               <input type="text" value="Desporto" readOnly />
             </div>
             <div className="form-group">
-            <label>Tópico do Evento</label>
+          <label>Tópico do Local</label>
             <select value={topico} onChange={(e) => setTopico(e.target.value)}>
               <option value="">selecionar tópico</option>
               {topicos.map((topico) => (
@@ -1866,24 +1761,24 @@ return (
             </select>
           </div>
 
-            <div className="form-group">
-            <label>Nome do Evento</label>
-            <input type="text" placeholder="inserir nome do local" value={nome} onChange={(e) => setNome(e.target.value)} />
-            </div>
-            <div className="form-group">
-            <label>Descrição do Evento</label>
+          <div className="form-group">
+            <label>Nome do local</label>
+            <input type="text" placeholder="inserir nome do local" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
+          </div>
+          <div className="form-group">
+            <label>Descrição do local</label>
             <input type="text" placeholder="inserir uma breve descrição do local" value={descricao} onChange={(e) => setDescricao(e.target.value)}/>
-            </div>
-           <div className="form-buttons">
+          </div>
+          <div className="form-buttons">
             <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-            <button type="button" className="submit-button" onClick={handleContinue} >Continuar</button>
+            <button type="submit" className="submit-button" onClick={handleContinue} >Continuar</button>
           </div>
         </form>
       )}
 
 {activeTab === 'galeria' && (
 <div className="tab-content_galeria">
-  <h2>Galeria do Evento</h2>
+  <h2>Galeria do local</h2>
   <div {...getRootProps({ className: 'dropzone' })} className="gallery-upload">
     <input {...getInputProps()} />
     <div className="upload-box">
@@ -1891,7 +1786,7 @@ return (
       <span className="upload-text">Upload</span>
     </div>
     <p className="gallery-info">
-      <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do evento
+      <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do local
     </p>
   </div>
   <div className="uploaded-images">
@@ -1909,23 +1804,25 @@ return (
 </div>
 )}
 
+
+
 {activeTab === 'horario' && (
 <div>
-  <h2>Horário do evento</h2>
+  <h2>Horário do local</h2>
   {Object.keys(horario).map((dia) => (
     <div key={dia} className="form-group_horario">
       <label>{dia}</label>
       <div className="horario-inputs">
         <input
           type="text"
-          placeholder="HH:mm"
+          placeholder="Início HH:mm"
           value={horario[dia].inicio}
           disabled={horario[dia].fechado}
           onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], inicio: e.target.value } })}
         />
         <input
           type="text"
-          placeholder="dd/mm/aaaa"
+          placeholder="Fim HH:mm"
           value={horario[dia].fim}
           disabled={horario[dia].fechado}
           onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], fim: e.target.value } })}
@@ -1942,17 +1839,17 @@ return (
   ))}
   <div className="form-buttons">
     <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-    <button type="button" className="submit-button" onClick={handleContinue}>Continuar</button>
+    <button type="submit" className="submit-button" onClick={handleContinue}>Continuar</button>
   </div>
 </div>
 )}
 
       {activeTab === 'localizacao' && (
         <div className="tab-content_localizacao">
-          <h2>Localização do evento</h2>
+          <h2>Localização do local</h2>
           <div className="localizacao-content">
             <div className="form-group">
-              <label>Endereço do evento:</label>
+              <label>Endereço do local:</label>
               <input
                 type="text"
                 placeholder="inserir local"
@@ -1974,73 +1871,55 @@ return (
           </div>
           <div className="form-buttons">
             <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-            <button type="button" className="submit-button" onClick={handleContinue} >Continuar</button>
+            <button type="submit" className="submit-button" onClick={handleContinue} >Continuar</button>
           </div>
         </div>
       )}
 
-
-      {activeTab === 'comentarios' && (
-        <div className="tab-content_comentarios">
-          <div className="comentarios-content">
-          <i class="fas fa-comment-slash"></i>
-          <p>Ainda sem comentários</p>
-          </div>
-          <div className="form-buttons">
-            <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-            <button type="button" className="submit-button" onClick={handleContinue}>Continuar</button>
-          </div>
-        </div>
-      )}
 
       {activeTab === 'mais_informacoes' && (
         <div className="tab-content_mais_informacoes">
           <form>
-          <div>
-      <label htmlFor="firstName" class="firstName">Primeiro Nome</label>
-      <input
-        type="text"
-        id="firstName"
-        value={firstName}
-        onChange={handleChange}
-        placeholder="...inserir primeiro nome..."
-        size="60"
-      />
-      <button onClick={handleClear} class="button_comment">✏️
-      </button>
-      <button onClick={handleClear} class="button_comment">🗑️
-      </button>
-    </div>
-    <button onClick={handleApproveClick} class="adicionar_botao"> <span className="plus-sign">+</span>  Adicionar Campo
-      
-    </button>
+            <div className="form-group">
+              <label>Pagina Web</label>
+              <input
+                type="text"
+                placeholder="inserir site"
+                value={paginaweb}
+                onChange={(e) => setPaginaweb(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label>Contacto</label>
+              <input
+                type="text"
+                placeholder="inserir contacto telefónico"
+                value={telemovel}
+                onChange={(e) => setTelemovel(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label>Email oficial</label>
+              <input
+                type="text"
+                placeholder="...inserir email..."
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
             <div className="form-buttons">
               <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-              <button type="submit" className="submit-button_maisinfos" onClick={handleSubmit}>Publicar</button>
+              <button type="button" className="submit-button_maisinfos" onClick={handleSubmit}>Publicar</button>
             </div>
           </form>
         </div>
       )}
 
-
-{showFormModal && (
-        <>
-          <div className="modal-backdrop"></div>
-          <div className="modal-content">
-            <h2>Adicionar Novo Campo</h2>
-          
-           
-          </div>
-        </>
-      )}
-      
-
-
       {showSuccessMessage && <div className="modal-backdrop"></div>}
         {showSuccessMessage && (
           <div className="success-message_delete">
             <div className="success-message-icon"></div>
-            <h1>Evento criado com sucesso!</h1>
+            <h1>Publicação criada com sucesso!</h1>
             <p>Como é o administrador do seu centro, não será necessário passar pelo processo de validação.</p>
             <button onClick={() => setShowSuccessMessage(false)}>Continuar</button>
           </div>
@@ -2056,11 +1935,9 @@ return (
           <thead>
             <tr>
               <th>#</th>
-              <th>Nome do Evento</th>
+              <th>Nome da Publicação</th>
               <th>Tópico</th>
               <th>Data de Criação</th>
-              <th>Data de Realização</th>
-              <th>Pessoas confirmadas</th>
               <th>Estado</th>
               <th>Editar</th>
             </tr>
@@ -2068,16 +1945,13 @@ return (
           <tbody>
        {filteredEventos.map((eventos, index) => {
   
-  console.log('Eventos filtrados:', filteredEventos);
-
+  
     return (
       <tr key={eventos.id}>
         <td>{index + 1}</td>
-        <td>{eventos.nome}</td>
+        <td>{eventos.titulo}</td>
         <td>{eventos.topico.nome}</td>
         <td>{formatarData(eventos.createdAt)}</td>
-        <td>{formatarData(eventos.inicioData)}</td>
-        <td>{eventos.numparticipantesatividade}</td>
         <td>
           <span className={`publications-status ${eventos.estado.toLowerCase().replace(' ', '-')}`}>
             {eventos.estado}
@@ -2169,3 +2043,6 @@ return (
 };
 
 export default EventosView;
+
+
+    
