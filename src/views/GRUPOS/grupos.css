@@ -1,31 +1,1568 @@
+.publicacoes-div_princ {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 250px); /* Ajustar a largura para descontar o menu lateral */
+  background-color: none; /* Cor de fundo azul */
+  padding: 20px;
+  box-sizing: border-box; /* Inclui padding e border no cálculo da largura e altura */
+  overflow: auto;
+  flex: 1;
+  min-height: calc(100vh - 90px); /* Ajustar para ocupar a altura da tela menos a navbar */
+  margin-left: 250px; /* Espaço para o menu lateral */
+  margin-top: 60px;
+}
 
-.div_princ_grupos{
-    display: flex;
-    flex-direction: column;
-    width: calc(100vh - 10vh); /* Ajustar a largura para descontar o menu lateral */
-    /*background-color: #20384b; */
-    padding: 10px;
-    box-sizing: border-box; /* Inclui padding e border no cálculo da largura e altura */
-    overflow: auto;
-    flex: 1;
-    min-height: calc(100vh - 10vh); /* Ajustar para ocupar a altura da tela menos a navbar */
-    margin-left: 250px; 
-    margin-top: 60px;
-    margin-right: 1px;
-  }
-  
-  
-  
-  .title2 {
-    color: rgb(255, 255, 255); /* Cor do texto */
-    font-size: 36px; /* Tamanho da fonte */
-    text-align: left; /* Alinha o texto à esquerda */
-    margin: 0; /* Remove margens adicionais */
-    padding: 10px 0; /* Adiciona espaçamento acima e abaixo do título */
-  }
-  
+.publicacoes-title2 {
+  color: white;
+  font-size: 26px;
+  margin: 0;
+  padding: 20px 0;
+  text-align: left;
+}
 
+.edit-buttons-container {
+  display: flex;
+  align-items: center;
+}
+
+.edit-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px; /* Ajuste o espaçamento entre os botões conforme necessário */
+}
+
+.publications-edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0; /* Remover padding para evitar espaçamento excessivo */
+  margin-right: 6px; /* Ajuste o espaçamento entre os botões conforme necessário */
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.publicacoes-button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.left-buttons {
+  display: flex;
+  gap: 20px; /* Espaço entre os botões à esquerda */
+}
+
+.right-button {
+  margin-left: auto; /* Coloca o botão à direita */
+}
+
+.create-publication-form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.create-publication-form h2 {
+  margin-top: 0;
+}
+
+.create-publication-form label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.create-publication-form input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.create-publication-form button {
+  padding: 10px 20px;
+  background-color: #156fca;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.create-publication-form button:hover {
+  background-color: #135a9c;
+}
+
+.publications-view {
+  background-color: #f9f9f9;
+  margin-left: 0px;
+  margin-right: 0px;
+  border-radius: 10px;
+}
+
+.publications-table {
+  color: #718EBF;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  text-align: left;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.publications-table th,
+.publications-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.publications-table th {
+  background-color: #f4f4f4;
+}
+
+.publications-table td {
+  color: black;
+}
+
+.publications-status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 12px;
+}
+
+.publications-status.ativa {
+  background-color: #28a745; /* Verde */
+}
+
+.publications-status.por-validar {
+  background-color: #f7d694; /* Amarelo */
+}
+
+.publications-status.denunciada {
+  background-color: #dc3545; /* Vermelho */
+}
+
+
+
+
+.publications-edit-btn:hover {
+  color: #156fca;
+}
+
+.search-container {
+  margin-bottom: 20px;
+}
+
+.search-wrapper {
+  position: relative;
+  max-width: 200px; /* Define um tamanho máximo para a barra de busca */
+  margin: left; /* Centraliza a barra de busca */
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 20px 12px 40px; /* Adicione padding para aumentar a área clicável e espaço para o ícone */
+  border: none;
+  border-radius: 25px; /* Adiciona bordas arredondadas */
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adiciona sombra para um efeito elevado */
+  outline: none; /* Remove a borda ao focar */
+  background-color: white; /* Fundo branco */
+}
+
+.search-input::placeholder {
+  color: #D3DDED; /* Cor azulada para o texto do placeholder */
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 15px; /* Ajuste a posição horizontal conforme necessário */
+  transform: translateY(-50%);
+  color: #D3DDED; /* Cor azulada para a lupa */
+  font-size: 18px;
+}
+
+.tab.active {
+  background-color: #4caf50;
+  color: #fff;
+}
+.form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.form-group label {
+  flex: 0.2;
+  margin-right: 10px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  flex: 2;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.form-buttons {
+  display: flex;
+  justify-content: flex-end; /* Alinha os botões à direita */
+  gap: 20px; /* Adiciona espaço entre os botões */
+}
+
+.cancel-button {
+  background: none; /* Remove o fundo */
+  color: red; /* Define a cor do texto como vermelho */
+  border: none; /* Remove a borda */
+  padding: 0; /* Remove o preenchimento */
+  cursor: pointer; /* Adiciona o ponteiro do mouse */
+  text-decoration: underline; /* Adiciona sublinhado */
+  font-size: 17px; /* Define o tamanho da fonte */
+}
+
+.form-group input[readonly] {
+  background-color: #f9f9f9; /* Cor de fundo para indicar que é apenas leitura */
+  border: 1px solid #ccc; /* Borda igual ao select */
+  padding: 8px; /* Padding igual ao select */
+  border-radius: 4px; /* Bordas arredondadas */
+  width: 100%; /* Largura total */
+  color: #333; /* Cor do texto */
+  cursor: not-allowed; /* Cursor para indicar que não é editável */
+}
+
+
+
+.submit-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+.cancel-button:hover {
+  background-color: #f6e5e5; /* Vermelho mais escuro */
+}
+.submit-button:hover {
+  background-color: #388e3c; /* Verde mais escuro */
+}
+.criar-publicacao-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px;
+  background-color: #4caf50; /* Cor verde */
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
   
+  color: white;
+}
+
+.hidden-title {
+  visibility: hidden;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+}
+
+.author-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.author img {
+  border-radius: 50%;
+  margin-left: 10px;
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  background-color: #f1f1ef; /* Ajuste para a cor desejada */
   
- 
-  
+}
+
+.tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #f5f5f5;
+  border: none;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.tab-content {
+  padding: 20px;
+  background-color: #fff;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+.tab-icon {
+  margin-right: 5px;
+}
+
+.header-title {
+  font-size: 2.0em;
+  color: white;
+}
+
+.authorName{
+  font-size: 1.5em;
+}
+
+
+.tab-content .form-group_horario {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px; /* Ajuste a margem conforme necessário */
+}
+
+.tab-content .form-group_horario label {
+  width: 100px; /* Defina a largura fixa para as labels */
+  margin-right: 10px;
+}
+
+.tab-content .form-group_horario input {
+  width: 100px; /* Defina a largura fixa para os inputs */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.tab-content_comentarios {
+  text-align: left;
+  padding: 20px;
+}
+
+.no-comments {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.no-comments-icon {
+  font-size: 64px;
+  color: #999;
+  margin-bottom: 20px;
+}
+
+.no-comments p {
+  font-size: 24px;
+  color: #333;
+}
+
+
+.tab-content_mais_informacoes {
+  padding: 2px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.tab-content_galeria {
+  padding: 2px;
+}
+
+.gallery-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.gallery-info {
+  font-size: 14px;
+  color: #888;
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.gallery-info i {
+  margin-right: 5px;
+}
+
+.tab-content_localizacao {
+  padding: 2px;
+}
+
+.localizacao-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.map-placeholder {
+  width: 100%;
+  height: 200px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-placeholder img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.submit-button_maisinfos {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+
+.submit-button_maisinfos:hover {
+  background-color: #388e3c; /* Verde mais escuro */
+}
+
+
+.submit-button_maisinfos::before {
+  content: '✔';
+  margin-right: 8px;
+}
+
+
+.success-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border: 2px solid #4caf50; /* Verde */
+  border-radius: 8px;
+  padding: 40px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.success-message h1 {
+  color: #4caf50; /* Verde */
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.success-message p {
+  color: #333;
+  font-size: 16px;
+  margin-bottom: 30px;
+}
+
+.success-message button {
+  padding: 10px 20px;
+  background-color: #4caf50; /* Verde */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.success-message button:hover {
+  background-color: #388e3c; /* Tom mais escuro de verde */
+}
+
+.delete-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  text-align: center;
+  width: 400px;
+}
+
+.modal-header {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.modal-body {
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.modal-icon {
+  font-size: 50px;
+  color: red;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.delete-button {
+  background-color: red;
+  color: white;
+}
+
+.cancel-button_delete {
+  background-color: #ccc;
+  color: black;
+}
+
+.modal_hide {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  text-align: center;
+  width: 400px;
+}
+
+.modal-header_hide {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.modal-body_hide {
+  font-size: 16px;
+  margin-bottom: 90px;
+}
+
+.modal-icon_hide {
+  font-size: 50px;
+  color: #007bff;
+}
+
+.modal-buttons_hide {
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-buttons_hide button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.hide-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.cancel-button_hide {
+  background-color: #ccc;
+  color: black;
+}
+
+.character-count {
+  text-align: right;
+  color: #666;
+  font-size: 12px;
+}
+
+.save-button {
+  background-color: #4CAF50; /* Cor de fundo verde */
+  color: white; /* Cor do texto branca */
+  border: none; /* Sem borda */
+  padding: 10px 20px; /* Espaçamento interno do botão */
+  border-radius: 25px; /* Bordas arredondadas */
+  cursor: pointer; /* Ponteiro do mouse quando sobre o botão */
+  display: flex; /* Flexbox para alinhar o ícone e o texto */
+  align-items: center; /* Alinha verticalmente ícone e texto */
+}
+
+.save-button i {
+  margin-right: 8px; /* Espaçamento entre o ícone e o texto */
+}
+
+.save-button:hover {
+  background-color: #45a049; /* Cor de fundo ao passar o mouse */
+}
+
+
+.search-container_comentarios {
+  margin-bottom: 20px;
+}
+
+.search-wrapper_comentarios {
+  position: relative;
+  max-width: 200px; /* Define um tamanho máximo para a barra de busca */
+  margin: left; /* Centraliza a barra de busca */
+}
+
+.search-input_comentarios {
+  width: 100%;
+  padding: 12px 20px 12px 40px; /* Adicione padding para aumentar a área clicável e espaço para o ícone */
+  border: none;
+  border-radius: 25px; /* Adiciona bordas arredondadas */
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adiciona sombra para um efeito elevado */
+  outline: none; /* Remove a borda ao focar */
+  background-color: white; /* Fundo branco */
+}
+
+.search-input_comentarios::placeholder {
+  color: #D3DDED; /* Cor azulada para o texto do placeholder */
+}.success-message_delete {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 50px;
+  text-align: center;
+  z-index: 1000;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.success-message_delete h1 {
+  font-size: 24px;
+  margin-bottom: 20px; /* Ajuste conforme necessário */
+}
+
+.success-message_delete button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px; /* Ajuste conforme necessário */
+}
+
+.success-message-icon {
+  width: 40px; /* Tamanho do ícone */
+  height: 40px; /* Tamanho do ícone */
+  margin-bottom: 20px; /* Espaço entre o ícone e o texto */
+  background: url('https://i.ibb.co/SBF55ft/Captura-de-ecr-2024-06-23-234924.png') no-repeat center center;
+  background-size: contain; /* Ajuste conforme necessário */
+}
+
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+
+.tab-content2 {
+  padding: 20px;
+  background-color: #fff;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  max-height: 70vh; /* Altura máxima para permitir espaço para a rolagem */
+  overflow-y: auto; /* Adicionar rolagem vertical */
+}
+
+
+.form-buttons {
+  display: flex;
+  justify-content: flex-end; /* Alinha os botões à direita */
+  gap: 20px; /* Adiciona espaço entre os botões */
+  margin-top: 20px;
+}
+
+
+/* CSS adicional para garantir a centralização do modal */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 400px; /* Ajuste conforme necessário */
+  z-index: 1000;
+  padding: 23px;
+  box-sizing: border-box; /* Certifique-se de incluir o padding na largura total */
+}
+
+/* CSS para escurecer o fundo ao redor do modal */
+.modal-backdrop2 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999; /* Um pouco abaixo do modal */
+}
+
+/* CSS adicional para garantir que os elementos internos estejam centralizados */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centraliza o conteúdo horizontalmente */
+  margin-bottom: 20px;
+  flex-direction: column;
+  font-style: bold;
+  font-size: 30px;
+}
+
+.modal-header img.modal-icon {
+  margin-bottom: 10px; /* Espaço entre a imagem e o texto */
+}
+
+.modal-body .option {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: 17px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end; /* Centraliza o botão Cancelar */
+  margin-top: 20px;
+}
+
+.modal-body .option img {
+  width: 50px; /* Defina o tamanho desejado */
+  height: 50px; /* Defina o tamanho desejado */
+  object-fit: contain;
+}
+
+.modal-footer .cancel-button {
+  background: none;
+  border: none;
+  color: rgb(87, 86, 86);
+  cursor: pointer;
+  padding: 5px 10px; /* Adicione padding para o botão cancelar */
+  border-radius: 4px; /* Adicione borda arredondada para combinar com o botão Enviar */
+  margin-right: 10px; /* Adicione margem direita para separar os botões */
+}
+
+.modal-footer .submit-button {
+  background: #007bff;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+
+
+
+/* CSS adicional para garantir a centralização do modal */
+.modalAlert {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 400px; /* Ajuste conforme necessário */
+  z-index: 1000;
+  padding: 28px;
+  box-sizing: border-box; /* Certifique-se de incluir o padding na largura total */
+}
+
+/* CSS para escurecer o fundo ao redor do modal */
+.modalAlert-backdrop2 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999; /* Um pouco abaixo do modal */
+}
+
+/* CSS adicional para garantir que os elementos internos estejam centralizados */
+.modalAlert-header {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centraliza o conteúdo horizontalmente */
+  margin-bottom: 20px;
+  flex-direction: column;
+  font-style: bold;
+  font-size: 30px;
+}
+
+.modalAlert-header img.modal-icon {
+  margin-bottom: 10px; /* Espaço entre a imagem e o texto */
+}
+
+.modalAlert-body .option {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: 17px;
+}
+
+.modalAlert-footer {
+  display: flex;
+  justify-content: flex-end; /* Centraliza o botão Cancelar */
+  margin-top: 20px;
+}
+
+
+.modalAlert-footer .cancel-button {
+  background: none;
+  border: none;
+  color: rgb(87, 86, 86);
+  cursor: pointer;
+  padding: 5px 10px; /* Adicione padding para o botão cancelar */
+  border-radius: 4px; /* Adicione borda arredondada para combinar com o botão Enviar */
+  margin-right: 10px; /* Adicione margem direita para separar os botões */
+}
+
+.modalAlert-footer .submit-button {
+  background: #007bff;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px 20px;
+  border-radius: 25px;
+}
+
+
+/* Adicione esta classe ao seu arquivo CSS */
+.large-textareaAlert {
+  width: 100%;
+  height: 100px; /* Defina a altura desejada */
+  resize: none; /* Para evitar que o usuário redimensione a textarea */
+}
+
+.modalAlert-header img {
+  width: 70px; /* Defina a largura desejada */
+  height: auto; /* Ajuste a altura proporcionalmente */
+  margin-bottom: 10px; /* Espaço entre a imagem e o texto */
+}
+
+
+.modalDeleteMedidas {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 400px;
+  z-index: 1000;
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+.modalDeleteMedidas-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  flex-direction: column;
+  font-style: bold;
+  font-size: 30px;
+}
+
+.modalDeleteMedidas-header img.modal-icon {
+  margin-bottom: 10px;
+}
+
+.modalDeleteMedidas-body .option {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: 17px;
+}
+
+.modalDeleteMedidas-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.modalDeleteMedidas-footer .cancel-button {
+  background: none;
+  border: none;
+  color: rgb(87, 86, 86);
+  cursor: pointer;
+  padding: 5px 10px; /* Adicione padding para o botão cancelar */
+  border-radius: 4px; /* Adicione borda arredondada para combinar com o botão Enviar */
+  margin-right: 10px; /* Adicione margem direita para separar os botões */
+}
+
+.modalDeleteMedidas-footer .delete-button {
+  background: red;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px 20px;
+  border-radius: 25px;
+}
+
+
+.large-textareaDeleteMedidas {
+  width: 100%;
+  height: 100px;
+  resize: none;
+}
+
+.modalDeleteMedidas-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.modalDeleteMedidas-header img {
+  width: 70px; /* Defina a largura desejada */
+  height: auto; /* Ajuste a altura proporcionalmente */
+  margin-bottom: 10px; /* Espaço entre a imagem e o texto */
+}
+
+.gallery {
+  display: flex;
+  flex-wrap: wrap; /* Permitir que as imagens quebrem para a próxima linha */
+  gap: 10px; /* Espaço entre as imagens */
+  margin-bottom: 20px;
+}
+
+.gallery-image {
+  flex: 1 1 calc(33.333% - 10px); /* Ajuste para mostrar 3 imagens por linha */
+  max-width: calc(33.333% - 10px); /* Garantir que a imagem não ultrapasse a largura do contêiner */
+  height: auto;
+  border-radius: 8px;
+}
+
+.description {
+  margin-top: 20px;
+}
+
+
+.reject-button, .approve-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  padding-left: 15px;
+}
+
+.reject-button {
+  background-color: #ff4d4d;
+  color: white;
+}
+
+.approve-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.reject-button i, .approve-button i {
+  margin-right: 5px; /* Espaço entre o ícone e o texto */
+}
+
+.tab.active {
+  margin-bottom: 20px; /* Adiciona espaço entre o título e as imagens */
+}
+
+.modal-approve-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.modal-approve {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 400px;
+  z-index: 1000;
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+.modal-approve-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  flex-direction: column;
+}
+
+.modal-approve-body {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.modal-approve-footer {
+  display: flex;
+  justify-content: flex-end; /* Alinha os botões à direita */
+  gap: 10px;
+}
+
+.approve-confirm-button {
+  background: #28a745;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.approve-cancel-button {
+  background: none;
+  border: none;
+  color: rgb(87, 86, 86);
+  cursor: pointer;
+  padding: 5px 10px; /* Adicione padding para o botão cancelar */
+  border-radius: 4px; /* Adicione borda arredondada para combinar com o botão Enviar */
+  margin-right: 10px; /* Adicione margem direita para separar os botões */
+  text-decoration: underline; /* Adicione sublinhado */
+}
+
+
+.modalApprove-header img {
+  width: 50px; /* Ajuste este valor conforme necessário */
+  height: 50px; /* Ajuste este valor conforme necessário */
+}
+
+.modal-footer2 {
+  display: flex;
+  justify-content: flex-end; /* Centraliza o botão Cancelar */
+  margin-top: 20px;
+}
+
+
+.modal-footer2 .rejeitar-submit-button {
+  background-color: #ff4d4d; /* Cor de fundo vermelha */
+  color: white; /* Cor do texto branco */
+  padding: 10px 20px; /* Espaçamento interno */
+  border: none; /* Remover borda padrão */
+  border-radius: 4px; /* Bordas arredondadas */
+  cursor: pointer; /* Cursor de ponteiro para indicar que é clicável */
+}
+
+.modal-footer2 .cancel-button {
+  background: none;
+  border: none;
+  color: rgb(87, 86, 86);
+  cursor: pointer;
+  padding: 5px 10px; /* Adicione padding para o botão cancelar */
+  border-radius: 4px; /* Adicione borda arredondada para combinar com o botão Enviar */
+  margin-right: 10px; /* Adicione margem direita para separar os botões */
+}
+
+.description, .additional-info {
+  margin-top: 20px;
+}
+
+.publications-approve-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #28a745; /* Verde para aprovar */
+}
+
+.publications-reject-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #dc3545; /* Vermelho para rejeitar */
+}
+
+
+.custom-icon {
+  width: 27px; /* Ajuste a largura conforme necessário */
+  height: 27px; /* Ajuste a altura conforme necessário */
+}
+
+.comentarios-section {
+  margin-top: 20px;
+}
+
+
+
+/* Adicione isso ao seu arquivo CSS */
+.dropzone {
+  border: 2px dashed #007bff;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+
+
+.upload-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.upload-icon {
+  font-size: 24px;
+  color: #ccc;
+}
+
+
+.upload-text {
+  font-size: 16px;
+  color: #ccc;
+}
+
+.uploaded-images {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+
+.image-preview {
+  position: relative;
+  display: inline-block;
+  margin: 10px;
+}
+
+.remove-image {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(255, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.remove-image:hover {
+  background-color: rgba(255, 0, 0, 1);
+}
+.image-preview img {
+  max-width: 100px;
+  max-height: 100px;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.horario-inputs {
+  display: flex;
+  gap: 10px;
+}
+
+.horario-inputs input {
+  flex: 1;
+}
+.comentarios-section {
+  margin-top: 20px;
+}
+
+.add-comentario {
+  margin-bottom: 5px; /* Espaço entre a área de texto e o botão */
+}
+
+.comment-textarea {
+  width: 100%; /* Largura total */
+  height: 80px; /* Altura fixa */
+  resize: none; /* Desativa o redimensionamento */
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  box-sizing: border-box; /* Para incluir padding e border na largura total */
+}
+
+
+.btn-comentar {
+  background-color: white; /* Fundo branco */
+  color: green; /* Texto verde */
+  border: 2px solid green; /* Borda verde */
+  padding: 5px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-comentar:hover {
+  background-color: green;
+  color: white;
+}
+
+
+.btn-comentarios {
+  background-color: white;
+  color: green;
+  border: 1px solid green;
+  padding: 1px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-comentarios:hover {
+  background-color: green;
+  color: white;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.margin-bottom {
+  margin-bottom: 20px; /* Ajuste este valor conforme necessário */
+}
+
+.comment-box {
+  border: 1px solid #ccc; /* ou outro estilo que você esteja usando */
+  padding: 10px; /* ou outro estilo que você esteja usando */
+  border-radius: 5px; /* ou outro estilo que você esteja usando */
+  margin-top: 10px; /* Ajuste este valor conforme necessário */
+}
+
+.comment-button-container {
+  display: flex;
+  justify-content: flex-end; /* Alinha o botão à direita */
+}
+
+
+.stars {
+  display: flex;
+  align-items: center;
+}
+
+.stars i {
+  font-size: 1.5rem;
+  color: #FFD700; /* Cor dourada */
+}
+
+.rating-container {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+}
+
+.rating-value {
+  font-size: 2rem;
+  margin-right: 0.5rem;
+}
+
+.rating-count {
+  margin-left: 0.5rem;
+}
+
+select {
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+}
+
+button {
+  font-size: 1.2rem;
+  padding: 0.5rem 1rem;
+}
+
+.estrelasubmit-button {
+  border: 2px solid #ffffff; /* Amarelo torrado */
+  border-radius: 20px;
+  background-color: white;
+  color: #000000; /* Amarelo torrado */
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.estrelasubmit-button:hover {
+  background-color: #FFA500; /* Amarelo torrado */
+  color: white;
+}
+
+.description {
+  margin-bottom: 20px; /* Espaço entre a descrição e o próximo elemento */
+}
+
+.comentarios-list {
+  margin-top: 20px;
+}
+
+.comentario {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.comentario-header {
+  display: flex;
+  align-items: center;
+}
+
+.comentario-avatar {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+.comentario-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.comentario-autor {
+  font-weight: bold;
+}
+
+.comentario-data {
+  font-size: 0.9em;
+  color: #777;
+}
+
+.comentario-conteudo {
+  margin-top: 10px;
+}
+
+.remove-comentario {
+  background: none;
+  border: 1px solid red; /* Borda vermelha */
+  color: red;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: auto;
+  border-radius: 50%; /* Borda circular */
+  width: 24px; /* Tamanho da bola */
+  height: 24px; /* Tamanho da bola */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; /* Remove padding */
+  transition: background-color 0.3s, color 0.3s; /* Transições suaves */
+}
+
+.remove-comentario:hover {
+  background-color: red; /* Fundo vermelho ao passar o mouse */
+  color: white; /* X branco ao passar o mouse */
+}
+
+
+.denuncias-list {
+  margin-top: 20px;
+}
+
+.denuncia {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.denuncia-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.denuncia-avatar {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+.denuncia-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.denuncia-autor {
+  font-weight: bold;
+}
+
+.denuncia-data {
+  font-size: 0.9em;
+  color: #777;
+}
+
+.denuncia-conteudo {
+  margin-top: 10px;
+}
+
+
+
+
+.denuncia-resolvida {
+  margin-left: 10px;
+  font-size: 18px;
+  color: green;
+  font-weight: bold;
+}
+
+
+.denuncia-actions {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.options-menu {
+  position: absolute;
+  top: 20px; /* Ajuste conforme necessário */
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  border-radius: 20px; /* Manter a borda arredondada */
+  padding: 5px 10px; /* Reduzir o padding */
+  white-space: nowrap; /* Manter o texto em uma linha */
+}
+
+
+.options-button {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.options-menu button, .options-menu span {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: 18px; /* Ajuste o tamanho da fonte conforme necessário */
+}
+
+
+.denunciante-info {
+  display: flex;
+  align-items: center;
+}
+
+.denunciante-texto {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+}
+
+.custom-check-icon {
+  margin-right: 3px; 
+}
+
+.total-denuncias {
+  font-size: 18px; /* Ajuste conforme necessário */
+  color: #797979; /* Ajuste conforme necessário */
+}
+
+.denuncia-header2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.denuncia-header2 h2 {
+  margin: 0;
+}
+
+
+
+

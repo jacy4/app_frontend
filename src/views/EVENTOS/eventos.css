@@ -161,6 +161,226 @@ select {
 }
 
 
+.author-info, .participants-info {
+  display: flex;
+  align-items: center;
+}
 
+.author-details, .participants-info {
+  margin-left: 10px;
+}
+
+.participants-info ul {
+  display: flex;
+  list-style: none;
+  padding: 0;
+}
+
+.participants-info li {
+  margin-right: 5px;
+}
+
+.participante-author-icon, .participant-icon {
+  width: 50px; /* Ajuste conforme necessário */
+  height: 50px; /* Ajuste conforme necessário */
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.participantes-info-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
   
-  
+.participants-info .participant-icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.participant-icon {
+  width: 40px; /* Ajuste conforme necessário */
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover; /* Garante que as imagens não sejam distorcidas */
+}
+
+.more-participants {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.more-participants .more-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  position: relative;
+}
+
+.more-participants .more-number {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centraliza o elemento */
+  background: rgba(0, 0, 0, 0.75); /* Ajuste na opacidade para melhor visibilidade */
+  color: white;
+  font-size: 14px;
+  border-radius: 50%;
+  width: 24px;  /* Ajuste para garantir que o círculo seja grande o suficiente para o texto */
+  height: 24px; /* Mesmo tamanho que a largura para manter a forma circular */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal-participantes {
+  width: 30%;
+  height: 60%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  z-index: 1000; /* Garante que o modal fique acima de outros elementos */
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  padding: 20px;
+}
+
+.overlay-participantes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Transparência para dar efeito de overlay */
+  z-index: 999; /* Garante que o overlay fique abaixo do modal e acima do resto */
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.modal-body {
+  overflow-y: auto; /* Permite rolagem se houver muitos participantes */
+}
+
+.participant-detail {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.participant-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  margin-right: 10px;
+}
+
+.modal-footer {
+  text-align: right;
+}
+
+.close-button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+
+.invitation-to-join {
+  margin-top: 10px; /* Espaço acima do texto */
+  text-align: center; /* Centraliza o texto */
+  font-size: 1rem; /* Tamanho da fonte */
+  color: #333; /* Cor do texto */
+}
+
+.user-plus-icon {
+  color: #4CAF50; /* Define a cor do ícone para verde */
+  font-size: 24px; /* Aumenta o tamanho do ícone */
+}
+
+.user-plus-button {
+  background-color: #f0f0f0; /* Cinza claro */
+  color: #333; /* Cor da letra escura para contraste */
+  padding: 10px 20px; /* Espaçamento interno para dar forma ao botão */
+  font-size: 14px; /* Tamanho menor da fonte */
+  border: none; /* Remover borda */
+  border-radius: 5px; /* Borda arredondada */
+  cursor: pointer; /* Cursor do mouse como ponteiro */
+  transition: background-color 0.3s ease; /* Transição suave de cor de fundo */
+}
+
+.user-plus-button:hover {
+  background-color: #e0e0e0; /* Cor mais escura quando o mouse estiver em cima */
+}
+
+
+.comentario-rating {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.rating-value {
+  font-size: 1.2em;
+  margin-right: 5px;
+}
+
+.stars i {
+  color: #FFD700; /* Cor amarela para as estrelas */
+}
+
+
+.map-button {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  background-color: #fff;
+  color: #007bff;
+  border: 2px solid #28a745;
+  border-radius: 30px;
+  font-size: 16px;
+  text-decoration: none;
+  text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.map-button:hover {
+  background-color: #28a745;
+  color: #fff;
+}
+
+
+.publications-status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 12px;
+}
+
+.publications-status.ativa {
+  background-color: #28a745; /* Verde */
+}
+
+.publications-status.por-validar {
+  background-color: #f7d694; /* Amarelo */
+}
+
+.publications-status.denunciada {
+  background-color: #dc3545; /* Vermelho */
+}
+
+.publications-status.finalizada {
+  background-color: #b1b1b1; /* Vermelho */
+}

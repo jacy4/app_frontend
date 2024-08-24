@@ -1,0 +1,182 @@
+  return (
+    <div className="div_princ_definicoes">
+      <h1 className="title2">Definições</h1>
+      <div className="def-form-container">
+        <div className="tab-nav">
+          <button
+            className={activeTab === 'editar' ? 'active' : ''}
+            onClick={() => handleTabClick('editar')}>
+            Editar Perfil
+          </button>
+          <button
+            className={activeTab === 'preferencias' ? 'active' : ''}
+            onClick={() => handleTabClick('preferencias')}>
+            Preferências
+          </button>
+          <button
+            className={activeTab === 'seguranca' ? 'active' : ''}
+            onClick={() => handleTabClick('seguranca')}>
+            Segurança
+          </button>
+        </div>
+
+        {activeTab === 'editar' && (
+          <div className="tab-content">
+            <form className='editar-perfil' onSubmit={handleSubmit}>
+              <div className='form-group'>
+                <div className='group-img'>
+                 {/* 
+                <label className='form-label-img'>Imagem de Perfil:</label>
+                */} 
+                  <div className='card' id='imagem' onChange={handleImageChange}>
+                    <img src={perfil} />
+                    <label for='input-file'></label>
+                    <input type='file' accept='image/*' id='img-input'/>
+                    
+                  </div>
+                  {imagemPreview && (
+                    <img src={imagemPreview} alt="Imagem de Perfil" className='perfil-imagem-preview' />
+                  )}
+                </div>
+                <div className='group'>
+                  <label className='form-label'>Nome:</label>
+                  <input
+                    type='text'
+                    id='nome'
+                    value={nome}
+                    onChange={(e) => setNome(e.target.value)}
+                    required
+                    placeholder='Seu nome'
+                  />
+                </div>
+                <div className='group'>
+                  <label className='form-label'>Sobrenome:</label>
+                  <input
+                    type='text'
+                    id='sobrenome'
+                    value={sobrenome}
+                    onChange={(e) => setSobrenome(e.target.value)}
+                    required
+                    placeholder='Seu sobrenome'
+                  />
+                </div>
+              </div>
+              <div className='form-group'>
+                <div className='group'>
+                  <label className='form-label'>Email:</label>
+                  <input
+                    type='email'
+                    id='email'
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    placeholder='exemplo@gmail.com'
+                  />
+                </div>
+                <div className='group'>
+                  <label className='form-label'>Senha:</label>
+                  <input
+                    type='password'
+                    id='senha'
+                    value={senha}
+                    onChange={(e) => setSenha(e.target.value)}
+                    required
+                    placeholder='********'
+                  />
+                </div>
+              </div>
+              <div className='form-group'>
+                <div className='group'>
+                  <label className='form-label'>Centro:</label>
+                  <input
+                    type='text'
+                    id='centro'
+                    value={centro}
+                    onChange={(e) => setCentro(e.target.value)}
+                    required
+                    placeholder='Nome do centro'
+                  />
+                </div>
+                <div className='group'>
+                  <label className='form-label'>Sobre Mim:</label>
+                  <input
+                    type='text'
+                    id='sobreMim'
+                    value={sobreMim}
+                    onChange={(e) => setSobreMim(e.target.value)}
+                    required
+                    placeholder='Descrição'
+                  />
+                </div>
+              </div>
+              <button className='btn' type='submit'>Salvar</button>
+            </form>
+          </div>
+        )}
+
+        {activeTab === 'preferencias' && (
+          <div className="tab-content-pref">
+            <form onSubmit={handleSubmit}>
+              <div className='pref-group'>
+                <label>Moeda</label>
+                <input
+                  type='text'
+                  id='moeda'
+                  value={moeda}
+                  onChange={(e) => setMoeda(e.target.value)}
+                  placeholder='EUR'
+                />
+                <label>Zona Horária</label>
+                <input
+                  type='text'
+                  id='zonaHor'
+                  value={zonaHor}
+                  onChange={(e) => setZonaHor(e.target.value)}
+                  placeholder='(GMT-12:00) LISBOA'
+                />
+              </div>
+              <div className='groups'>
+                <div className="form-group">
+                  <label className="switch">
+                    <input type="checkbox" checked={denuncias} onChange={handleDenunciasChange} />
+                    <span className="slider"></span>
+                  </label>
+                  <label>Receber denúncias</label>
+                </div>
+                <div className="form-group">
+                  <label className="switch">
+                    <input type="checkbox" checked={concluidos} onChange={handleConcluidosChange} />
+                    <span className="slider"></span>
+                  </label>
+                  <label>Mostrar concluídos</label>
+                </div>
+                <div className="form-group">
+                  <label className="switch">
+                    <input type="checkbox" checked={pendentes} onChange={handlePendentesChange} />
+                    <span className="slider"></span>
+                  </label>
+                  <label>Mostrar pendentes</label>
+                </div>
+              </div>
+              <button className='btn' type='submit'>Salvar Preferências</button>
+            </form>
+          </div>
+        )}
+
+        {activeTab === 'seguranca' && (
+          <div className="tab-content-seg">
+            <form onSubmit={handleSubmit}>
+              <div className='form-group'>
+                <label className="switch">
+                  <input type="checkbox" checked={doisFatores} onChange={handleToggleChange} />
+                  <span className="slider"></span>
+                </label>
+                <label>Autenticação de dois fatores</label>
+              </div>
+              <button className='btn' type='submit'>Salvar</button>
+            </form>
+          </div>
+        )}
+      </div>
+    </div>
+  );

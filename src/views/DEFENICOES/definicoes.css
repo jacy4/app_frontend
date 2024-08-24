@@ -1,0 +1,375 @@
+.div_princ_definicoes {
+  height: 75%;
+  width: 90%;
+  margin-right: -25%;
+}
+
+.title2 {
+  color: #ffffff;
+  padding: 0px;
+  margin-top: -10px;
+}
+
+.def-form-container {
+  background-color: white;
+  border-radius: 20px;
+  height: 100%;
+  width: 90%;
+  margin-right: -17%;
+  margin-top: 1%;
+  max-width: 100%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.div_princ_definicoes .tab-nav {
+  display: flex;
+  padding: 0%;
+  margin: 0%;
+  width: 100%;
+  background-color: white;
+  border-radius: 20px;
+}
+
+.div_princ_definicoes .tab-nav button {
+  background-color: white;
+  border: none;
+  margin-top: 3%;
+  margin-left: 3%;
+  margin-right: 5%;
+}
+
+.div_princ_definicoes .tab-nav .active {
+  background-color: white;
+  border-bottom: 2px solid blue;
+}
+
+.div_princ_definicoes .tab-content {
+  border-radius: 20px;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* EDITAR PERFIL */
+.div_princ_definicoes .form-group {
+  margin-left: 158px;
+}
+
+.div_princ_definicoes .form-group .group {
+  display: flex;
+  /* Usa flexbox para alinhar itens em linha */
+  align-items: center;
+  /* Alinha os itens verticalmente no centro */
+  margin-bottom: 20px;
+  /* Espaçamento entre os grupos */
+}
+
+
+.div_princ_definicoes .form-group label {
+  width: 150px;
+  /* Largura fixa para os labels */
+  font-weight: bold;
+}
+
+.div_princ_definicoes .form-group input {
+  flex: 1;
+  /* Faz com que o input ocupe o restante do espaço disponível */
+  padding: 10px;
+  border-radius: 5px;
+  margin-right: 20px;
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.editar-perfil{
+  margin-top: -18%;
+}
+
+.div_princ_definicoes .editar-perfil .btn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 82%;
+  width: 150px;
+}
+
+.tab-con.div_princ_definicoes .editar-perfil .btn:hover {
+  background-color: #0056b3;
+}
+
+.editar-perfil .group-img {
+  width: 26%;
+  margin-left: -70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 40px;
+  margin-top: 0%;
+}
+/*
+.div_princ_definicoes .card {
+  width: 1%;
+  height: 8px;
+  background-color: #fff;
+  padding: 50px;
+  border-radius: 50%;
+  text-align: center;
+  color: #333;
+  margin-left: 20%;
+  margin-right: 189px;
+}
+
+.div_princ_definicoes .card h1 {
+  font-weight: 200px;
+  font-size: medium;
+  color: #000;
+  align-self: center;
+}
+
+.div_princ_definicoes .card img {
+  width: 80px;
+  height: 110px;
+  border-radius: 50%;
+  align-self: center;
+  margin-right: 20%;
+}
+
+.perfil-imagem-preview {
+  max-width: 100px;
+  max-height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-top: 2px;
+  margin-left: -131%;
+  margin-right: 50%;
+}
+
+.group-img label {
+  display: block;
+  margin-right: 10px;
+}*/
+
+.editar-perfil .group-img .img-input{
+  margin-left: -20%;
+  margin-right: 10%;
+  margin-top: 20%;
+  align-self: start;
+}
+
+
+/* SEGURANÇA */
+.tab-content-seg .form-group .switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+  margin-right: -95px;
+}
+
+.tab-content-seg .form-group .switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.tab-content-seg .form-group .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+  width: 60px;
+  height: 25px;
+}
+
+.tab-content-seg .form-group .slider:before {
+  position: absolute;
+  content: "";
+  height: 19px;
+  width: 18px;
+  left: 6px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.tab-content-seg input:checked+.slider {
+  background-color: #21dd08;
+}
+
+.tab-content-seg input:checked+.slider:before {
+  transform: translateX(30px);
+}
+
+.tab-content-seg .form-group span {
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+.tab-content-seg .btn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 82%;
+  width: 150px;
+}
+
+.tab-content-seg .btn:hover {
+  background-color: #0056b3;
+}
+
+.tab-content-seg .label {
+  margin-left: 5%;
+  margin-top: -15%;
+  color: #365577;
+}
+
+.tab-content-seg .form-group {
+  margin-left: 4%;
+  margin-top: 3%;
+  margin-bottom: 5%;
+}
+
+.tab-content-seg .password-form input {
+  width: 300px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.tab-content-seg .password-form {
+  margin-top: 3%;
+  margin-left: 5%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tab-content-seg .password-form label {
+  width: 100%;
+}
+
+/* Global adjustments for inputs and labels */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+input[type="number"] {
+  width: 300px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  width: 5%;
+}
+
+.tab-content-seg {
+  margin-top: 3%;
+}
+
+
+/* PREFERÊNCIAS */
+.tab-content-pref .form-group {
+  margin-left: 5%;
+}
+
+.tab-content-pref .groups {
+  margin-bottom: 10%;
+}
+
+.tab-content-pref .form-group .switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+  margin-right: -95px;
+}
+
+.tab-content-pref .form-group .switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.tab-content-pref .form-group .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+  width: 60px;
+  height: 25px;
+}
+
+.tab-content-pref .form-group .slider:before {
+  position: absolute;
+  content: "";
+  height: 19px;
+  width: 18px;
+  left: 6px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.tab-content-pref input:checked+.slider {
+  background-color: #21dd08;
+}
+
+.tab-content-pref input:checked+.slider:before {
+  transform: translateX(30px);
+}
+
+.tab-content-pref .form-group span {
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+.tab-content-pref .pref-group label {
+  margin-left: 5%;
+  margin-right: 1%;
+  ;
+}
+
+.tab-content-pref .pref-group {
+  margin-top: 5%;
+  margin-bottom: 7%;
+}
+
+.tab-content-pref .btn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 82%;
+  width: 150px;
+}
+
+.tab-content-pref .btn:hover {
+  background-color: #0056b3;
+}

@@ -9,6 +9,9 @@ import { GoogleMap, LoadScript, Marker, useJsApiLoader } from '@react-google-map
 import { useDropzone } from 'react-dropzone';
 import moment from 'moment';
 import 'moment/locale/pt'; // Importar o locale português
+import Modal from 'react-modal';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 
 moment.locale('pt'); // Definir o locale para português
 
@@ -64,8 +67,12 @@ const EventosView = () => {
     const [horario, setHorario] = useState({
     "Inicio": { inicioData: '', InicioHora: '' },
     "Fim": { fimData: '', FimHora: ''}
+
 });
 
+const [novaClassificacao, setNovaClassificacao] = useState(0);
+
+const [imagensGaleria, setImagensGaleria] = useState([]);
 
 const [localizacao, setLocalizacao] = useState('');
 const navigate = useNavigate();
@@ -75,8 +82,12 @@ const [topicos, setTopicos] = useState([]);
 const areaId = 1; // Defina o ID da área aqui
 
 const [showAllComentarios, setShowAllComentarios] = useState(false);
-const comentariosExibidos = showAllComentarios ? comentarios : comentarios.slice(0, 1);
+const [comentariosExibidos, setComentariosExibidos] = useState([]);
+useEffect(() => {
+  setComentariosExibidos(showAllComentarios ? comentarios : comentarios.slice(0, 1));
+}, [comentarios, showAllComentarios]);
 
+const [loading, setLoading] = useState(false);
 
 const [isOpen, setIsOpen] = useState(false); 
 // Form states
@@ -93,6 +104,30 @@ const [mediaAvaliacoes, setMediaAvaliacoes] = useState(null);
 
 const [comentariosParaRemover, setComentariosParaRemover] = useState([]);
 const [firstName, setFirstName] = useState('');
+
+const [participantes, setParticipantes] = useState([]);
+
+const [modalIsOpen, setModalIsOpen] = useState(false);
+
+const [dataEvento, setDataEvento] = useState('');
+
+const openModalParticipantes = () => {
+  setModalIsOpen(true); // Abre o modal
+};
+
+const closeModalParticipantes = () => {
+  setModalIsOpen(false); // Fecha o modal
+};
+
+const [showComentarioModal, setShowComentarioModal] = useState(false);
+
+useEffect(() => {
+  if (modalIsOpen) {
+    console.log("Modal está aberto agora!");
+    // Aqui você poderia, por exemplo, carregar dados adicionais necessários para o modal.
+  }
+}, [modalIsOpen]); // A dependência modalIsOpen faz com que o efeito seja executado sempre que modalIsOpen muda.
+
 
 const handleChange = (event) => {
   setFirstName(event.target.value);
@@ -117,7 +152,7 @@ useEffect(() => {
     }
     console.log(`Buscando publicações para centroId: ${centroId}`);
     try {
-      const response = await axios.get(`https://backend-teste-q43r.onrender.com/eventos/listarEventos/${centroId}`);
+      const response = await axios.get(`http://localhost:3000/eventos/listarEventos/${centroId}`);
       if (response.data && Array.isArray(response.data)) {
         console.log(response.data);
         setEventos(response.data);
@@ -206,11 +241,23 @@ const handleConfirmDelete = async () => {
     setEventos(eventos.filter(p => p.id !== eventoToDelete.id));
     setShowSuccessMessageDelete(true); // Exibir a mensagem de sucesso após a exclusão
   } catch (error) {
-    console.error('Erro ao deletar publicação:', error);
-    // Aqui você pode adicionar lógica para tratar erros, como mostrar uma mensagem de erro para o usuário
+    if (error.response) {
+      // O servidor respondeu com um status fora do intervalo 2xx
+      console.error('Erro na resposta da API:', error.response.data);
+      console.error('Status:', error.response.status);
+      console.error('Headers:', error.response.headers);
+    } else if (error.request) {
+      // A requisição foi feita, mas nenhuma resposta foi recebida
+      console.error('Erro na requisição:', error.request);
+    } else {
+      // Algo aconteceu ao configurar a requisição
+      console.error('Erro ao configurar a requisição:', error.message);
+    }
+    console.error('Erro ao deletar evento:', error.config);
   }
   setShowDeleteModal(false);
 };
+
 
 
 
@@ -360,7 +407,7 @@ const center = {
   lng: -7.91968580401233
 };
 
-const API_KEY = 'AIzaSyAPQ0rU-UXFxtKNTNnes9XB6iQ_dCLycHo'; // Substitua pela sua API Key do Google Maps
+const API_KEY = 'AIzaSyC6d4W1bxeX8v1G6mmLFCTzao3BrXOTa7s'; // Substitua pela sua API Key do Google Maps
 
 const [mapCenter, setMapCenter] = useState(center); // center é a posição inicial do mapa
 const [address, setAddress] = useState('');
@@ -390,7 +437,6 @@ const handleAddressSubmit = async (event) => {
     }
   }
 };
-
 const handleButtonClick = (filter) => {
   setFilter(filter);
   setShowEventosList(true);
@@ -399,37 +445,52 @@ const handleButtonClick = (filter) => {
   setSelectedButton(filter);
 };
 
-const filteredEventos = eventos.filter(evento => {
-  // Verifique se 'titulo' e 'estado' são definidos
+
+// Primeiro, filtre os eventos pelo tópico
+let filteredEventos;
+if (topico !== 'all') {
+  filteredEventos = eventos.filter(evento => evento.topico_id === parseInt(topico));
+} else {
+  filteredEventos = [...eventos]; // Faça uma cópia de todos os eventos
+}
+
+// Agora aplique os filtros por título e estado
+  filteredEventos = filteredEventos.filter(evento => {
   if (!evento.nome || !evento.estado) return false;
 
   // Filtro por título
   const matchesTitle = evento.nome.toLowerCase().includes(searchTerm.toLowerCase());
 
   // Filtro por estado
-  let matchesState = true; // Default to true for 'all'
-  if (filter === 'por validar') {
+  let matchesState = true; // Assume que é verdadeiro para 'all' ou nenhum filtro de estado selecionado
+  switch (filter) {
+    case 'por validar':
       matchesState = evento.estado === 'Por validar';
-  } else if (filter === 'ativa') {
+      break;
+    case 'ativa':
       matchesState = evento.estado === 'Ativa';
-  } else if (filter === 'denunciada') {
+      break;
+    case 'denunciada':
       matchesState = evento.estado === 'Denunciada';
-  } else if (filter === 'inativo') {
-      matchesState = evento.estado === 'Inativo';
-}
+      break;
+    case 'finalizada':
+      matchesState = evento.estado === 'Finalizada';
+      break;
+    default:
+      matchesState = true;
+  }
 
   console.log('Filtro atual:', filter);
-console.log('Estado do evento:', evento.estado);
+  console.log('Estado do evento:', evento.estado);
 
-
-  // Combina ambos os filtros
+  // Combina ambos os filtros: título e estado
   return matchesTitle && matchesState;
 });
 
 const countEventosPorValidar = eventos.filter(p => p.estado && p.estado.toLowerCase() === 'por validar').length;
 const countEventosAtivas = eventos.filter(p => p.estado && p.estado.toLowerCase() === 'ativa').length;
 const countEventosDenunciadas = eventos.filter(p => p.estado && p.estado.toLowerCase() === 'denunciada').length;
-const countEventosInativos = eventos.filter(p => p.estado && p.estado.toLowerCase() === 'Inativo').length;
+const countEventosFinalizados = eventos.filter(p => p.estado && p.estado.toLowerCase() === 'Finalizada').length;
 
 const handleMedidasClick = () => {
   setShowMedidasModal(true);
@@ -576,7 +637,7 @@ setShowReportedModal(true);
 useEffect(() => {
 const Comentarios = async () => {
   try {
-    const response = await axios.get(`https://backend-teste-q43r.onrender.com/comentarios/eventos/${selectedEvento.id}`);
+    const response = await axios.get(`http://localhost:3000/comentarios_eventos/todoscomentarios/${selectedEvento.id}`);
     console.log(response.data);
     setComentarios(response.data);
   } catch (error) {
@@ -590,28 +651,47 @@ if (selectedEvento) {
 }, [selectedEvento]);
 
 const handleAddComentario = async () => {
-const autor_id = sessionStorage.getItem('user_id'); // Obtendo o user_id do sessionStorage
-const comentarioData = {
-  evento_id: selectedEvento.id,
-  conteudo: novoComentario,
-  autor_id
-};
+const user_id = sessionStorage.getItem('user_id'); // Obtendo o user_id do sessionStorage
+  const comentarioData = {
+    evento_id: selectedEvento.id,
+    texto_comentario: novoComentario,
+    user_id,
+    classificacao: novaClassificacao
+  };
 
-try {
-  const response = await axios.post('https://backend-teste-q43r.onrender.com/eventos/create', comentarioData, {
-    headers: {
-      'Content-Type': 'application/json'
+  try {
+    const response = await axios.post('http://localhost:3000/comentarios_eventos/criarcomentario', comentarioData, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.status === 201) {
+      // Sucesso ao adicionar comentário
+
+      // Atualize todos os comentários do usuário com a nova classificação no frontend
+      const updatedComentarios = comentariosExibidos.map(comentario => {
+        if (comentario.usuario.id === user_id) {
+          return {
+            ...comentario,
+            classificacao: novaClassificacao
+          };
+        }
+        return comentario;
+      });
+
+      // Atualize o estado com os novos comentários
+      setComentariosExibidos(updatedComentarios);
+
+      // Limpe o comentário e a classificação
+      setNovoComentario('');
+      setNovaClassificacao(0); // ou qualquer valor que indique a ausência de classificação
+    } else {
+      console.error('Erro na resposta do Backend:', response);
     }
-  });
-
-  if (response.status === 201) {
-    // Lógica de sucesso
-  } else {
-    console.error('Erro na resposta do Backend:', response);
+  } catch (error) {
+    console.error('Erro ao criar comentário:', error);
   }
-} catch (error) {
-  console.error('Erro ao criar comentário:', error);
-}
 };
 
 
@@ -724,7 +804,7 @@ const userId = sessionStorage.getItem('user_id');
 const eventoId = selectedEvento.id;
 
 try {
-  const response = await axios.post('https://backend-teste-q43r.onrender.com/avaliacao/create', {
+  const response = await axios.post('http://localhost:3000/avaliacao_eventos/criar', {
     evento_id: eventoId,
     autor_id: userId,
     estrelas: estrelas
@@ -736,20 +816,20 @@ try {
 }
 };
 
-const MediaAvaliacoes = async () => {
+const MediaAvaliacoes2 = async () => {
 try {
-  const response = await axios.get(`https://backend-teste-q43r.onrender.com/avaliacao/average/${selectedEvento.id}`);
+  const response = await axios.get(`http://localhost:3000/avaliacao_eventos/media/${selectedEvento.id}`);
   setMediaAvaliacoes(response.data);
 } catch (error) {
   console.error('Erro ao buscar média de avaliações:', error);
 }
 };
 
-useEffect(() => {
-if (selectedEvento) {
-  MediaAvaliacoes();
-}
-}, [selectedEvento]);
+// useEffect(() => {
+// if (selectedEvento) {
+//   MediaAvaliacoes();
+// }
+// }, [selectedEvento]);
 
 useEffect(() => {
 if (eventoToEdit) {
@@ -792,7 +872,7 @@ setGaleria(updatedGaleria);
 
 const handleRemoveComentario = async (comentarioId) => {
 try {
-  await axios.delete(`https://backend-teste-q43r.onrender.com/comentarios/delete/${comentarioId}`);
+  await axios.delete(`http://localhost:3000/comentarios_eventos/delete/${comentarioId}`);
   setComentarios(comentarios.filter(comentario => comentario.id !== comentarioId));
 } catch (error) {
   console.error('Erro ao remover comentário:', error);
@@ -831,7 +911,7 @@ try {
 
   // Remover os comentários marcados
   for (const comentarioId of comentariosParaRemover) {
-    await axios.delete(`https://backend-teste-q43r.onrender.com/comentarios/delete/${comentarioId}`);
+    await axios.delete(`http://localhost:3000/comentarios_eventos/delete/${comentarioId}`);
   }
 
   if (response.status === 201) { // Ajuste o código de status para 201 
@@ -874,12 +954,128 @@ try {
 }
 };
 
+useEffect(() => {
+  const fetchParticipantes = async () => {
+      setLoading(true);
+      try {
+          const response = await axios.get(`http://localhost:3000/listaparticipantes_evento/evento/${selectedEvento.id}`);
+          setParticipantes(response.data);
+          setLoading(false);
+      } catch (err) {
+          setError('Falha ao buscar participantes');
+          setLoading(false);
+      }
+  };
+
+  fetchParticipantes();
+}, [selectedEvento]);
+
+
+
+
+const adicionarParticipante = async (eventoId, usuarioId) => {
+  try {
+      const response = await axios.post('http://localhost:3000/listaparticipantes_evento/adicionar_participante/', {
+          evento_id: eventoId,
+          usuario_id: usuarioId
+      });
+      const data = await response.json();
+      if (response.status === 201) {
+        setParticipantes(prevParticipantes => [...prevParticipantes, data.participante]);
+          // Atualize seu estado ou faça qualquer outra ação necessária após adição bem sucedida
+      } else {
+      }
+  } catch (error) {
+      if (error.response) {
+          // Resposta com status fora do intervalo 2xx
+          console.error('Erro ao adicionar participante:', error.response.data);
+      } else if (error.request) {
+          // A requisição foi feita mas não houve resposta
+          console.error('Erro ao adicionar participante:', error.request);
+      } else {
+          // Algo aconteceu na configuração da requisição
+          console.error('Erro:', error.message);
+      }
+  }
+};
+
+// Dentro do componente, antes do return
+useEffect(() => {
+  console.log('Selected Evento:', selectedEvento);
+  console.log('Participantes:', participantes);
+  console.log('UserId:', userId);
+}, [selectedEvento, participantes, userId]); // Dependências para re-logar quando mudarem
+
+// async function getAddressFromCoordinates(latitude, longitude) {
+//   const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=API_KEY`);
+//   const data = await response.json();
+
+//   if (data.results && data.results.length > 0) {
+//     return data.results[0].formatted_address;
+//   } else {
+//     return 'Endereço não encontrado';
+//   }
+// }
+
+// // Em algum lugar do seu componente React:
+// const [endereco, setEndereco] = useState('');
+
+// useEffect(() => {
+//   if (selectedEvento.latitude && selectedEvento.longitude) {
+//     getAddressFromCoordinates(selectedEvento.latitude, selectedEvento.longitude)
+//       .then(address => setEndereco(address))
+//       .catch(error => console.error('Erro ao obter endereço:', error));
+//   }
+// }, [selectedEvento.latitude, selectedEvento.longitude]);
+
+
+
+useEffect(() => {
+  if (selectedEvento && selectedEvento.id) {
+    const fetchMediaAvaliacoes = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/comentarios_eventos/mediaavaliacoes/${selectedEvento.id}`);
+        setMediaAvaliacoes(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar a média das avaliações:', error);
+      }
+    };
+
+    fetchMediaAvaliacoes();
+  }
+}, [selectedEvento]);
+
+useEffect(() => {
+  const fetchImagensGaleria = async () => {
+      try {
+          const response = await axios.get(`http://localhost:3000/galeria_evento/listar_imagens_v2/${selectedEvento.id}`);
+          setImagensGaleria(response.data);
+      } catch (error) {
+          console.error('Erro ao buscar imagens da galeria:', error);
+      }
+  };
+
+  
+      fetchImagensGaleria();
+  
+}, [selectedEvento]);
+
+
+
+
 return (
   <div className="publicacoes-div_princ"> 
     {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de Eventos deste Centro</h1>}
     {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView &&(
       <div className="publicacoes-button-container">
         <div className="left-buttons">
+        <div className='topicSelector'>
+            <TopicSelector
+              topics={topicos}
+              selectedTopic={topico}
+              onChange={(value) => setTopico(value)}
+            />
+            </div>
           <CreateEventoButton
             onClick={() => handleButtonClick('all')}
             iconSrc="https://i.ibb.co/P4nsk4w/Icon-criar.png"
@@ -907,10 +1103,11 @@ return (
           <CreateEventoButton
             iconSrc="https://i.ibb.co/D8QwJ6M/active-removebg-preview.png"
             iconBgColor="#CCFFCC"
-            title="Inativos"
-            subtitle={countEventosInativos.toString()}
-            isSelected={selectedButton === 'inativo'}
-            onClick={() => handleButtonClick('inativo')}
+            title="Finalizada"
+            subtitle={countEventosFinalizados.toString()}
+            isSelected={selectedButton === 'Finalizada'}
+            onClick={() => handleButtonClick('Finalizada')}
+            
           />
           <CreateEventoButton
             iconSrc="https://i.ibb.co/RPC7vW8/Icon-denuncia.png"
@@ -953,11 +1150,11 @@ return (
       <div className="header">
       <h1 className="header-title">{selectedEvento.nome}</h1>
       <div className="author">
-    <div className="authorName"><span>Autor :</span></div>
-    <img src={selectedEvento.autor.caminho_foto} alt={selectedEvento.autor.nome} className="author-icon" />
-    <span>{selectedEvento.autor.nome} {selectedEvento.autor.sobrenome}</span>
-    console.log(selectedEvento.autor);
-  </div>  
+          <div className="authorName"><span>Autor :</span></div>
+          <img src={selectedEvento.user.caminho_foto} alt={selectedEvento.user.nome} className="author-icon" />
+          <span>{selectedEvento.user.nome} {selectedEvento.user.sobrenome}</span>
+      
+        </div>
 
         </div>
 /______________________________________
@@ -1229,8 +1426,8 @@ return (
         <h1 className="header-title">{selectedEvento.nome}</h1>
         <div className="author">
           <div className="authorName"><span>Autor :</span></div>
-          <img src={selectedEvento.autor.caminho_foto} alt={selectedEvento.autor.nome} className="author-icon" />
-          <span>{selectedEvento.autor.nome} {selectedEvento.autor.sobrenome}</span>
+          <img src={selectedEvento.user.caminho_foto} alt={selectedEvento.user.nome} className="author-icon" />
+          <span>{selectedEvento.user.nome} {selectedEvento.user.sobrenome}</span>
       
         </div>
 
@@ -1247,107 +1444,76 @@ return (
       </>
     )}
 
-  {selectedEvento && selectedEvento.estado === 'Ativa' && (
-    <div>
-  <button className="tab active">
-    <i className="fas fa-star tab-icon"></i> Avaliação do evento
-  </button>
-  <div className="description">
-    {mediaAvaliacoes ? (
-      <div className="rating-container">
-        <span className="rating-value">
-          {mediaAvaliacoes.total > 0 ? mediaAvaliacoes.media : "Sê o primeiro a avaliar este Local!"}
-        </span>
-        {mediaAvaliacoes.total > 0 && (
-          <>
-            <div className="stars">
-              {Array.from({ length: 5 }, (_, index) => (
-                <i
-                  key={index}
-                  className={`fas fa-star${index < Math.round(mediaAvaliacoes.media) ? '' : '-o'}`}
-                />
-              ))}
-            </div>
-            <span className="rating-count">
-                com base em {mediaAvaliacoes.total} {mediaAvaliacoes.total === 1 ? 'avaliação' : 'avaliações'}
-              </span>
-
-      </>
-    )}
-  </div>
-) : (
-  <span className="rating-value">Sê o primeiro a avaliar este Local!</span>
-)}
-
-<form onSubmit={handleAvaliacaoSubmit} className="avaliacao-form">
-  <label>
-    <select value={estrelas} onChange={handleAvaliacaoChange}>
-      <option value="1">★ </option>
-      <option value="2">★★ </option>
-      <option value="3">★★★ </option>
-      <option value="4">★★★★ </option>
-      <option value="5">★★★★★ </option>
-    </select>
-  </label>
-  <button type="submit" className="estrelasubmit-button">Enviar Avaliação</button>
-</form>
-</div>
-</div>
-)}
-
-
-/* ---------- Detalhes do evento--------------- */--------------------------------------
-{selectedEvento.autor && (
+{selectedEvento.user && (
   <>
     <button className="tab active">
-      <i className="fas fa-info-circle tab-icon"></i> Organizado por
-    </button>
-    <div className="description">
-      <div className="info-container">
-        <div className="author-info">
-          {selectedEvento.autor.caminho_foto && (
-            <img 
-              src={selectedEvento.autor.caminho_foto} 
-              alt={`${selectedEvento.autor.nome} ${selectedEvento.autor.sobrenome}`} 
-              className="author-icon" 
-            />
-          )}
-          <div className="author-details">
-            <p className="author-name">{selectedEvento.autor.nome} {selectedEvento.autor.sobrenome}</p>
-          </div>
-        </div>
+  <i className="fas fa-check tab-icon"></i>
+  Participantes ({participantes.length}) </button>
+  
 
+  {/* Mostra o botão apenas se o usuário não estiver na lista de participantes */}
+  {!participantes.some(participante =>  Number(participante.usuario.id) === Number(userId))  && (
+      <button className="user-plus-button" onClick={() => adicionarParticipante(selectedEvento.id, userId)}>
+        <i className="fas fa-user-plus tab-icon user-plus-icon"></i> Participar no Evento
+      </button>
+    )}
+  
+
+    <div className="description">
+      <div className="participantes-info-container">
         <div className="participants-info">
-          <h3>Pessoas que vão:</h3>
-          <ul className="participants-list">
-            {selectedEvento.participantes && selectedEvento.participantes.map((pessoa, index) => (
-              <li key={index} className="participant-item">
-                {pessoa.nome} {pessoa.sobrenome}
-              </li>
+          
+          <div className="participant-icons">
+            {participantes.slice(0, 5).map((participante, index) => (
+              <img key={index} src={participante.usuario.caminho_foto} alt={`${participante.usuario.nome} ${participante.usuario.sobrenome}`} className="participant-icon"/>
             ))}
-          </ul>
+            {participantes.length > 5 && (
+              <div onClick={openModalParticipantes} className="more-participants">
+                <img src={participantes[5].usuario.caminho_foto} alt="Mais participantes" className="more-icon"/>
+                <span className="more-number">+{participantes.length - 5}</span>
+              </div>
+            )}
+          </div>
+          
         </div>
-        
       </div>
-      
     </div>
+
+    {/* Modal para mostrar todos os participantes com um layout ampliado e mais detalhes */}
+    <Modal
+      isOpen={modalIsOpen}
+      onRequestClose={closeModalParticipantes}
+      contentLabel="Lista Completa de Participantes"
+      className="modal-participantes"
+      overlayClassName="overlay-participantes"
+    >
+      <div className="modal-content">
+        <h2>Lista Completa de Participantes</h2>
+        <div className="modal-body">
+          {participantes.map(participante => (
+            <div key={participante.usuario.id} className="participant-detail">
+              <img src={participante.usuario.caminho_foto} alt={`${participante.usuario.nome} ${participante.usuario.sobrenome}`} className="participant-icon"/>
+              <span>{participante.usuario.nome} {participante.usuario.sobrenome}</span>
+            </div>
+          ))}
+        </div>
+        <div className="modal-footer">
+          <button onClick={closeModalParticipantes} className="close-button">Fechar</button>
+        </div>
+      </div>
+    </Modal>
   </>
 )}
- 
- {selectedEvento.horario && (
+
+
+
+{selectedEvento.datainicioatividade && (
   <>
     <button className="tab active">
-      <i className="fas fa-clock tab-icon"></i> Horário do Evento
+      <i className="fas fa-calendar-alt tab-icon"></i> Data do Evento
     </button>
     <div className="description">
-      <p><strong>Estado:</strong> {selectedEvento.estado}</p>
-      <div className="tab active">
-        {weekDays.map((dia) => (
-          <p key={dia}>
-            <strong>{dia}:</strong> {selectedEvento.horario[dia] || 'Fechado'}
-          </p>
-        ))}
-      </div>
+      <p><strong>Data:</strong> {new Date(selectedEvento.datainicioatividade).toLocaleString()}</p>
     </div>
   </>
 )}
@@ -1362,102 +1528,196 @@ return (
         </div>
       </>
     )}
+    {selectedEvento.latitude && (
+  <>
+    <button className="tab active">
+      <i className="fas fa-map-marker-alt tab-icon"></i> Localização
+    </button>
+    <div className="location">
+      <p><strong>Localização:</strong> {selectedEvento.latitude}, {selectedEvento.longitude}</p>
+      <a 
+        href={`https://www.google.com/maps?q=${selectedEvento.latitude},${selectedEvento.longitude}`} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="map-button"
+      >
+        Ver no Google Maps
+      </a>
+    </div>
+  </>
+)}
+
+{selectedEvento.topico &&  (
+  <>
+    <button className="tab active">
+      <i className="fas fa-tag tab-icon"></i> Relacionado com Este Evento
+    </button>
+    <div className="description tags-container">
+      <span className="tag">
+        <i className="fas fa-tags tag-icon"></i> {selectedEvento.topico.nome}
+      </span>
+      
+      <p>
+        <i className="fas fa-tag"></i> {selectedEvento.tipo_evento.nome_tipo}
+      </p>
     
+    </div>
+  </>
+)}
 
-   
+<div className="tab-content2">
+  {imagensGaleria && imagensGaleria.length > 0 && (
+    <>
+      <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Evento</button>
+      <div className="gallery">
+        {imagensGaleria.map((image, index) => (
+          <img key={index} src={image.caminho_imagem} alt={`Galeria ${index}`} className="gallery-image" />
+        ))}
+      </div>
+    </>
+  )}
+</div>
 
-    {selectedEvento.estado && (
-      <>
-        <button className="tab active"><i className="fas fa-tasks tab-icon"></i> Estado do Evento</button>
-        <div className="estado">
-          <p><strong>Estado:</strong> {selectedEvento.estado}</p>
-        </div>
-      </>
-    )}
-    {selectedEvento.localizacao && (
-      <>
-        <button className="tab active"><i className="fas fa-map-marker-alt tab-icon"></i> Localização</button>
-        <div className="location">
-          <p><strong>Localização:</strong> {selectedEvento.localizacao}</p>
-        </div>
-      </>
-    )}
-    {selectedEvento.paginaweb && (
-      <>
-        <button className="tab active"><i className="fas fa-globe tab-icon"></i> Página Web</button>
-        <div className="website">
-          <p><strong>Página web:</strong> {selectedEvento.paginaweb}</p>
-        </div>
-      </>
-    )}
-    {selectedEvento.telemovel && (
-      <>
-        <button className="tab active"><i className="fas fa-phone tab-icon"></i> Telefone</button>
-        <div className="phone">
-          <p><strong>Telemóvel/Telefone: </strong>{selectedEvento.telemovel}</p>
-        </div>
-      </>
-    )}
-    {selectedEvento.email && (
-      <>
-        <button className="tab active"><i className="fas fa-envelope tab-icon"></i> Email</button>
-        <div className="email">
-          <p><strong>Email:</strong> {selectedEvento.email}</p>
-        </div>
-      </>
-    )}
+
     {/* Seção de Comentários */}
-    {selectedEvento && selectedEvento.estado === 'Ativa' && (
+    {/* Seção de Comentários */}
+{selectedEvento && selectedEvento.estado === 'Ativa' && (
 <div> 
-<button className="tab active"><i className="fas fa-comments tab-icon"></i> Comentários</button>
-<div className="comentarios-section">
-<div className="comentarios-list">
-{comentariosExibidos.map((comentario) => (
-  <div key={comentario.id} className="comentario">
-    <div className="comentario-header">
-    {comentario.autor && comentario.autor.caminho_foto && (
-        <img src={comentario.autor.caminho_foto} alt={`${comentario.autor.nome} ${comentario.autor.sobrenome}`} className="comentario-avatar" />
-      )}
-      <div className="comentario-info">
-      {comentario.autor && (
+  <button className="tab active"><i className="fas fa-comments tab-icon"></i> Comentários e Avaliações</button>
+  <div className="comentarios-section">
+    <div className="avaliacoes-resumo">
+      
+      <div className="avaliacoes-info">
+        {mediaAvaliacoes && mediaAvaliacoes.total > 0 ? (
           <>
-            <span className="comentario-autor">{comentario.autor.nome} {comentario.autor.sobrenome}</span>
-            <span className="comentario-data">{new Date(comentario.createdat).toLocaleDateString()}</span>
+            <span className="avaliacoes-media">
+              {mediaAvaliacoes.media.toFixed(1)}
+            </span>
+            <div className="stars">
+              {Array.from({ length: 5 }, (_, index) => (
+                <i
+                  key={index}
+                  className={`fas fa-star${index < Math.round(mediaAvaliacoes.media) ? '' : '-o'}`}
+                />
+              ))}
+            </div>
+            <span className="avaliacoes-total">
+              com base em {mediaAvaliacoes.total} {mediaAvaliacoes.total === 1 ? 'avaliação' : 'avaliações'}
+            </span>
           </>
+        ) : (
+          <span className="avaliacoes-media">Sê o primeiro a avaliar este Evento!</span>
         )}
       </div>
     </div>
-    <div className="comentario-conteudo">
-      <p>{comentario.conteudo}</p>
+
+    <div className="comentarios-list">
+      {comentariosExibidos.map((comentario) => (
+        <div key={comentario.id} className="comentario">
+          <div className="comentario-header">
+            {comentario.usuario && comentario.usuario.caminho_foto && (
+              <img src={comentario.usuario.caminho_foto} alt={`${comentario.usuario.nome} ${comentario.usuario.sobrenome}`} className="comentario-avatar" />
+            )}
+            <div className="comentario-info">
+              {comentario.usuario && (
+                <>
+                  <span className="comentario-autor">{comentario.usuario.nome} {comentario.usuario.sobrenome}</span>
+                  <span className="comentario-data">{new Date(comentario.createdat).toLocaleDateString()}</span>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Aqui você adiciona a lógica para exibir a classificação textual */}
+          <div className="comentario-rating">
+            {comentario.classificacao > 0 && (
+              <>
+                <div className="stars">
+                  {Array.from({ length: 5 }, (_, index) => (
+                    <i
+                      key={index}
+                      className={`fas fa-star${index < comentario.classificacao ? '' : '-o'}`}
+                    />
+                  ))}
+                </div>
+                <span className="rating-text">
+                  {comentario.classificacao === 5 && 'Excelente'}
+                  {comentario.classificacao === 4 && 'Bom'}
+                  {comentario.classificacao === 3 && 'Médio'}
+                  {comentario.classificacao === 2 && 'Fraco'}
+                  {comentario.classificacao === 1 && 'Péssimo'}
+                </span>
+              </>
+            )}
+          </div>
+
+          <div className="comentario-conteudo">
+            <p>{comentario.texto_comentario}</p>
+          </div>
+        </div>
+      ))}
     </div>
+
+    <button className="btn-comentarios margin-bottom" onClick={() => setShowAllComentarios(!showAllComentarios)}>
+      {showAllComentarios ? 'Esconder Comentários' : 'Mostrar todos os Comentários'}
+    </button>
+
+    <div className="comment-button-container">
+      <button className="btn-comentar" onClick={() => setShowComentarioModal(true)}>Comentar</button>
     </div>
-  ))}
-</div>
-
-<button className="btn-comentarios margin-bottom" onClick={() => setShowAllComentarios(!showAllComentarios)}>
-{showAllComentarios ? 'Esconder Comentários' : 'Mostrar todos os Comentários'}
-</button>
-
-
-<div className="add-comentario">
-<textarea
-  className="comment-textarea"
-  placeholder="Adicionar um comentário..."
-  value={novoComentario}
-  onChange={(e) => setNovoComentario(e.target.value)}
-/>
-</div>
-<div className="comment-button-container">
-<button className="btn-comentar" onClick={handleAddComentario}>Comentar</button>
-</div>
 
 </div>
+{showComentarioModal && (
+  <div className="modal">
+    <div className="modal-content">
+      <span className="close" onClick={() => setShowComentarioModal(false)}>&times;</span>
+      <div className="modal-header">
+        <h2>Classifique o Evento</h2>
+      </div>
+      <div className="modal-body">
+        <div className="rating">
+          <select 
+            value={novaClassificacao} 
+            onChange={(e) => setNovaClassificacao(parseInt(e.target.value))}
+            style={{ fontSize: '2rem' }}
+          >
+            <option value="0">Sem Classificação</option>
+            <option value="1">★☆☆☆☆</option>
+            <option value="2">★★☆☆☆</option>
+            <option value="3">★★★☆☆</option>
+            <option value="4">★★★★☆</option>
+            <option value="5">★★★★★</option>
+          </select>
+        </div>
+
+        <textarea
+          className="comment-textarea"
+          placeholder="Escreva o Comentário"
+          value={novoComentario}
+          onChange={(e) => setNovoComentario(e.target.value)}
+        />
+      </div>
+
+      <div className="modal-footer">
+        <button onClick={handleAddComentario} className="btn-comentar">Publicar</button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
 </div>
 )}
 
   </div>
 </div>
 )}
+
+
+
+
 
 
 {showApprovalView && eventoDetail && (
@@ -2060,7 +2320,6 @@ return (
               <th>Tópico</th>
               <th>Data de Criação</th>
               <th>Data de Realização</th>
-              <th>Pessoas confirmadas</th>
               <th>Estado</th>
               <th>Editar</th>
             </tr>
@@ -2076,8 +2335,7 @@ return (
         <td>{eventos.nome}</td>
         <td>{eventos.topico.nome}</td>
         <td>{formatarData(eventos.createdAt)}</td>
-        <td>{formatarData(eventos.inicioData)}</td>
-        <td>{eventos.numparticipantesatividade}</td>
+        <td>{formatarData(eventos.datainicioatividade)}</td>
         <td>
           <span className={`publications-status ${eventos.estado.toLowerCase().replace(' ', '-')}`}>
             {eventos.estado}
