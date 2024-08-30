@@ -650,6 +650,43 @@ if (selectedEvento) {
 }
 }, [selectedEvento]);
 
+const handleLike = async (comentarioId) => {
+  try {
+    await axios.post(`http://localhost:3000/likescomentarioseventos/like`, {
+      comentario_evento_id: comentarioId,
+      user_id: sessionStorage.getItem('user_id')
+    });
+
+    // Após o sucesso, você pode incrementar o número de likes no estado local
+    setComentarios(prevComentarios => prevComentarios.map(comentario => {
+      if (comentario.id === comentarioId) {
+        return { ...comentario, likes: comentario.likes + 1 };
+      }
+      return comentario;
+    }));
+  } catch (error) {
+    console.error('Erro ao adicionar like:', error);
+  }
+};
+
+const [optionsOpen, setOptionsOpen] = useState(null);
+
+const toggleOptionsEvento = (mensagemId) => {
+  setOptionsOpen(prevId => (prevId === mensagemId ? null : mensagemId));
+};
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (!event.target.closest('.comentario-options')) {
+      setOptionsOpen(null);
+    }
+  };
+
+  document.addEventListener('click', handleClickOutside);
+  return () => {
+    document.removeEventListener('click', handleClickOutside);
+  };
+}, []);
+
 const handleAddComentario = async () => {
 const user_id = sessionStorage.getItem('user_id'); // Obtendo o user_id do sessionStorage
   const comentarioData = {
@@ -1060,6 +1097,24 @@ useEffect(() => {
   
 }, [selectedEvento]);
 
+const [comentariosEventos, setComentariosEventos] = useState([]);
+
+const handleDeleteComentarioEvento = async (comentarioId) => {
+  try {
+    const response = await axios.delete(`http://localhost:3000/comentarios_eventos/apagarcomentario/${comentarioId}`);
+    if (response.status === 200) {
+      alert('Comentário excluído com sucesso');
+      setComentariosEventos(comentariosEventos.filter(comentario => comentario.id !== comentarioId)); // Atualize a lista de comentários
+    } else {
+      console.error('Erro ao excluir o comentário:', response);
+      alert('Ocorreu um erro ao excluir o comentário');
+    }
+  } catch (error) {
+    console.error('Erro ao excluir o comentário:', error);
+    alert('Ocorreu um erro ao excluir o comentário');
+  }
+};
+
 
 
 
@@ -1157,7 +1212,6 @@ return (
         </div>
 
         </div>
-/______________________________________
     <div className="tabs">
       <button
         className={`tab ${activeTab === 'descricao' ? 'active' : ''}`}
@@ -1197,8 +1251,6 @@ return (
       </button>
     </div>
     <div className="tab-content">
-
-    //---------------------------------------------------------------------------------
     {activeTab === 'descricao' && (
           <form onSubmit={handleSubmit}>
             
@@ -1626,6 +1678,7 @@ return (
                 </>
               )}
             </div>
+            
           </div>
 
           {/* Aqui você adiciona a lógica para exibir a classificação textual */}
@@ -1650,10 +1703,27 @@ return (
               </>
             )}
           </div>
-
+          <div className="comentario-options">
+        <div className="options-button" onClick={() => toggleOptionsEvento(comentario.id)}>
+          <i className="fas fa-ellipsis-v"></i>
+        </div>
+        {optionsOpen === comentario.id && (
+          <div className="options-menu">
+            <button onClick={() => handleDeleteComentarioEvento(comentario.id)}>
+              <i className="fas fa-trash-alt custom-delete-icon"></i> Excluir Mensagem
+            </button>
+          </div>
+        )}
+      </div>
           <div className="comentario-conteudo">
             <p>{comentario.texto_comentario}</p>
           </div>
+          {/* Botão de Like */}
+      <div className="comentario-like">
+  <button className="comentario-like-button" onClick={() => handleLike(comentario.id)}>
+    {comentario.likes} <i className="fas fa-thumbs-up" style={{color: '#1877F2'}}></i>
+  </button>
+</div>
         </div>
       ))}
     </div>

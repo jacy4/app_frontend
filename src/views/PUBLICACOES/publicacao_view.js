@@ -69,7 +69,8 @@ const PublicacoesView = () => {
     "Domingo": { inicio: '', fim: '', fechado: false },
 });
   
-
+  const [showComentarioModal, setShowComentarioModal] = useState(false);
+  const [novaClassificacao, setNovaClassificacao] = useState(0);
   const [localizacao, setLocalizacao] = useState('');
   const navigate = useNavigate();
   const [imageSrc, setImageSrc] = useState(null); // Estado para imagem escolhida
@@ -78,7 +79,10 @@ const PublicacoesView = () => {
   const areaId = 1; // Defina o ID da área aqui
 
   const [showAllComentarios, setShowAllComentarios] = useState(false);
-  const comentariosExibidos = showAllComentarios ? comentarios : comentarios.slice(0, 1);
+  const [comentariosExibidos, setComentariosExibidos] = useState([]);
+useEffect(() => {
+  setComentariosExibidos(showAllComentarios ? comentarios : comentarios.slice(0, 1));
+}, [comentarios, showAllComentarios]);
 
 
   const [isOpen, setIsOpen] = useState(false); 
@@ -98,6 +102,7 @@ const PublicacoesView = () => {
   const [denuncias, setDenuncias] = useState([]);
 
   const [optionsOpen, setOptionsOpen] = useState(null);
+  const [optionsOpenExcluir, setOptionsOpenExcluir] = useState(null);
 
   const [menuAberto, setMenuAberto] = useState(null);
 
@@ -541,7 +546,7 @@ const handleReportedClick = (publicacao) => {
 useEffect(() => {
   const Comentarios = async () => {
     try {
-      const response = await axios.get(`https://backend-teste-q43r.onrender.com/comentarios/publicacao/${selectedPublication.id}`);
+      const response = await axios.get(`http://localhost:3000/comentarios/todospubcomentarios/${selectedPublication.id}`);
       console.log(response.data);
       setComentarios(response.data);
     } catch (error) {
@@ -554,30 +559,72 @@ useEffect(() => {
   }
 }, [selectedPublication]);
 
-const handleAddComentario = async () => {
-  const autor_id = sessionStorage.getItem('user_id'); // Obtendo o user_id do sessionStorage
-  const comentarioData = {
-    publicacao_id: selectedPublication.id,
-    conteudo: novoComentario,
-    autor_id
-  };
 
+
+
+const handleLike = async (comentarioId) => {
   try {
-    const response = await axios.post('https://backend-teste-q43r.onrender.com/comentarios/create', comentarioData, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
+    await axios.post(`http://localhost:3000/likescomentariospublicacoes/like`, {
+      comentario_publicacao_id: comentarioId,
+      user_id: sessionStorage.getItem('user_id')
     });
 
-    if (response.status === 201) {
-      // Lógica de sucesso
-    } else {
-      console.error('Erro na resposta do Backend:', response);
-    }
+    // Após o sucesso, você pode incrementar o número de likes no estado local
+    setComentarios(prevComentarios => prevComentarios.map(comentario => {
+      if (comentario.id === comentarioId) {
+        return { ...comentario, likes: comentario.likes + 1 };
+      }
+      return comentario;
+    }));
   } catch (error) {
-    console.error('Erro ao criar comentário:', error);
+    console.error('Erro ao adicionar like:', error);
   }
 };
+
+
+const handleAddComentario = async () => {
+  const user_id = sessionStorage.getItem('user_id'); // Obtendo o user_id do sessionStorage
+    const comentarioData = {
+      publicacao_id: selectedPublication.id,
+      conteudo: novoComentario,
+      user_id,
+      classificacao: novaClassificacao
+    };
+  
+    try {
+      const response = await axios.post('http://localhost:3000/comentarios/criarpubcomentario', comentarioData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (response.status === 201) {
+        // Sucesso ao adicionar comentário
+  
+        // Atualize todos os comentários do usuário com a nova classificação no frontend
+        const updatedComentarios = comentariosExibidos.map(comentario => {
+          if (comentario.usuario.id === user_id) {
+            return {
+              ...comentario,
+              classificacao: novaClassificacao
+            };
+          }
+          return comentario;
+        });
+  
+        // Atualize o estado com os novos comentários
+        setComentariosExibidos(updatedComentarios);
+  
+        // Limpe o comentário e a classificação
+        setNovoComentario('');
+        setNovaClassificacao(0); // ou qualquer valor que indique a ausência de classificação
+      } else {
+        console.error('Erro na resposta do Backend:', response);
+      }
+    } catch (error) {
+      console.error('Erro ao criar comentário:', error);
+    }
+  };
 
 
 const handleToggleVisibility = async (publicacao) => {
@@ -700,18 +747,33 @@ const handleAvaliacaoSubmit = async (e) => {
   }
 };
 
-const MediaAvaliacoes = async () => {
-  try {
-    const response = await axios.get(`https://backend-teste-q43r.onrender.com/avaliacao/average/${selectedPublication.id}`);
-    setMediaAvaliacoes(response.data);
-  } catch (error) {
-    console.error('Erro ao buscar média de avaliações:', error);
-  }
-};
+// const MediaAvaliacoes = async () => {
+//   try {
+//     const response = await axios.get(`https://backend-teste-q43r.onrender.com/avaliacao/average/${selectedPublication.id}`);
+//     setMediaAvaliacoes(response.data);
+//   } catch (error) {
+//     console.error('Erro ao buscar média de avaliações:', error);
+//   }
+// };
+
+// useEffect(() => {
+//   if (selectedPublication) {
+//     MediaAvaliacoes();
+//   }
+// }, [selectedPublication]);
 
 useEffect(() => {
-  if (selectedPublication) {
-    MediaAvaliacoes();
+  if (selectedPublication && selectedPublication.id) {
+    const fetchMediaAvaliacoes = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/comentarios/mediapubavaliacoes/${selectedPublication.id}`);
+        setMediaAvaliacoes(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar a média das avaliações:', error);
+      }
+    };
+
+    fetchMediaAvaliacoes();
   }
 }, [selectedPublication]);
 
@@ -884,6 +946,42 @@ useEffect(() => {
 }, []);
 
 
+const toggleOptionsPublicacao = (comentarioId) => {
+  console.log('Toggle Options for:', comentarioId);
+  setOptionsOpenExcluir(prevId => (prevId === comentarioId ? null : comentarioId));
+};
+
+
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (!event.target.closest('.comentario-options-publicacao')) {
+      setOptionsOpenExcluir(null);
+    }
+  };
+
+  document.addEventListener('click', handleClickOutside);
+  return () => {
+    document.removeEventListener('click', handleClickOutside);
+  };
+}, []);
+
+const [comentariosPublicacoes, setComentariosPublicacoes] = useState([]);
+
+const handleDeleteComentarioPublicacao = async (comentarioId) => {
+  try {
+    const response = await axios.delete(`http://localhost:3000/comentarios/apagarpubcomentario/${comentarioId}`);
+    if (response.status === 200) {
+      alert('Comentário excluído com sucesso');
+      setComentariosPublicacoes(comentariosPublicacoes.filter(comentario => comentario.id !== comentarioId)); // Atualize a lista de comentários
+    } else {
+      console.error('Erro ao excluir o comentário:', response);
+      alert('Ocorreu um erro ao excluir o comentário');
+    }
+  } catch (error) {
+    console.error('Erro ao excluir o comentário:', error);
+    alert('Ocorreu um erro ao excluir o comentário');
+  }
+};
 
 
   return (
@@ -1250,7 +1348,7 @@ useEffect(() => {
         </>
       )}
 
-{selectedPublication && selectedPublication.estado === 'Ativa' && (
+{/* {selectedPublication && selectedPublication.estado === 'Ativa' && (
   <div>
 <button className="tab active">
   <i className="fas fa-star tab-icon"></i> Avaliação do Local
@@ -1296,7 +1394,7 @@ useEffect(() => {
   </form>
 </div>
 </div>
-)}
+)} */}
 
       {selectedPublication.descricao && (
         <>
@@ -1364,7 +1462,7 @@ useEffect(() => {
         </>
       )}
       {/* Seção de Comentários */}
-      {selectedPublication && selectedPublication.estado === 'Ativa' && (
+      {/* {selectedPublication && selectedPublication.estado === 'Ativa' && (
   <div> 
 <button className="tab active"><i className="fas fa-comments tab-icon"></i> Comentários</button>
 <div className="comentarios-section">
@@ -1411,6 +1509,159 @@ useEffect(() => {
 
 
 </div>
+</div>
+)} */}
+
+{selectedPublication && selectedPublication.estado === 'Ativa' && (
+<div> 
+  <button className="tab active"><i className="fas fa-comments tab-icon"></i> Comentários e Avaliações</button>
+  <div className="comentarios-section">
+    <div className="avaliacoes-resumo">
+      
+      <div className="avaliacoes-info">
+        {mediaAvaliacoes && mediaAvaliacoes.total > 0 ? (
+          <>
+            <span className="avaliacoes-media">
+              {mediaAvaliacoes.media.toFixed(1)}
+            </span>
+            <div className="stars">
+              {Array.from({ length: 5 }, (_, index) => (
+                <i
+                  key={index}
+                  className={`fas fa-star${index < Math.round(mediaAvaliacoes.media) ? '' : '-o'}`}
+                />
+              ))}
+            </div>
+            <span className="avaliacoes-total">
+              com base em {mediaAvaliacoes.total} {mediaAvaliacoes.total === 1 ? 'avaliação' : 'avaliações'}
+            </span>
+          </>
+        ) : (
+          <span className="avaliacoes-media">Sê o primeiro a avaliar esta Publicação!</span>
+        )}
+      </div>
+    </div>
+
+    
+          <div className="comentarios-list">
+  {comentariosExibidos.map((comentario) => (
+    <div key={comentario.id} className="comentario">
+      <div className="comentario-header">
+        {comentario.usuario && comentario.usuario.caminho_foto && (
+          <img src={comentario.usuario.caminho_foto} alt={`${comentario.usuario.nome} ${comentario.usuario.sobrenome}`} className="comentario-avatar" />
+        )}
+        <div className="comentario-info">
+          {comentario.usuario && (
+            <>
+              <span className="comentario-autor">{comentario.usuario.nome} {comentario.usuario.sobrenome}</span>
+              <span className="comentario-data">{new Date(comentario.createdat).toLocaleDateString()}</span>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Classificação do comentário */}
+      <div className="comentario-rating">
+        {comentario.classificacao > 0 && (
+          <>
+            <div className="stars">
+              {Array.from({ length: 5 }, (_, index) => (
+                <i
+                  key={index}
+                  className={`fas fa-star${index < comentario.classificacao ? '' : '-o'}`}
+                />
+              ))}
+            </div>
+            <span className="rating-text">
+              {comentario.classificacao === 5 && 'Excelente'}
+              {comentario.classificacao === 4 && 'Bom'}
+              {comentario.classificacao === 3 && 'Médio'}
+              {comentario.classificacao === 2 && 'Fraco'}
+              {comentario.classificacao === 1 && 'Péssimo'}
+            </span>
+          </>
+        )}
+      </div>
+      <div className="comentario-options-publicacao">
+  <div className="options-button" onClick={() => toggleOptionsPublicacao(comentario.id)}>
+    <i className="fas fa-ellipsis-v"></i>
+  </div>
+  {optionsOpenExcluir === comentario.id && (
+    <div className="options-menu">
+      <button onClick={() => handleDeleteComentarioPublicacao(comentario.id)}>
+        <i className="fas fa-trash-alt custom-delete-icon"></i> Excluir Comentário
+      </button>
+    </div>
+  )}
+</div>
+
+      {/* Conteúdo do comentário */}
+      <div className="comentario-conteudo">
+        <p>{comentario.conteudo}</p>
+      </div>
+
+      {/* Botão de Like */}
+      <div className="comentario-like">
+  <button className="comentario-like-button" onClick={() => handleLike(comentario.id)}>
+    {comentario.likes} <i className="fas fa-thumbs-up" style={{color: '#1877F2'}}></i>
+  </button>
+</div>
+
+    </div>
+  ))}
+</div>
+
+
+    <button className="btn-comentarios margin-bottom" onClick={() => setShowAllComentarios(!showAllComentarios)}>
+      {showAllComentarios ? 'Esconder Comentários' : 'Mostrar todos os Comentários'}
+    </button>
+
+    <div className="comment-button-container">
+      <button className="btn-comentar" onClick={() => setShowComentarioModal(true)}>Comentar</button>
+    </div>
+
+</div>
+{showComentarioModal && (
+  <div className="modal">
+    <div className="modal-content">
+      <span className="close" onClick={() => setShowComentarioModal(false)}>&times;</span>
+      <div className="modal-header">
+        <h2>Classifique a Publicação</h2>
+      </div>
+      <div className="modal-body">
+        <div className="rating">
+          <select 
+            value={novaClassificacao} 
+            onChange={(e) => setNovaClassificacao(parseInt(e.target.value))}
+            style={{ fontSize: '2rem' }}
+          >
+            <option value="0">Sem Classificação</option>
+            <option value="1">★☆☆☆☆</option>
+            <option value="2">★★☆☆☆</option>
+            <option value="3">★★★☆☆</option>
+            <option value="4">★★★★☆</option>
+            <option value="5">★★★★★</option>
+          </select>
+        </div>
+
+        <textarea
+          className="comment-textarea"
+          placeholder="Escreva o Comentário"
+          value={novoComentario}
+          onChange={(e) => setNovoComentario(e.target.value)}
+        />
+      </div>
+
+      <div className="modal-footer">
+        <button onClick={handleAddComentario} className="btn-comentar">Publicar</button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
 </div>
 )}
 

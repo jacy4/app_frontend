@@ -1389,6 +1389,8 @@ button {
   border-radius: 5px;
   padding: 10px;
   margin-bottom: 10px;
+  position: relative;
+  
 }
 
 .comentario-header {
@@ -1561,4 +1563,39 @@ button {
 
 .denuncia-header2 h2 {
   margin: 0;
+}
+
+.comentario-like {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+.comentario-like-button {
+  background-color: #f0f0f0; /* Cor de fundo do botão */
+  border: none; /* Remover borda padrão */
+  border-radius: 50%; /* Tornar o botão redondo */
+  cursor: pointer; /* Mostrar cursor de "mão" ao passar sobre o botão */
+  padding: 10px; /* Espaçamento interno do botão */
+  font-size: 14px; /* Tamanho da fonte */
+  width: 40px; /* Largura do botão */
+  height: 40px; /* Altura do botão */
+}
+
+.comentario-like-button:hover {
+  background-color: #e0e0e0; /* Mudar cor ao passar o mouse */
+}
+
+.comentario-options {
+  position: absolute;
+  top: 10px; /* Ajuste conforme necessário para posicionar no topo */
+  right: 10px; /* Ajuste conforme necessário para posicionar à direita */
+  z-index: 10; /* Garante que o menu esteja acima de outros elementos */
+}
+
+.comentario-options-publicacao {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
 }
