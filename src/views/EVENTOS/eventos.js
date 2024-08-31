@@ -237,7 +237,7 @@ const handleCancelDelete = () => {
 };
 const handleConfirmDelete = async () => {
   try {
-    await axios.delete(`https://backend-teste-q43r.onrender.com/eventos/delete/${eventoToDelete.id}`);
+    await axios.delete(`http://localhost:3000/eventos/delete/${eventoToDelete.id}`);
     setEventos(eventos.filter(p => p.id !== eventoToDelete.id));
     setShowSuccessMessageDelete(true); // Exibir a mensagem de sucesso após a exclusão
   } catch (error) {
@@ -337,7 +337,7 @@ const handleSubmit = async (e) => {
   console.log('Dados da Publicação:', eventoData); // Log dos dados que serão enviados
 
   try {
-      const response = await axios.post('https://backend-teste-q43r.onrender.com/eventos/create', eventoData, {
+      const response = await axios.post('http://localhost:3000/eventos/create', eventoData, {
           headers: {
               'Content-Type': 'application/json',
           },
@@ -446,16 +446,15 @@ const handleButtonClick = (filter) => {
 };
 
 
-// Primeiro, filtre os eventos pelo tópico
-let filteredEventos;
-if (topico !== 'all') {
-  filteredEventos = eventos.filter(evento => evento.topico_id === parseInt(topico));
-} else {
-  filteredEventos = [...eventos]; // Faça uma cópia de todos os eventos
-}
+
+
+
+
+// Todos os eventos são considerados no início
+let filteredEventos = [...eventos]; // Faça uma cópia de todos os eventos
 
 // Agora aplique os filtros por título e estado
-  filteredEventos = filteredEventos.filter(evento => {
+filteredEventos = filteredEventos.filter(evento => {
   if (!evento.nome || !evento.estado) return false;
 
   // Filtro por título
@@ -486,6 +485,8 @@ if (topico !== 'all') {
   // Combina ambos os filtros: título e estado
   return matchesTitle && matchesState;
 });
+
+
 
 const countEventosPorValidar = eventos.filter(p => p.estado && p.estado.toLowerCase() === 'por validar').length;
 const countEventosAtivas = eventos.filter(p => p.estado && p.estado.toLowerCase() === 'ativa').length;
@@ -554,7 +555,7 @@ handleRejectAndDelete();
 
 const handleRejectAndDelete = async () => {
 try {
-  const response = await axios.delete(`https://backend-teste-q43r.onrender.com/eventos/delete/${eventoDetail.id}`);
+  const response = await axios.delete(`http://localhost:3000/eventos/delete/${eventoDetail.id}`);
   if (response.status === 200) {
     console.log('evento eliminada com sucesso:', response.data);
     // Adicione qualquer lógica adicional, como redirecionamento ou atualização da UI
@@ -735,7 +736,7 @@ const user_id = sessionStorage.getItem('user_id'); // Obtendo o user_id do sessi
 const handleToggleVisibility = async (evento) => {
 try {
   const updatedVisivel = !evento.visivel;
-  await axios.put(`https://backend-teste-q43r.onrender.com/eventos/updateVisibility/${evento.id}`, { visivel: updatedVisivel });
+  await axios.put(`http://localhost:3000/eventos/updateVisibility/${evento.id}`, { visivel: updatedVisivel });
   setEventos(eventos.map(p => p.id === evento.id ? { ...p, visivel: updatedVisivel } : p));
 } catch (error) {
   console.error('Erro ao atualizar visibilidade da publicação:', error);
@@ -799,7 +800,7 @@ useEffect(() => {
 // Função para buscar os tópicos da API
 const Topicos = async () => {
   try {
-    const response = await axios.get(`https://backend-teste-q43r.onrender.com/topicos/topicosdeumaarea/${areaId}`); // Substitua areaId pelo id da área
+    const response = await axios.get(`http://localhost:3000/topicos/topicosdeumaarea/${areaId}`); // Substitua areaId pelo id da área
     setTopicos(response.data);
   } catch (error) {
     console.error('Erro ao buscar tópicos:', error);
@@ -811,7 +812,7 @@ Topicos();
 
 const fetchUser = async (id) => {
 try {
-  const response = await axios.get(`https://backend-teste-q43r.onrender.com/users/user/${id}`);
+  const response = await axios.get(`http://localhost:3000/users/user/${id}`);
   console.log("Resposta da API:", response.data); // Adicione este log
   setUser(response.data);
 } catch (error) {
@@ -940,7 +941,7 @@ const eventoData = {
 };
 
 try {
-  const response = await axios.put(`https://backend-teste-q43r.onrender.com/eventos/update/${eventoToEdit.id}`, eventoData, {
+  const response = await axios.put(`http://localhost:3000/eventos/update/${eventoToEdit.id}`, eventoData, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -972,7 +973,7 @@ setComentarios(comentarios.filter(comentario => comentario.id !== comentarioId))
 
 const approveLocal = async (eventoId) => {
 try {
-  const response = await axios.put(`https://backend-teste-q43r.onrender.com/eventos/update/${eventoId}`, {
+  const response = await axios.put(`http://localhost:3000/eventos/update/${eventoId}`, {
     estado: 'Ativa',
   }, {
     headers: {
@@ -1124,13 +1125,13 @@ return (
     {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView &&(
       <div className="publicacoes-button-container">
         <div className="left-buttons">
-        <div className='topicSelector'>
+        {/* <div className='topicSelector'>
             <TopicSelector
               topics={topicos}
               selectedTopic={topico}
               onChange={(value) => setTopico(value)}
             />
-            </div>
+            </div> */}
           <CreateEventoButton
             onClick={() => handleButtonClick('all')}
             iconSrc="https://i.ibb.co/P4nsk4w/Icon-criar.png"

@@ -89,6 +89,7 @@ useEffect(() => {
   // Form states
   const [titulo, setTitulo] = useState('');
   const [topico, setTopico] = useState('');
+  const [area, setArea] = useState('');
   const autor_id = sessionStorage.getItem('user_id');
 
   const [userId, setUserId] = useState(null);
@@ -106,6 +107,21 @@ useEffect(() => {
 
   const [menuAberto, setMenuAberto] = useState(null);
 
+  useEffect(() => {
+    // Função para buscar as áreas da API
+    const fetchAreas = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/areas/listarAreas'); // Substitua com a URL correta da sua API para buscar as áreas
+        setAreas(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar áreas:', error);
+      }
+    };
+  
+    fetchAreas();
+  }, []);
+  
+  const [areas, setAreas] = useState([]);
 
   useEffect(() => {
     const storedCentroId = sessionStorage.getItem('centro_id');
@@ -122,7 +138,7 @@ useEffect(() => {
       }
       console.log(`Buscando publicações para centroId: ${centroId}`);
       try {
-        const response = await axios.get(`https://backend-teste-q43r.onrender.com/publicacoes/listarPublicacoes/${centroId}`);
+        const response = await axios.get(`http://localhost:3000/publicacoes/listarPublicacoes/${centroId}`);
         if (response.data && Array.isArray(response.data)) {
           console.log(response.data);
           setPublicacoes(response.data);
@@ -206,7 +222,7 @@ useEffect(() => {
   };
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`https://backend-teste-q43r.onrender.com/publicacoes/delete/${publicationToDelete.id}`);
+      await axios.delete(`http://localhost:3000/publicacoes/delete/${publicationToDelete.id}`);
       setPublicacoes(publicacoes.filter(p => p.id !== publicationToDelete.id));
       setShowSuccessMessageDelete(true); // Exibir a mensagem de sucesso após a exclusão
     } catch (error) {
@@ -245,6 +261,7 @@ useEffect(() => {
     }
 
     const publicacaoData = {
+      area_id: area,
         topico_id: topico,
         titulo,
         descricao,
@@ -261,7 +278,7 @@ useEffect(() => {
     console.log('Dados da Publicação:', publicacaoData); // Log dos dados que serão enviados
 
     try {
-        const response = await axios.post('https://backend-teste-q43r.onrender.com/publicacoes/create', publicacaoData, {
+        const response = await axios.post('http://localhost:3000/publicacoes/create', publicacaoData, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -463,7 +480,7 @@ const handleRejectClick = () => {
 
 const handleRejectAndDelete = async () => {
   try {
-    const response = await axios.delete(`https://backend-teste-q43r.onrender.com/publicacoes/delete/${publicationDetail.id}`);
+    const response = await axios.delete(`http://localhost:3000/publicacoes/delete/${publicationDetail.id}`);
     if (response.status === 200) {
       console.log('Publicação eliminada com sucesso:', response.data);
       // Adicione qualquer lógica adicional, como redirecionamento ou atualização da UI
@@ -630,7 +647,7 @@ const handleAddComentario = async () => {
 const handleToggleVisibility = async (publicacao) => {
   try {
     const updatedVisivel = !publicacao.visivel;
-    await axios.put(`https://backend-teste-q43r.onrender.com/publicacoes/updateVisibility/${publicacao.id}`, { visivel: updatedVisivel });
+    await axios.put(`http://localhost:3000/publicacoes/updateVisibility/${publicacao.id}`, { visivel: updatedVisivel });
     setPublicacoes(publicacoes.map(p => p.id === publicacao.id ? { ...p, visivel: updatedVisivel } : p));
   } catch (error) {
     console.error('Erro ao atualizar visibilidade da publicação:', error);
@@ -660,14 +677,29 @@ const handleImageChange = (event) => {
   }
 };
 
+const headers = {
+  "Content-Type": "application/json",
+  Authorization: '4d755673a2dc94483064445f4d5c54e9', // Certifique-se de substituir pela chave correta
+};
+
 const uploadImage = async (file) => {
   const formData = new FormData();
-  formData.append('key', '4d755673a2dc94483064445f4d5c54e9'); // substitua pela sua chave da API imgbb
+  formData.append('key', headers.Authorization); // Use a chave da API do objeto headers
   formData.append('image', file);
 
-  const response = await axios.post('https://api.imgbb.com/1/upload', formData);
-  return response.data.data.url; // Certifique-se de que está retornando a URL correta
+  try {
+    const response = await axios.post('https://api.imgbb.com/1/upload', formData,
+    { params: {
+      key: '4d755673a2dc94483064445f4d5c54e9'
+    }});
+    console.log('Upload bem-sucedido:', response.data);
+    return response.data.data.url; // Certifique-se de que está acessando a URL corretamente
+  } catch (error) {
+    console.error('Erro ao fazer upload da imagem:', error);
+    throw error; // Repropague o erro para ser tratado na função de chamada
+  }
 };
+
 
 
 const onDrop = async (acceptedFiles) => {
@@ -686,6 +718,7 @@ const { getRootProps, getInputProps } = useDropzone({
   accept: 'image/*'
 });
 
+const [selectedAreaId, setSelectedAreaId] = useState(null);
 
 
 
@@ -693,7 +726,7 @@ useEffect(() => {
   // Função para buscar os tópicos da API
   const Topicos = async () => {
     try {
-      const response = await axios.get(`https://backend-teste-q43r.onrender.com/topicos/topicosdeumaarea/${areaId}`); // Substitua areaId pelo id da área
+      const response = await axios.get(`http://localhost:3000/topicos/topicosdeumaarea/${area}`); // Substitua areaId pelo id da área
       setTopicos(response.data);
     } catch (error) {
       console.error('Erro ao buscar tópicos:', error);
@@ -701,11 +734,11 @@ useEffect(() => {
   };
 
   Topicos();
-}, [areaId]);
+}, [area]);
 
 const fetchUser = async (id) => {
   try {
-    const response = await axios.get(`https://backend-teste-q43r.onrender.com/users/user/${id}`);
+    const response = await axios.get(`http://localhost:3000/users/user/${id}`);
     console.log("Resposta da API:", response.data); // Adicione este log
     setUser(response.data);
   } catch (error) {
@@ -735,7 +768,7 @@ const handleAvaliacaoSubmit = async (e) => {
   const publicacaoId = selectedPublication.id;
 
   try {
-    const response = await axios.post('https://backend-teste-q43r.onrender.com/avaliacao/create', {
+    const response = await axios.post('http://localhost:3000/avaliacao/create', {
       publicacao_id: publicacaoId,
       autor_id: userId,
       estrelas: estrelas
@@ -749,7 +782,7 @@ const handleAvaliacaoSubmit = async (e) => {
 
 // const MediaAvaliacoes = async () => {
 //   try {
-//     const response = await axios.get(`https://backend-teste-q43r.onrender.com/avaliacao/average/${selectedPublication.id}`);
+//     const response = await axios.get(`http://localhost:3000/avaliacao/average/${selectedPublication.id}`);
 //     setMediaAvaliacoes(response.data);
 //   } catch (error) {
 //     console.error('Erro ao buscar média de avaliações:', error);
@@ -781,6 +814,7 @@ useEffect(() => {
   if (publicationToEdit) {
     setTitulo(publicationToEdit.titulo);
     setDescricao(publicationToEdit.descricao);
+    setArea(publicationToEdit.area_id);
     setTopico(publicationToEdit.topico_id);
     setPaginaweb(publicationToEdit.paginaweb);
     setTelemovel(publicationToEdit.telemovel);
@@ -817,7 +851,7 @@ const handleRemoveImage = (index) => {
 
 const handleRemoveComentario = async (comentarioId) => {
   try {
-    await axios.delete(`https://backend-teste-q43r.onrender.com/comentarios/delete/${comentarioId}`);
+    await axios.delete(`http://localhost:3000/comentarios/delete/${comentarioId}`);
     setComentarios(comentarios.filter(comentario => comentario.id !== comentarioId));
   } catch (error) {
     console.error('Erro ao remover comentário:', error);
@@ -833,6 +867,7 @@ const handleSubmitEdit = async (e) => {
   }
 
   const publicacaoData = {
+    area_id: area,
     topico_id: topico,
     titulo,
     descricao,
@@ -848,7 +883,7 @@ const handleSubmitEdit = async (e) => {
   };
 
   try {
-    const response = await axios.put(`https://backend-teste-q43r.onrender.com/publicacoes/update/${publicationToEdit.id}`, publicacaoData, {
+    const response = await axios.put(`http://localhost:3000/publicacoes/update/${publicationToEdit.id}`, publicacaoData, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -856,7 +891,7 @@ const handleSubmitEdit = async (e) => {
 
     // Remover os comentários marcados
     for (const comentarioId of comentariosParaRemover) {
-      await axios.delete(`https://backend-teste-q43r.onrender.com/comentarios/delete/${comentarioId}`);
+      await axios.delete(`http://localhost:3000/comentarios/delete/${comentarioId}`);
     }
 
     if (response.status === 201) { // Ajuste o código de status para 201 
@@ -880,7 +915,7 @@ const marcarComentarioParaRemover = (comentarioId) => {
 
 const approveLocal = async (publicationId) => {
   try {
-    const response = await axios.put(`https://backend-teste-q43r.onrender.com/publicacoes/update/${publicationId}`, {
+    const response = await axios.put(`http://localhost:3000/publicacoes/update/${publicationId}`, {
       estado: 'Ativa',
     }, {
       headers: {
@@ -902,7 +937,7 @@ const approveLocal = async (publicationId) => {
 useEffect(() => {
   const fetchDenuncias = async () => {
     try {
-      const response = await axios.get(`https://backend-teste-q43r.onrender.com/denuncias/publicacao/${publicationDetailDenunciada?.id}`);
+      const response = await axios.get(`http://localhost:3000/denuncias/publicacao/${publicationDetailDenunciada?.id}`);
       setDenuncias(response.data);
     } catch (error) {
       console.error('Erro ao buscar denúncias:', error);
@@ -920,7 +955,7 @@ const toggleOptions = (denunciaId) => {
 
 const marcarDenunciaComoResolvida = async (denunciaId) => {
   try {
-    const response = await axios.put(`https://backend-teste-q43r.onrender.com/denuncias/update/${denunciaId}`, { resolvida: true });
+    const response = await axios.put(`http://localhost:3000/denuncias/update/${denunciaId}`, { resolvida: true });
     if (response.status === 200) {
       setDenuncias(prevDenuncias => prevDenuncias.map(denuncia => 
         denuncia.id === denunciaId ? { ...denuncia, resolvida: true } : denuncia
@@ -982,6 +1017,8 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
     alert('Ocorreu um erro ao excluir o comentário');
   }
 };
+
+
 
 
   return (
@@ -1104,7 +1141,18 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
   <div className="tab-content">
   {activeTab === 'descricao' && (
           <form onSubmit={handleSubmit}>
-            
+              <div className="form-group">
+  <label>Área do Local</label>
+  <select value={area} onChange={(e) => setArea(e.target.value)}>
+  <option value="">Selecionar área</option>
+  {areas.map((areaOption) => (
+    <option key={areaOption.id} value={areaOption.id}>
+      {areaOption.nome}
+    </option>
+  ))}
+</select>
+</div>
+
             <div className="form-group">
             <label>Tópico do Local</label>
               <select value={topico} onChange={(e) => setTopico(e.target.value)}>
