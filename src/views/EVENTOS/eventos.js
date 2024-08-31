@@ -166,7 +166,7 @@ useEffect(() => {
     }
     console.log(`Buscando publicações para centroId: ${centroId}`);
     try {
-      const response = await axios.get(`http://localhost:3000/eventos/listarEventos/${centroId}`);
+      const response = await axios.get(`https://backend-teste-q43r.onrender.com/eventos/listarEventos/${centroId}`);
       if (response.data && Array.isArray(response.data)) {
         console.log(response.data);
         setEventos(response.data);
@@ -567,6 +567,7 @@ setShowApprovalView(true);
 
 const handleApproveClick = () => {
 setShowApproveModal(true);
+approveLocal(eventoDetail.id);
 
 };
 
@@ -1333,6 +1334,17 @@ return (
   <input type="text" placeholder="inserir nome do evento" value={nome} onChange={(e) => setNome(e.target.value)} />
 </div>
 <div className="form-group">
+  <label>Estado do Evento</label>
+  <select value={estado} onChange={(e) => setEstado(e.target.value)}>
+    <option value="">Selecionar estado</option>
+    <option value="Ativa">Ativa</option>
+    <option value="Denunciada">Denunciada</option>
+    <option value="Por validar">Por validar</option>
+    <option value="Finalizada">Finalizada</option>
+  </select>
+</div>
+
+<div className="form-group">
   <label>Data de Início da Atividade</label>
   <input 
     type="datetime-local" 
@@ -1454,6 +1466,7 @@ return (
 
   {showDetailView && selectedEvento && (
     <div className="publicacoes_div_princ">
+      {selectedEvento && console.log('selectedEvento:', selectedEvento)}
       <h1 className="publicacoes-title2">Informações do evento</h1>
       <div className="header">
         <h1 className="header-title">{selectedEvento.nome}</h1>
@@ -1772,96 +1785,96 @@ return (
 
 
 {showApprovalView && eventoDetail && (
-<div className="publicacoes_div_princ">
-<h1 className="publicacoes-title2">Informações do Evento</h1>
-<div className="header">
-  <h1 className="header-title">{eventoDetail.nome}</h1>
-  <div className="author">
-    <div className="authorName"><span>Autor :</span></div>
-    <img src={eventoDetail.autor.caminho_foto} alt={eventoDetail.autor.nome} className="author-icon" />
-    <span>{eventoDetail.autor.nome} {eventoDetail.autor.sobrenome}</span>
-
-  </div>
-
-</div>
-<div className="tab-content2">
-  {eventoDetail.galeria && eventoDetail.galeria.length > 0 && (
-    <>
-      <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Evento</button>
-      <div className="gallery">
-        {eventoDetail.galeria.map((image, index) => (
-          <img key={index} src={image} alt={`Galeria ${index}`} className="gallery-image" />
-        ))}
-      </div>
-    </>
-  )}
-
-
-  {eventoDetail.descricao && (
-    <>
-      <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Evento</button>
-      <div className="description">
-        <p>{eventoDetail.descricao}</p>
-      </div>
-    </>
-  )}
-  
-
-  {eventoDetail.horario && (
-    <>
-      <button className="tab active"><i className="fas fa-clock tab-icon"></i> Horário do Evento</button>
-      <div className="additional-info">
-        <div className="status">
-          <i className="fas fa-check-circle"></i> {isOpen ? 'Aberto Agora' : 'Fechado Agora'}
+  <div className="publicacoes_div_princ">
+     {console.log('eventoDetail:', eventoDetail)}
+      <h1 className="publicacoes-title2">Informações do evento</h1>
+      <div className="header">
+        <h1 className="header-title">{eventoDetail.nome}</h1>
+        <div className="author">
+          <div className="authorName"><span>Autor :</span></div>
+          <img src={eventoDetail.user.caminho_foto} alt={eventoDetail.user.nome} className="author-icon" />
+          <span>{eventoDetail.user.nome} {eventoDetail.user.sobrenome}</span>
+      
         </div>
-        <div className="schedule">
-          {weekDays.map((dia) => (
-            <p key={dia}><strong>{dia}:</strong> {eventoDetail.horario[dia] || 'Fechado'}</p>
-          ))}
+
+      </div>
+  <div className="tab-content2">
+    
+  {eventoDetail.imagens && eventoDetail.imagens.length > 0 && (
+    <>
+        <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Evento</button>
+        <div className="gallery">
+            {eventoDetail.imagens.map((image, index) => (
+                <img key={index} src={image.caminho_imagem} alt={`Galeria ${index}`} className="gallery-image" />
+            ))}
         </div>
-      </div>
     </>
-  )}
-  {eventoDetail.estado && (
-    <>
-      <button className="tab active"><i className="fas fa-tasks tab-icon"></i> Estado do Evento</button>
-      <div className="estado">
-        <p><strong>Estado:</strong> {eventoDetail.estado}</p>
-      </div>
-    </>
-  )}
-  {eventoDetail.localizacao && (
-    <>
-      <button className="tab active"><i className="fas fa-map-marker-alt tab-icon"></i> Localização</button>
-      <div className="location">
-        <p><strong>Localização:</strong> {eventoDetail.localizacao}</p>
-      </div>
-    </>
-  )}
-  {eventoDetail.paginaweb && (
-    <>
-      <button className="tab active"><i className="fas fa-globe tab-icon"></i> Página Web</button>
-      <div className="website">
-        <p><strong>Página web:</strong> {eventoDetail.paginaweb}</p>
-      </div>
-    </>
-  )}
-  {eventoDetail.telemovel && (
-    <>
-      <button className="tab active"><i className="fas fa-phone tab-icon"></i> Telefone</button>
-      <div className="phone">
-        <p><strong>Telemóvel/Telefone: </strong>{eventoDetail.telemovel}</p>
-      </div>
-    </>
-  )}
-  {eventoDetail.email && (
-    <>
-      <button className="tab active"><i className="fas fa-envelope tab-icon"></i> Email</button>
-      <div className="email">
-        <p><strong>Email:</strong> {eventoDetail.email}</p>
-      </div>
-    </>
-  )}
+)}
+
+
+
+{eventoDetail.datainicioatividade && (
+  <>
+    <button className="tab active">
+      <i className="fas fa-calendar-alt tab-icon"></i> Data do Evento
+    </button>
+    <div className="description">
+      <p><strong>Data:</strong> {new Date(eventoDetail.datainicioatividade).toLocaleString()}</p>
+    </div>
+  </>
+)}
+
+
+
+    {eventoDetail.descricao && (
+      <>
+        <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Evento</button>
+        <div className="description">
+          <p>{eventoDetail.descricao}</p>
+        </div>
+      </>
+    )}
+    {eventoDetail.latitude && (
+  <>
+    <button className="tab active">
+      <i className="fas fa-map-marker-alt tab-icon"></i> Localização
+    </button>
+    <div className="location">
+      <p><strong>Localização:</strong> {eventoDetail.latitude}, {eventoDetail.longitude}</p>
+      <a 
+        href={`https://www.google.com/maps?q=${eventoDetail.latitude},${eventoDetail.longitude}`} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="map-button"
+      >
+        Ver no Google Maps
+      </a>
+    </div>
+  </>
+)}
+
+{eventoDetail.topico &&  (
+  <>
+    <button className="tab active">
+      <i className="fas fa-tag tab-icon"></i> Relacionado com Este Evento
+    </button>
+    <div className="description tags-container">
+      <span className="tag">
+        <i className="fas fa-tags tag-icon"></i> {eventoDetail.topico.nome}
+      </span>
+      
+      <p>
+        <i className="fas fa-tag"></i> {eventoDetail.tipo_evento.nome_tipo}
+      </p>
+    
+    </div>
+  </>
+)}
+
+
+
+
+ 
   
 
     <div className="form-buttons">

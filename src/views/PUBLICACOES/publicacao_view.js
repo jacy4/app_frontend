@@ -823,6 +823,7 @@ useEffect(() => {
     setTelemovel(publicationToEdit.telemovel);
     setEmail(publicationToEdit.email);
     setLocalizacao(publicationToEdit.localizacao);
+    setEstado(publicationToEdit.estado);
     
     // Inicializa o estado do horário com os dados da publicação
     if (publicationToEdit.horario) {
@@ -878,6 +879,7 @@ const handleSubmitEdit = async (e) => {
     localizacao,
     paginaweb,
     telemovel,
+    estado,
     email,
     galeria: galeria.map((img) => img.url), // Envia apenas as URLs das imagens
     centro_id: centroId,
@@ -915,6 +917,7 @@ const marcarComentarioParaRemover = (comentarioId) => {
   setComentarios(comentarios.filter(comentario => comentario.id !== comentarioId));
 };
 
+const [estado, setEstado] = useState('');
 
 const approveLocal = async (publicationId) => {
   try {
@@ -1169,6 +1172,16 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
               <label>Nome do local</label>
               <input type="text" placeholder="inserir nome do local" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
             </div>
+            <div className="form-group">
+  <label>Estado do Evento</label>
+  <select value={estado} onChange={(e) => setEstado(e.target.value)}>
+    <option value="">Selecionar estado</option>
+    <option value="Ativa">Ativa</option>
+    <option value="Denunciada">Denunciada</option>
+    <option value="Por validar">Por validar</option>
+    <option value="Finalizada">Finalizada</option>
+  </select>
+</div>
             <div className="form-group">
               <label>Descrição do local</label>
               <input type="text" placeholder="inserir uma breve descrição do local" value={descricao} onChange={(e) => setDescricao(e.target.value)}/>
