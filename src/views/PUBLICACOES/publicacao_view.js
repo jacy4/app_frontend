@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 
 
+
 moment.locale('pt'); // Definir o locale para português
 
 const PublicacoesView = () => {
@@ -677,6 +678,7 @@ const handleImageChange = (event) => {
   }
 };
 
+  
 const headers = {
   "Content-Type": "application/json",
   Authorization: '4d755673a2dc94483064445f4d5c54e9', // Certifique-se de substituir pela chave correta
@@ -684,7 +686,8 @@ const headers = {
 
 const uploadImage = async (file) => {
   const formData = new FormData();
-  formData.append('key', headers.Authorization); // Use a chave da API do objeto headers
+  console.log(file);
+  formData.set('key', headers.Authorization); // Use a chave da API do objeto headers
   formData.append('image', file);
 
   try {
@@ -1125,12 +1128,12 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
     >
       <i className="fas fa-map-marker-alt tab-icon"></i> Localização
     </button>
-    <button
+    {/* <button
       className={`tab ${activeTab === 'comentarios' ? 'active' : ''}`}
       onClick={() => handleTabClick('comentarios')}
     >
       <i className="fas fa-comments tab-icon"></i> Comentários
-    </button>
+    </button> */}
     <button
       className={`tab ${activeTab === 'mais_informacoes' ? 'active' : ''}`}
       onClick={() => handleTabClick('mais_informacoes')}
@@ -1278,7 +1281,7 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
           </div>
         )}
 
-{activeTab === 'comentarios' && (
+{/* {activeTab === 'comentarios' && (
   <div className="tab-content_comentarios">
     {comentarios.length === 0 ? (
       <div className="no-comments">
@@ -1315,7 +1318,7 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
       <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
     </div>
   </div>
-)}
+)} */}
 
 
 

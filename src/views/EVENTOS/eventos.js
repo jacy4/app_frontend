@@ -30,6 +30,7 @@ const EventosView = () => {
     const [removalReason, setRemovalReason] = useState('');
     const [showEditForm, setShowEditForm] = useState(false);
     const [eventoToEdit, setEventoToEdit] = useState(null);
+
     const [showSuccessMessageDelete, setShowSuccessMessageDelete] = useState(false);
     const [showSuccessMessageHide, setShowSuccessMessageHide] = useState(false);
     const [filter, setFilter] = useState('all');
@@ -69,6 +70,19 @@ const EventosView = () => {
     "Fim": { fimData: '', FimHora: ''}
 
 });
+
+
+const [dataInicioAtividade, setDataInicioAtividade] = useState('');
+const [dataFimAtividade, setDataFimAtividade] = useState('');
+
+
+
+const [estado, setEstado] = useState('');
+const [capaImagemEvento, setCapaImagemEvento] = useState('');
+const [latitude, setLatitude] = useState(null);
+const [longitude, setLongitude] = useState(null);
+const [tipodeevento, setTipoDeEvento] = useState('');
+
 
 const [novaClassificacao, setNovaClassificacao] = useState(0);
 
@@ -174,6 +188,21 @@ const handleViewDetailsClick = (evento) => {
   setShowDetailView(true);
 };
 
+const [areas, setAreas] = useState('');
+
+useEffect(() => {
+  // Função para buscar as áreas da API
+  const fetchAreas = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/areas/listarAreas'); // Substitua com a URL correta da sua API para buscar as áreas
+      setAreas(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar áreas:', error);
+    }
+  };
+
+  fetchAreas();
+}, []);
 
 
 const handlePendingViewClick = (evento) => {
@@ -793,14 +822,13 @@ onDrop,
 accept: 'image/*'
 });
 
-
-
+const [area, setArea] = useState('');
 
 useEffect(() => {
 // Função para buscar os tópicos da API
 const Topicos = async () => {
   try {
-    const response = await axios.get(`http://localhost:3000/topicos/topicosdeumaarea/${areaId}`); // Substitua areaId pelo id da área
+    const response = await axios.get(`http://localhost:3000/topicos/topicosdeumaarea/${area}`); // Substitua areaId pelo id da área
     setTopicos(response.data);
   } catch (error) {
     console.error('Erro ao buscar tópicos:', error);
@@ -808,7 +836,7 @@ const Topicos = async () => {
 };
 
 Topicos();
-}, [areaId]);
+}, [area]);
 
 const fetchUser = async (id) => {
 try {
@@ -869,44 +897,45 @@ try {
 // }
 // }, [selectedEvento]);
 
-useEffect(() => {
-if (eventoToEdit) {
-  setNome(eventoToEdit.nome);
-  setAutor(eventoToEdit.autor_id);
-  setDescricao(eventoToEdit.descricao);
-  setTopico(eventoToEdit.topico_id);
-  setPaginaweb(eventoToEdit.paginaweb);
-  setTelemovel(eventoToEdit.telemovel);
-  setEmail(eventoToEdit.email);
-  setLocalizacao(eventoToEdit.localizacao);
-  
-  // Inicializa o estado do horário com os dados da publicação
-  if (eventoToEdit.horario) {
-    const initialHorario = Object.keys(eventoToEdit.horario).reduce((acc, dia) => {
-      const [inicio, fim] = eventoToEdit.horario[dia] === 'Fechado' ? ['', ''] : eventoToEdit.horario[dia].split('-');
-      acc[dia] = {
-        inicio: inicio || '',
-        fim: fim || '',
-        fechado: eventoToEdit.horario[dia] === 'Fechado',
-      };
-      return acc;
-    }, {});
-    setHorario(initialHorario);
-  }
 
-  // Inicializa o estado da galeria com os dados da publicação
-  if (eventoToEdit.galeria) {
-    setGaleria(eventoToEdit.galeria.map((url) => ({ url, preview: url })));
+
+useEffect(() => {
+  if (eventoToEdit) {
+    setNome(eventoToEdit.nome);
+    setAutor(eventoToEdit.autor_id);
+    setDescricao(eventoToEdit.descricao);
+    setTopico(eventoToEdit.topico_id);
+    setLocalizacao(eventoToEdit.localizacao);
+    setEstado(eventoToEdit.estado);
+    // Formatar as datas para o formato datetime-local
+    const dataInicioFormatada = new Date(eventoToEdit.datainicioatividade).toISOString().slice(0, 16);
+    const dataFimFormatada = new Date(eventoToEdit.datafimatividade).toISOString().slice(0, 16);
+    setDataInicioAtividade(dataInicioFormatada);
+    setDataFimAtividade(dataFimFormatada);
+    setCapaImagemEvento(eventoToEdit.capa_imagem_evento);
+    setLatitude(eventoToEdit.latitude);
+    setLongitude(eventoToEdit.longitude);
+    setTipoDeEventoId(eventoToEdit.tipodeevento_id);
+    setArea(eventoToEdit.area_id);
+
+    // Se houver uma galeria de imagens associada ao evento
+    if (eventoToEdit.imagens) {
+      setGaleria(eventoToEdit.imagens.map((image) => ({
+        id: image.id,
+        url: image.caminho_imagem,
+        preview: image.caminho_imagem
+      })));
+    }
   }
-}
 }, [eventoToEdit]);
 
 
-const handleRemoveImage = (index) => {
-const updatedGaleria = [...galeria];
-updatedGaleria.splice(index, 1);
-setGaleria(updatedGaleria);
-};
+
+// const handleRemoveImage = (index) => {
+// const updatedGaleria = [...galeria];
+// updatedGaleria.splice(index, 1);
+// setGaleria(updatedGaleria);
+// };
 
 const handleRemoveComentario = async (comentarioId) => {
 try {
@@ -918,52 +947,51 @@ try {
 };
 
 const handleSubmitEdit = async (e) => {
-e.preventDefault();
+  e.preventDefault();
 
-const formattedHorario = {};
-for (const [dia, { inicio, fim, fechado }] of Object.entries(horario)) {
-  formattedHorario[dia] = fechado ? 'Fechado' : `${inicio}-${fim}`;
-}
-
-const eventoData = {
-  topico_id: topico,
-  nome,
-  descricao,
-  horario: formattedHorario,
-  localizacao,
-  paginaweb,
-  telemovel,
-  email,
-  galeria: galeria.map((img) => img.url), // Envia apenas as URLs das imagens
-  centro_id: centroId,
-  // autor_id: sessionStorage.getItem('user_id')
-  autor_id: eventoToEdit.autor_id || sessionStorage.getItem('user_id') // Mantém o autor original se já definido
-};
-
-try {
-  const response = await axios.put(`http://localhost:3000/eventos/update/${eventoToEdit.id}`, eventoData, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  // Remover os comentários marcados
-  for (const comentarioId of comentariosParaRemover) {
-    await axios.delete(`http://localhost:3000/comentarios_eventos/delete/${comentarioId}`);
+  const formattedHorario = {};
+  for (const [dia, { inicio, fim, fechado }] of Object.entries(horario)) {
+    formattedHorario[dia] = fechado ? 'Fechado' : `${inicio}-${fim}`;
   }
 
-  if (response.status === 201) { // Ajuste o código de status para 201 
-    setShowSuccessMessage(true); // Mostrar modal de sucesso
-  } else {
-    console.error('Erro na resposta do Backend:', response); // Log de erro caso a resposta não seja 201
-    // Lógica de erro adicional, se necessário
+  const eventoData = {
+    area_id: area,
+    topico_id: topico,
+    nome,  // Nome do evento
+    descricao,
+    datainicioatividade: dataInicioAtividade,
+    datafimatividade: dataFimAtividade,
+    estado,
+    centro_id: centroId,
+    autor_id: eventoToEdit.autor_id || sessionStorage.getItem('user_id'), // Mantém o autor original se já definido
+    capa_imagem_evento: capaImagemEvento,
+    latitude,
+    longitude,
+    tipodeevento_id: tipoDeEventoId,
+    imagensRemovidas,
+  };
+
+  try {
+    const response = await axios.put(`http://localhost:3000/eventos/update/${eventoToEdit.id}`, eventoData, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.status === 200) { // Ajuste o código de status para 201 
+      
+      setShowSuccessMessage(true); // Mostrar modal de sucesso
+    } else {
+      console.error('Erro na resposta do Backend:', response); // Log de erro caso a resposta não seja 201
+      // Lógica de erro adicional, se necessário
+    }
+    console.log('Evento atualizado:', response.data);
+    
+  } catch (error) {
+    console.error('Erro ao atualizar evento:', error);
   }
-  console.log('Publicação atualizada:', response.data);
-  
-} catch (error) {
-  console.error('Erro ao atualizar publicação:', error);
-}
 };
+
 
 const marcarComentarioParaRemover = (comentarioId) => {
 setComentariosParaRemover([...comentariosParaRemover, comentarioId]);
@@ -1117,6 +1145,47 @@ const handleDeleteComentarioEvento = async (comentarioId) => {
 };
 
 
+const [tiposDeEvento, setTiposDeEvento] = useState([]);
+
+useEffect(() => {
+  // Função para buscar os tipos de eventos da API
+  const fetchTiposDeEvento = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/tipodeevento/listarTipos'); // URL correta da sua API para buscar os tipos de eventos
+      setTiposDeEvento(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar tipos de evento:', error);
+    }
+  };
+
+  fetchTiposDeEvento();
+}, []);
+
+const [tipoDeEventoId, setTipoDeEventoId] = useState('');
+
+
+// Adicionar estado para rastrear as imagens removidas
+const [imagensRemovidas, setImagensRemovidas] = useState([]);
+
+const handleRemoveImage = (index) => {
+  // Remove a imagem do array de galeria baseado no índice
+  const updatedGallery = galeria.filter((_, i) => i !== index);
+  
+  // Atualiza o estado
+  setGaleria(updatedGallery);
+
+  // Verifique se a imagem tem um ID e o adicione à lista de imagens removidas
+  const imagemRemovida = galeria[index]; // Captura a imagem que está sendo removida
+
+  if (imagemRemovida && imagemRemovida.id) {
+    setImagensRemovidas([...imagensRemovidas, imagemRemovida.id]);
+  } else {
+    console.warn('Imagem removida não tem ID:', imagemRemovida);
+  }
+};
+
+
+
 
 
 return (
@@ -1226,35 +1295,30 @@ return (
       >
         <i className="fas fa-images tab-icon"></i> Galeria
       </button>
-      <button
-        className={`tab ${activeTab === 'horario' ? 'active' : ''}`}
-        onClick={() => handleTabClick('horario')}
-      >
-        <i className="fas fa-clock tab-icon"></i> Horário
-      </button>
+      
       <button
         className={`tab ${activeTab === 'localizacao' ? 'active' : ''}`}
         onClick={() => handleTabClick('localizacao')}
       >
         <i className="fas fa-map-marker-alt tab-icon"></i> Localização
       </button>
-      <button
-        className={`tab ${activeTab === 'comentarios' ? 'active' : ''}`}
-        onClick={() => handleTabClick('comentarios')}
-      >
-        <i className="fas fa-comments tab-icon"></i> Comentários
-      </button>
-      <button
-        className={`tab ${activeTab === 'mais_informacoes' ? 'active' : ''}`}
-        onClick={() => handleTabClick('mais_informacoes')}
-      >
-        <i className="fas fa-info tab-icon"></i> Formulário de Inscrição
-      </button>
+      
+      
     </div>
     <div className="tab-content">
     {activeTab === 'descricao' && (
           <form onSubmit={handleSubmit}>
-            
+            <div className="form-group">
+  <label>Área do Local</label>
+  <select value={area} onChange={(e) => setArea(e.target.value)}>
+  <option value="">Selecionar área</option>
+  {areas.map((areaOption) => (
+    <option key={areaOption.id} value={areaOption.id}>
+      {areaOption.nome}
+    </option>
+  ))}
+</select>
+</div>
             <div className="form-group">
             <label>Tópico do Local</label>
               <select value={topico} onChange={(e) => setTopico(e.target.value)}>
@@ -1265,13 +1329,41 @@ return (
               </select>
             </div>
             <div className="form-group">
-              <label>Nome do local</label>
-              <input type="text" placeholder="inserir nome do local" value={nome} onChange={(e) => setNome(e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label>Descrição do local</label>
-              <input type="text" placeholder="inserir uma breve descrição do local" value={descricao} onChange={(e) => setDescricao(e.target.value)}/>
-            </div>
+  <label>Nome do Evento</label>
+  <input type="text" placeholder="inserir nome do evento" value={nome} onChange={(e) => setNome(e.target.value)} />
+</div>
+<div className="form-group">
+  <label>Data de Início da Atividade</label>
+  <input 
+    type="datetime-local" 
+    value={dataInicioAtividade} 
+    onChange={(e) => setDataInicioAtividade(e.target.value)} 
+  />
+</div>
+<div className="form-group">
+  <label>Data de Fim da Atividade</label>
+  <input 
+    type="datetime-local" 
+    value={dataFimAtividade} 
+    onChange={(e) => setDataFimAtividade(e.target.value)} 
+  />
+</div>
+
+<div className="form-group">
+  <label>Descrição do Evento</label>
+  <input type="text" placeholder="inserir uma breve descrição do evento" value={descricao} onChange={(e) => setDescricao(e.target.value)}/>
+</div>
+<div className="form-group">
+  <label>Tipo de Evento</label>
+  <select value={tipoDeEventoId} onChange={(e) => setTipoDeEventoId(e.target.value)}>
+    <option value="">Selecionar Tipo de Evento</option>
+    {tiposDeEvento.map((tipo) => (
+      <option key={tipo.id} value={tipo.id}>{tipo.nome_tipo}</option>  
+    ))}
+  </select>
+</div>
+
+
             <div className="form-buttons">
               <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
               <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
@@ -1281,7 +1373,7 @@ return (
 
 {activeTab === 'galeria' && (
   <div className="tab-content_galeria">
-    <h2>Galeria do local</h2>
+    <h2>Galeria do evento</h2>
     <div {...getRootProps({ className: 'dropzone' })} className="gallery-upload">
       <input {...getInputProps()} />
       <div className="upload-box">
@@ -1289,7 +1381,7 @@ return (
         <span className="upload-text">Upload</span>
       </div>
       <p className="gallery-info">
-        <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do local
+        <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do evento
       </p>
     </div>
     <div className="uploaded-images">
@@ -1310,68 +1402,30 @@ return (
 
 
 
-{activeTab === 'horario' && (
-  <div>
-    <h2>Horário do local</h2>
-    {Object.keys(horario).map((dia) => (
-      <div key={dia} className="form-group_horario">
-        <label>{dia}</label>
-        <div className="horario-inputs">
-          <input
-            type="text"
-            placeholder="Início HH:mm"
-            value={horario[dia].inicio}
-            disabled={horario[dia].fechado}
-            onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], inicio: e.target.value } })}
-          />
-          <input
-            type="text"
-            placeholder="Fim HH:mm"
-            value={horario[dia].fim}
-            disabled={horario[dia].fechado}
-            onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], fim: e.target.value } })}
-          />
-          <label>
-            <input
-              type="checkbox"
-              checked={horario[dia].fechado}
-              onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], fechado: e.target.checked, inicio: '', fim: '' } })}
-            />
-          </label>
-        </div>
-      </div>
-    ))}
-    <div className="form-buttons">
-      <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-      <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
-    </div>
-  </div>
-)}
+
+
 
         {activeTab === 'localizacao' && (
           <div className="tab-content_localizacao">
             <h2>Localização do local</h2>
             <div className="localizacao-content">
-              <div className="form-group">
-                <label>Endereço do local:</label>
-                <input
-                  type="text"
-                  placeholder="inserir local"
-                  value={localizacao}
-                  onChange={(e) => setLocalizacao(e.target.value)}
-                />
-              </div>
-              <div className="map-placeholder">
-                <LoadScript googleMapsApiKey={API_KEY}>
-                  <GoogleMap
-                    mapContainerStyle={containerStyle}
-                    center={center}
-                    zoom={10}
-                  >
-                    <Marker position={center} />
-                  </GoogleMap>
-                </LoadScript>
-              </div>
+            <div className="form-group">
+  <label>Latitude</label>
+  <input type="text" placeholder="Latitude" value={latitude} onChange={(e) => setLatitude(e.target.value)} />
+</div>
+<div className="form-group">
+  <label>Longitude</label>
+  <input type="text" placeholder="Longitude" value={longitude} onChange={(e) => setLongitude(e.target.value)} />
+</div>
+
+<a 
+        href={`https://www.google.com/maps?q=${selectedEvento.latitude},${selectedEvento.longitude}`} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="map-button"
+      >
+        Ver no Google Maps
+      </a>
             </div>
             <div className="form-buttons">
               <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
@@ -1380,84 +1434,10 @@ return (
           </div>
         )}
 
-{activeTab === 'comentarios' && (
-  <div className="tab-content_comentarios">
-    {comentarios.length === 0 ? (
-      <div className="no-comments">
-        <i className="fas fa-comment-slash no-comments-icon"></i>
-        <p>Ainda sem comentários</p>
-      </div>
-    ) : (
-      <div className="comentarios-list">
-        {comentarios.map((comentario) => (
-          <div key={comentario.id} className="comentario">
-            <div className="comentario-header">
-              {comentario.autor && comentario.autor.caminho_foto && (
-                <img src={comentario.autor.caminho_foto} alt={`${comentario.autor.nome} ${comentario.autor.sobrenome}`} className="comentario-avatar" />
-              )}
-              <div className="comentario-info">
-                {comentario.autor && (
-                  <>
-                    <span className="comentario-autor">{comentario.autor.nome} {comentario.autor.sobrenome}</span>
-                    <span className="comentario-data">{new Date(comentario.createdat).toLocaleDateString()}</span>
-                    </>
-                    )}
-                  </div>
-                  <button className="remove-comentario" onClick={() => marcarComentarioParaRemover(comentario.id)}>x</button>
-                </div>
-            <div className="comentario-conteudo">
-              <p>{comentario.conteudo}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    )}
-    <div className="form-buttons">
-      <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-      <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
-    </div>
-  </div>
-)}
 
 
 
-        {activeTab === 'mais_informacoes' && (
-          <div className="tab-content_mais_informacoes">
-            <form>
-              <div className="form-group">
-                <label>Pagina Web</label>
-                <input
-                  type="text"
-                  placeholder="inserir site"
-                  value={paginaweb}
-                  onChange={(e) => setPaginaweb(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label>Contacto</label>
-                <input
-                  type="text"
-                  placeholder="inserir contacto telefónico"
-                  value={telemovel}
-                  onChange={(e) => setTelemovel(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label>Email oficial</label>
-                <input
-                  type="text"
-                  placeholder="...inserir email..."
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="form-buttons">
-                <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-                <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
-              </div>
-            </form>
-          </div>
-        )}
+        
   {showSuccessMessage && <div className="modal-backdrop"></div>}
             {showSuccessMessage && (
               <div className="success-message_delete">
