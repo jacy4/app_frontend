@@ -1127,6 +1127,48 @@ useEffect(() => {
   
 }, [selectedEvento]);
 
+
+const [optionsOpenMarcar, setOptionsOpenMarcar] = useState(null);
+
+const toggleOptionsMarcar = (denunciaId) => {
+  console.log("Toggle Options for Denuncia ID:", denunciaId);
+  setOptionsOpenMarcar(prevId => {
+    const newId = (prevId === denunciaId ? null : denunciaId);
+    console.log("Setting optionsOpenMarcar to:", newId);
+    return newId;
+  });
+};
+
+
+// No useEffect para detectar clique fora:
+// useEffect(() => {
+//   const handleClickOutside = (event) => {
+//     console.log("Clicked outside:", event.target);
+//     if (!event.target.closest('.comentario-options-publicacao')) {
+//       console.log("Resetting optionsOpenMarcar");
+//       setOptionsOpenMarcar(null);
+//     }
+//   };
+
+//   document.addEventListener('click', handleClickOutside);
+//   return () => {
+//     document.removeEventListener('click', handleClickOutside);
+//   };
+// }, []);
+
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (!event.target.closest('.denuncia-actions')) {
+      setOptionsOpenMarcar(null);
+    }
+  };
+
+  document.addEventListener('click', handleClickOutside);
+  return () => {
+    document.removeEventListener('click', handleClickOutside);
+  };
+}, []);
+
 const [comentariosEventos, setComentariosEventos] = useState([]);
 
 const handleDeleteComentarioEvento = async (comentarioId) => {
@@ -1185,8 +1227,43 @@ const handleRemoveImage = (index) => {
   }
 };
 
+const [denuncias, setDenuncias] = useState([]);
 
+useEffect(() => {
+  
+  const fetchDenuncias = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/denuncias_comentarios_eventos/denunciasPorEvento/${eventoDetailDenunciada?.id}`);
+      console.log("Fetched denuncias response:", response.data);
+      setDenuncias(response.data);
+      console.log(denuncias);
+    } catch (error) {
+      console.error('Erro ao buscar denúncias:', error);
+    }
+  };
 
+  if (eventoDetailDenunciada) {
+    fetchDenuncias();
+  }
+}, [eventoDetailDenunciada?.id]);
+
+const marcarDenunciaComoResolvida = async (denunciaId) => {
+  try {
+    const response = await axios.put(`http://localhost:3000/denuncias_comentarios_eventos/update/${denunciaId}`, { resolvida: true });
+    if (response.status === 200) {
+      setDenuncias(prevDenuncias => prevDenuncias.map(denuncia => 
+        denuncia.id === denunciaId ? { ...denuncia, resolvida: true } : denuncia
+      ));
+      setOptionsOpenMarcar(null); // Fecha o menu de opções após marcar como resolvida
+    }
+  } catch (error) {
+    console.error('Erro ao marcar denúncia como resolvida:', error);
+  }
+};
+
+useEffect(() => {
+  console.log('Denuncias state atualizado:', denuncias);  // Log do estado
+}, [denuncias]);
 
 
 return (
@@ -1944,73 +2021,79 @@ return (
 
 
 
-{showDetailViewDenunciada ? (
-<div className="publicacoes_div_princ">
-  <h1 className="publicacoes-title2">Denúncias do Evento</h1>
-  <div className="header">
-    <h1 className="header-title">{eventoDetailDenunciada.nome}</h1>
-    <div className="author">
-      <div className="authorName"><span>Autor :</span></div>
-      <img src={eventoDetailDenunciada.autor.caminho_foto} alt={eventoDetailDenunciada.autor.nome} className="author-icon" />
-      <span>{eventoDetailDenunciada.autor.nome} {eventoDetailDenunciada.autor.sobrenome}</span>
+  {showDetailViewDenunciada &&  eventoDetailDenunciada&& (
+  <div className="publicacoes_div_princ">
+    <h1 className="publicacoes-title2">Denúncias do Evento</h1>
+    <div className="header">
+      <h1 className="header-title">{eventoDetailDenunciada.nome}</h1>
+      <div className="author">
+        <div className="authorName"><span>Autor :</span></div>
+        {eventoDetailDenunciada.user?.caminho_foto && (
+          <img src={eventoDetailDenunciada.user.caminho_foto} alt={eventoDetailDenunciada.user.nome} className="author-icon" />
+        )}
+        {eventoDetailDenunciada.user && (
+          <span>{eventoDetailDenunciada.user.nome} {eventoDetailDenunciada.user.sobrenome}</span>
+        )}
+      </div>
     </div>
+    <div className="tab-content2">
+      <div className="denuncia-header2">
+        <h2>Lista de Denúncias</h2>
+        <span className="total-denuncias">Total: {denuncias.length} {denuncias.length === 1 ? 'Denúncia' : 'Denúncias'}</span>
+      </div>
+      <div className="denuncias-list">
+      
+      
+        {denuncias.map((denuncia) => (
+          
+          <div key={denuncia.id} className="denuncia">
+             <div className="denuncia-header">
+             <div className="denunciante-info">
+          {denuncia.denunciador?.caminho_foto && (
+            <img src={denuncia.denunciador.caminho_foto} alt={`${denuncia.denunciador.nome} ${denuncia.denunciador.sobrenome}`} className="denuncia-avatar" />
+          )}
+          <div className="denunciante-texto">
+          {denuncia.denunciador && (
+            <>
+              <span className="denuncia-autor">{denuncia.denunciador.nome} {denuncia.denunciador.sobrenome}</span>
+              <span className="denuncia-data">{new Date(denuncia.data_denuncia).toLocaleDateString()}</span>
+            </>
+          )}
+        </div> </div>
+        <div className="denuncia-actions">
+                {!denuncia.resolvida && (
+                  <div className="options-button" onClick={() => toggleOptionsMarcar(denuncia.id)}>
+                    <i className="fas fa-ellipsis-v"></i>
+                  </div>
+                )}
+                {optionsOpenMarcar === denuncia.id && (
+  <div className="options-menu">
+    <button onClick={() => marcarDenunciaComoResolvida(denuncia.id)}>
+      <i className="fas fa-check-circle custom-check-icon"></i> Marcar como Resolvida
+    </button>
   </div>
-  <div className="tab-content2">
-    <div className="denuncia-header2">
-      <h2>Lista de Denúncias</h2>
-      <span className="total-denuncias">Total: 1 Denúncia</span>
-    </div>
-    <div className="denuncia-lista">
-      <div className="denuncia-card">
-        <div className="denuncia-header">
-          <img src="https://via.placeholder.com/40" alt="User" className="user-icon" />
-          <div className="denuncia-info">
-            <strong>Vitor Ferreira</strong>
-            <p>29/01/2023</p>
-          </div>
-        </div>
-        <div className="denuncia-content">
-          <p><strong>Motivo da denúncia :</strong> Informação Errada ou Não Fidedigna</p>
-          <p><strong>Informação adicional :</strong></p>
-          <p>Boa tarde, não é que o local seja indevido mas eu moro perto e a morada não é essa, é tal tal tal, tal qualquer coisa! Obrigado pela atenção</p>
-        </div>
+)}
+                {denuncia.resolvida && (
+                  <span className="denuncia-resolvida">Denúncia Resolvida</span>
+                )}
+              </div>
+            </div>
+      <div className="denuncia-conteudo">
+        <p><strong>Motivo:</strong> {denuncia.motivo_denuncia}</p>
+        <p><strong>Informação Adicional:</strong> {denuncia.descricao_denuncia}</p>
       </div>
-      <div className="denuncia-card">
-        <div className="denuncia-header">
-          <img src="https://via.placeholder.com/40" alt="User" className="user-icon" />
-          <div className="denuncia-info">
-            <strong>Vitor Ferreira</strong>
-            <p>29/01/2023</p>
           </div>
-        </div>
-        <div className="denuncia-content">
-          <p><strong>Motivo da denúncia :</strong> Informação Errada ou Não Fidedigna</p>
-          <p><strong>Informação adicional :</strong></p>
-          <p>Boa tarde, não é que o local seja indevido mas eu moro perto e a morada não é essa, é tal tal tal, tal qualquer coisa! Obrigado pela atenção</p>
-        </div>
+        ))}
       </div>
-      <div className="denuncia-card">
-        <div className="denuncia-header">
-          <img src="https://via.placeholder.com/40" alt="User" className="user-icon" />
-          <div className="denuncia-info">
-            <strong>Vitor Ferreira</strong>
-            <p>29/01/2023</p>
-          </div>
-        </div>
-        <div className="denuncia-content">
-          <p><strong>Motivo da denúncia :</strong> Informação Errada ou Não Fidedigna</p>
-          <p><strong>Informação adicional :</strong></p>
-          <p>Boa tarde, não é que o local seja indevido mas eu moro perto e a morada não é essa, é tal tal tal, tal qualquer coisa! Obrigado pela atenção</p>
-        </div>
+      <div className="form-buttons">
+        <button type="button" className="cancel-button" onClick={() => setShowDetailViewDenunciada(false)}>Cancelar</button>
+        <button type="button" className="save-button" onClick={handleMedidasClick}>Tomar Medidas</button>
       </div>
     </div>
-    <div className="form-buttons">
-      <button type="button" className="cancel-button" onClick={() => setShowDetailViewDenunciada(false)}>Cancelar</button>
-      <button type="button" className="save-button" onClick={handleMedidasClick}>Tomar Medidas</button>
     </div>
-  </div>
-</div>
-) : null}
+  
+)}
+
 
 
 

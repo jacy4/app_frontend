@@ -941,9 +941,11 @@ const approveLocal = async (publicationId) => {
 };
 
 useEffect(() => {
+  
   const fetchDenuncias = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/denuncias/publicacao/${publicationDetailDenunciada?.id}`);
+      const response = await axios.get(`http://localhost:3000/denuncias/listarDenunciasPorPublicacao/${publicationDetailDenunciada?.id}`);
+      console.log("Fetched denuncias response:", response.data);
       setDenuncias(response.data);
     } catch (error) {
       console.error('Erro ao buscar denúncias:', error);
@@ -1921,7 +1923,10 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
         <span className="total-denuncias">Total: {denuncias.length} {denuncias.length === 1 ? 'Denúncia' : 'Denúncias'}</span>
       </div>
       <div className="denuncias-list">
+      
+
         {denuncias.map((denuncia) => (
+          
           <div key={denuncia.id} className="denuncia">
              <div className="denuncia-header">
              <div className="denunciante-info">
