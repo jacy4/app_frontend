@@ -172,3 +172,16 @@
   border-radius: 50%;
   object-fit: cover;
 }
+.btn-green {
+  background-color: green !important;
+  color: white;
+}
+
+.btn-red {
+  background-color: red !important;
+  color: white;
+}
+
+.flex {
+  display: flex;
+}

@@ -33,7 +33,7 @@ const UsuariosView = () => {
       }
       console.log(`Buscando usuários para centroId: ${centroId}`);
       try {
-        const response = await axios.get(`https://backend-teste-q43r.onrender.com/users/listarUsers/${centroId}`);
+        const response = await axios.get(`http://localhost:3000/users/listarUsers/${centroId}`);
         if (response.data && Array.isArray(response.data)) {
           console.log(response.data);
           setUsuarios(response.data);
@@ -54,6 +54,50 @@ const UsuariosView = () => {
     const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
     return new Date(data).toLocaleDateString('pt-PT', options);
   };
+
+  async function ativarUser(id) {
+    try {
+      const response = await axios.get(`http://localhost:3000/users/user/ativar/${id}`);
+      // const response = await axios.get(`http://localhost:3000/users/ativar/${id}`);
+      if (response.data.error) {
+        setError(response.error);
+      } else {
+        console.error('Utilizador ativado com sucesso');
+        document.getElementById(`btn_${id}`).innerHTML = `
+          <button class="edit-btn">i</button>
+          <button class="edit-btn btn-red" id="deactivate-btn-${id}">
+            Des
+          </button>
+        `
+        document.getElementById(`deactivate-btn-${id}`).addEventListener('click', () => desativarUser(id));
+      }
+    } catch (error) {
+      console.error('Erro ao ativar utilizador:', error);
+      setError(error.message);
+    }
+  }
+
+  async function desativarUser(id) {
+    try {
+      const response = await axios.get(`http://localhost:3000/users/user/desativar/${id}`);
+      // const response = await axios.get(`http://localhost:3000/users/desativar/${id}`);
+      if (response.data.error) {
+        setError(response.error);
+      } else {
+        console.error('Utilizador desativado com sucesso');
+        document.getElementById(`btn_${id}`).innerHTML = `
+          <button class="edit-btn">i</button>
+          <button class="edit-btn btn-green" id="activate-btn-${id}">
+            Act
+          </button>
+        `
+        document.getElementById(`activate-btn-${id}`).addEventListener('click', () => ativarUser(id));
+      }
+    } catch (error) {
+      console.error('Erro ao desativar utilizador:', error);
+      setError(error.message);
+    }
+  }
 
   const handleCreateUserClick = () => {
     setShowCreateForm(true);
@@ -94,7 +138,7 @@ const UsuariosView = () => {
       const fileInput = document.querySelector('input[type="file"]');
       if (fileInput.files.length > 0) {
         const imageUrl = await uploadImage(fileInput.files[0]);
-        const response = await axios.post('https://backend-teste-q43r.onrender.com/users/create', {
+        const response = await axios.post('http://localhost:3000/users/create', {
           nome,
           sobrenome,
           email,
@@ -223,7 +267,12 @@ const UsuariosView = () => {
                   <td>{usuarios.eventsCreated}</td>
                   <td>{usuarios.sharesCreated}</td>
                   <td>{usuarios.postsCreated}</td>
-                  <td><button className="edit-btn">i</button></td>
+                  <td className="flex" id={`btn_${usuarios.id}`}>
+                    <button className="edit-btn">i</button>
+                    <button className={`edit-btn ${usuarios.active === false ? 'btn-green' : 'btn-red'}`} onClick={() => (usuarios.active === false ? ativarUser(usuarios.id) : desativarUser(usuarios.id))} >
+                      {usuarios.active === false ? 'Act' : 'Des'}
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
