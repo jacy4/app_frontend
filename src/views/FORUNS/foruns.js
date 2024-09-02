@@ -169,7 +169,7 @@ useEffect(() => {
     }
     console.log(`Buscando publicações para centroId: ${centroId}`);
     try {
-      const response = await axios.get(`http://localhost:3000/forum/list/${centroId}`);
+      const response = await axios.get(`https://backend-teste-q43r.onrender.com/forum/list/${centroId}`);
       if (response.data && Array.isArray(response.data)) {
         console.log(response.data);
         setforum(response.data);
