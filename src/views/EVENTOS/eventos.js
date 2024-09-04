@@ -1556,7 +1556,7 @@ return (
 
       </div>
   <div className="tab-content2">
-    {selectedEvento.galeria && selectedEvento.galeria.length > 0 && (
+    {/* {selectedEvento.galeria && selectedEvento.galeria.length > 0 && (
       <>
         <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do evento</button>
         <div className="gallery">
@@ -1565,7 +1565,19 @@ return (
           ))}
         </div>
       </>
-    )}
+    )} */}
+    <div className="tab-content2">
+  {imagensGaleria && imagensGaleria.length > 0 && (
+    <>
+      <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Evento</button>
+      <div className="gallery">
+        {imagensGaleria.map((image, index) => (
+          <img key={index} src={image.caminho_imagem} alt={`Galeria ${index}`} className="gallery-image" />
+        ))}
+      </div>
+    </>
+  )}
+</div>
 
 {selectedEvento.user && (
   <>
@@ -1688,7 +1700,7 @@ return (
   </>
 )}
 
-<div className="tab-content2">
+{/* <div className="tab-content2">
   {imagensGaleria && imagensGaleria.length > 0 && (
     <>
       <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Evento</button>
@@ -1699,7 +1711,7 @@ return (
       </div>
     </>
   )}
-</div>
+</div> */}
 
 
     {/* Seção de Comentários */}

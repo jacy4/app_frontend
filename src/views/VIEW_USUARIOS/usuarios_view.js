@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './UserView.css'; 
 import CreateUserButton from '../../componentes/botao_view_usuarios/criar_user';
+import { Password } from '@mui/icons-material';
 
 const UsuariosView = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -16,7 +17,7 @@ const UsuariosView = () => {
   const [nome, setNome] = useState('');
   const [sobrenome, setSobrenome] = useState('');
   const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+  const [password, setPassword] = useState('');
 
   useEffect(() => {
     const storedCentroId = sessionStorage.getItem('centro_id');
@@ -135,35 +136,39 @@ const UsuariosView = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const fileInput = document.querySelector('input[type="file"]');
-      if (fileInput.files.length > 0) {
-        const imageUrl = await uploadImage(fileInput.files[0]);
-        const response = await axios.post('http://localhost:3000/users/create', {
-          nome,
-          sobrenome,
-          email,
-          senha,
-          sobre_min: "Olá, sou novo na SoftShare!!",
-          caminho_foto: imageUrl,
-          centro_id: centroId // Passar o centro_id correto aqui
-        });
-        if (response.status === 200) {
-          alert('Usuário criado com sucesso!');
-          setShowCreateForm(false);
-          setShowUserList(true);
-          // Atualize a lista de usuários após criar um novo usuário
-          setUsuarios([...usuarios, response.data]);
-        } else {
-          alert('Erro ao criar usuário.');
-        }
+      // Se a imagem não é obrigatória, podemos comentar essa parte ou deixá-la para o caso de você querer usá-la depois.
+      // const fileInput = document.querySelector('input[type="file"]');
+      // let imageUrl = null;
+      // if (fileInput && fileInput.files.length > 0) {
+      //   imageUrl = await uploadImage(fileInput.files[0]);
+      // }
+  
+      // Envio da solicitação com ou sem a imagem (se comentado)
+      const response = await axios.post('http://localhost:3000/users/create', {
+        nome,
+        sobrenome,
+        email,
+        password,
+        sobre_min: "Olá, sou novo na SoftShare!!",
+        // caminho_foto: imageUrl, // Se quiser incluir a imagem depois
+        centro_id: centroId // Certifique-se de que o centroId está definido corretamente
+      });
+  
+      if (response.status === 200) {
+        alert('Usuário criado com sucesso!');
+        setShowCreateForm(false);
+        setShowUserList(true);
+        // Atualize a lista de usuários após criar um novo usuário
+        setUsuarios([...usuarios, response.data]);
       } else {
-        alert('Por favor, selecione uma imagem.');
+        alert('Erro ao criar usuário.');
       }
     } catch (error) {
       console.error('Erro ao criar usuário:', error);
       alert('Erro ao criar usuário.');
     }
   };
+  
 
   if (error) {
     return <div className='error-message'>Erro ao buscar usuários: {error}</div>;
@@ -222,10 +227,10 @@ const UsuariosView = () => {
               </label>
               <label>
                 Senha:
-                <input type="password" name="senha" value={senha} onChange={(e) => setSenha(e.target.value)} />
+                <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} />
               </label>
             </div>
-            <div className="form-right">
+            {/* <div className="form-right">
               <label className="image-label">
                 Escolher Imagem:
                 <input type="file" onChange={handleImageChange} />
@@ -233,7 +238,7 @@ const UsuariosView = () => {
               {imageSrc && (
                 <img src={imageSrc} alt="Avatar" className="avatar" />
               )}
-            </div>
+            </div> */}
             <button type="submit">Criar</button>
           </form>
         </div>
