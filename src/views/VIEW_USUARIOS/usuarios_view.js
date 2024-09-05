@@ -33,7 +33,7 @@ const UsuariosView = () => {
       }
       // console.log(`Buscando usuários para centroId: ${centroId}`);
       try {
-        const response = await axios.get(`http://localhost:3000/users/listarUsers`);
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/users/listarUsers`);
         if (response.data && Array.isArray(response.data)) {
           // console.log(response.data);
           setUsuarios(response.data);
@@ -58,7 +58,7 @@ const UsuariosView = () => {
   async function ativarUser(id) {
     try {
       // const response = await axios.get(`https://backend-teste-q43r.onrender.com/users/ativar/${id}`);
-      const response = await axios.get(`http://localhost:3000/users/user/ativar/${id}`);
+      const response = await axios.get(`https://backend-teste-q43r.onrender.com/users/user/ativar/${id}`);
       if (response.data.error) {
         // console.log(response.data.error)
         setError(response.error);
@@ -82,7 +82,7 @@ const UsuariosView = () => {
     // console.log('desativar')
     try {
       // const response = await axios.get(`https://backend-teste-q43r.onrender.com/users/desativar/${id}`);
-      const response = await axios.get(`http://localhost:3000/users/user/desativar/${id}`);
+      const response = await axios.get(`https://backend-teste-q43r.onrender.com/users/user/desativar/${id}`);
       // console.log(response)
       if (response.data.error) {
         // console.log(response.data.error)

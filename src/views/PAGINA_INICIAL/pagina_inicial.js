@@ -27,7 +27,7 @@ const PaginaInicial = () => {
   useEffect(() => {
     const fetchCount = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/eventos/modelcount'); 
+        const response = await axios.get('https://backend-teste-q43r.onrender.com/eventos/modelcount'); 
         const { labels, values } = response.data; // Desestrutura os dados recebidos da API
         // console.log(labels)
         // console.log(values)
@@ -39,7 +39,7 @@ const PaginaInicial = () => {
     };
     const fetchMonthly = async () => {
         try {
-          const response = await axios.get('http://localhost:3000/eventos/monthlycounts'); 
+          const response = await axios.get('https://backend-teste-q43r.onrender.com/eventos/monthlycounts'); 
           const monthlyCounts = response.data; // Supondo que a resposta é um objeto com a estrutura mencionada
 
         // Processar dados

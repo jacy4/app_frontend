@@ -44,7 +44,7 @@ const DefinicoesView = () => {
         throw new Error('ID do administrador não encontrado no token');
       }
 
-      const url = `http://localhost:3000/admin/detalharAdmin/${id}`;
+      const url = `https://backend-teste-q43r.onrender.com/admin/detalharAdmin/${id}`;
       const response = await axios.get(url);
       const userData = response.data;
 
@@ -117,7 +117,7 @@ const DefinicoesView = () => {
         formData.append('doisFatores', doisFatores);
       }
 
-      await axios.put(`http://localhost:3000/admin/atualizarAdmin/${id}`, dados, {
+      await axios.put(`https://backend-teste-q43r.onrender.com/admin/atualizarAdmin/${id}`, dados, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

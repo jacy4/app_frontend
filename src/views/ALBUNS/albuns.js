@@ -168,7 +168,7 @@ useEffect(() => {
     }
     console.log(`Buscando albuns para areaid: ${areaId}`);
     try {
-      const response = await axios.get(`http://localhost:3000/albuns/listByArea/${areaId}`);
+      const response = await axios.get(`https://backend-teste-q43r.onrender.com/albuns/listByArea/${areaId}`);
       if (response.data && Array.isArray(response.data)) {
         console.log(response.data);
         setAlbuns(response.data);
@@ -196,7 +196,7 @@ useEffect(() => {
   // Função para buscar as áreas da API
   const fetchAreas = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/areas/listarAreas'); // Substitua com a URL correta da sua API para buscar as áreas
+      const response = await axios.get('https://backend-teste-q43r.onrender.com/areas/listarAreas'); // Substitua com a URL correta da sua API para buscar as áreas
       setAreas(response.data);
     } catch (error) {
       console.error('Erro ao buscar áreas:', error);
@@ -268,7 +268,7 @@ const handleCancelDelete = () => {
 };
 const handleConfirmDelete = async () => {
   try {
-    await axios.delete(`http://localhost:3000/albuns/delete/${eventoToDelete.id}`);
+    await axios.delete(`https://backend-teste-q43r.onrender.com/albuns/delete/${eventoToDelete.id}`);
     setAlbuns(albuns.filter(p => p.id !== eventoToDelete.id));
     setShowSuccessMessageDelete(true); // Exibir a mensagem de sucesso após a exclusão
   } catch (error) {
@@ -354,7 +354,7 @@ const handleSubmit = async (e) => {
   console.log('Dados do Album:', albumData); // Log dos dados que serão enviados
 
   try {
-      const response = await axios.post('http://localhost:3000/albuns/create', albumData, {
+      const response = await axios.post('https://backend-teste-q43r.onrender.com/albuns/create', albumData, {
           headers: {
               'Content-Type': 'application/json',
           },
@@ -568,7 +568,7 @@ handleRejectAndDelete();
 
 const handleRejectAndDelete = async () => {
 try {
-  const response = await axios.delete(`http://localhost:3000/albuns/delete/${eventoDetail.id}`);
+  const response = await axios.delete(`https://backend-teste-q43r.onrender.com/albuns/delete/${eventoDetail.id}`);
   if (response.status === 200) {
     console.log('evento eliminada com sucesso:', response.data);
     // Adicione qualquer lógica adicional, como redirecionamento ou atualização da UI
@@ -651,7 +651,7 @@ setShowReportedModal(true);
 useEffect(() => {
 const Comentarios = async () => {
   try {
-    const response = await axios.get(`http://localhost:3000/comentarios_albuns/todoscomentarios/${selectedEvento.id}`);
+    const response = await axios.get(`https://backend-teste-q43r.onrender.com/comentarios_albuns/todoscomentarios/${selectedEvento.id}`);
     console.log(response.data);
     setComentarios(response.data);
   } catch (error) {
@@ -666,7 +666,7 @@ if (selectedEvento) {
 
 const handleLike = async (comentarioId) => {
   try {
-    await axios.post(`http://localhost:3000/likescomentariosalbuns/like`, {
+    await axios.post(`https://backend-teste-q43r.onrender.com/likescomentariosalbuns/like`, {
       comentario_evento_id: comentarioId,
       user_id: sessionStorage.getItem('user_id')
     });
@@ -711,7 +711,7 @@ const user_id = sessionStorage.getItem('user_id'); // Obtendo o user_id do sessi
   };
 
   try {
-    const response = await axios.post('http://localhost:3000/comentarios_albuns/criarcomentario', comentarioData, {
+    const response = await axios.post('https://backend-teste-q43r.onrender.com/comentarios_albuns/criarcomentario', comentarioData, {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -749,7 +749,7 @@ const user_id = sessionStorage.getItem('user_id'); // Obtendo o user_id do sessi
 const handleToggleVisibility = async (evento) => {
 try {
   const updatedVisivel = !evento.visivel;
-  await axios.put(`http://localhost:3000/albuns/updateVisibility/${evento.id}`, { visivel: updatedVisivel });
+  await axios.put(`https://backend-teste-q43r.onrender.com/albuns/updateVisibility/${evento.id}`, { visivel: updatedVisivel });
   setAlbuns(albuns.map(p => p.id === evento.id ? { ...p, visivel: updatedVisivel } : p));
 } catch (error) {
   console.error('Erro ao atualizar visibilidade da publicação:', error);
@@ -812,7 +812,7 @@ useEffect(() => {
 // Função para buscar os tópicos da API
 const Topicos = async () => {
   try {
-    const response = await axios.get(`http://localhost:3000/topicos/topicosdeumaarea/${areaId}`); // Substitua areaId pelo id da área
+    const response = await axios.get(`https://backend-teste-q43r.onrender.com/topicos/topicosdeumaarea/${areaId}`); // Substitua areaId pelo id da área
     setTopicos(response.data);
   } catch (error) {
     console.error('Erro ao buscar tópicos:', error);
@@ -824,7 +824,7 @@ Topicos();
 
 const fetchUser = async (id) => {
 try {
-  const response = await axios.get(`http://localhost:3000/users/user/${id}`);
+  const response = await axios.get(`https://backend-teste-q43r.onrender.com/users/user/${id}`);
   console.log("Resposta da API:", response.data); // Adicione este log
   setUser(response.data);
 } catch (error) {
@@ -854,7 +854,7 @@ const userId = sessionStorage.getItem('user_id');
 const eventoId = selectedEvento.id;
 
 try {
-  const response = await axios.post('http://localhost:3000/avaliacao_albuns/criar', {
+  const response = await axios.post('https://backend-teste-q43r.onrender.com/avaliacao_albuns/criar', {
     evento_id: eventoId,
     autor_id: userId,
     estrelas: estrelas
@@ -868,7 +868,7 @@ try {
 
 const MediaAvaliacoes2 = async () => {
 try {
-  const response = await axios.get(`http://localhost:3000/avaliacao_albuns/media/${selectedEvento.id}`);
+  const response = await axios.get(`https://backend-teste-q43r.onrender.com/avaliacao_albuns/media/${selectedEvento.id}`);
   setMediaAvaliacoes(response.data);
 } catch (error) {
   console.error('Erro ao buscar média de avaliações:', error);
@@ -923,7 +923,7 @@ useEffect(() => {
 
 const handleRemoveComentario = async (comentarioId) => {
 try {
-  await axios.delete(`http://localhost:3000/comentarios_albuns/delete/${comentarioId}`);
+  await axios.delete(`https://backend-teste-q43r.onrender.com/comentarios_albuns/delete/${comentarioId}`);
   setComentarios(comentarios.filter(comentario => comentario.id !== comentarioId));
 } catch (error) {
   console.error('Erro ao remover comentário:', error);
@@ -949,7 +949,7 @@ const handleSubmitEdit = async (e) => {
   };
 
   try {
-    const response = await axios.put(`http://localhost:3000/albuns/update/${eventoToEdit.id}`, albumData, {
+    const response = await axios.put(`https://backend-teste-q43r.onrender.com/albuns/update/${eventoToEdit.id}`, albumData, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -978,7 +978,7 @@ setComentarios(comentarios.filter(comentario => comentario.id !== comentarioId))
 
 const approveLocal = async (eventoId) => {
 try {
-  const response = await axios.put(`http://localhost:3000/albuns/update/${eventoId}`, {
+  const response = await axios.put(`https://backend-teste-q43r.onrender.com/albuns/update/${eventoId}`, {
     estado: 'Ativa',
   }, {
     headers: {
@@ -1001,7 +1001,7 @@ useEffect(() => {
   const fetchParticipantes = async () => {
       setLoading(true);
       try {
-          const response = await axios.get(`http://localhost:3000/listaparticipantes_evento/evento/${selectedEvento.id}`);
+          const response = await axios.get(`https://backend-teste-q43r.onrender.com/listaparticipantes_evento/evento/${selectedEvento.id}`);
           setParticipantes(response.data);
           setLoading(false);
       } catch (err) {
@@ -1017,7 +1017,7 @@ useEffect(() => {
 useEffect(() => {
   const fetchAlbuns = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/albuns/listByArea/${areaId}`);
+      const response = await axios.get(`https://backend-teste-q43r.onrender.com/albuns/listByArea/${areaId}`);
       setAlbuns(response.data);
     } catch (error) {
       console.error('Erro ao buscar álbuns por área:', error);
@@ -1036,7 +1036,7 @@ useEffect(() => {
 
 const adicionarParticipante = async (eventoId, usuarioId) => {
   try {
-      const response = await axios.post('http://localhost:3000/listaparticipantes_evento/adicionar_participante/', {
+      const response = await axios.post('https://backend-teste-q43r.onrender.com/listaparticipantes_evento/adicionar_participante/', {
           evento_id: eventoId,
           usuario_id: usuarioId
       });
@@ -1102,7 +1102,7 @@ useEffect(() => {
     // Verifica se o eventoId não é null
     if (eventoId) {
       try {
-        const response = await axios.get(`http://localhost:3000/eventos/${eventoId}`);
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/eventos/${eventoId}`);
         setSelectedEvento(response.data);
       } catch (error) {
         console.error('Erro ao buscar o evento:', error);
@@ -1121,7 +1121,7 @@ useEffect(() => {
   if (selectedEvento && selectedEvento.id) {
     const fetchMediaAvaliacoes = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/comentarios_albuns/mediaavaliacoes/${selectedEvento.id}`);
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/comentarios_albuns/mediaavaliacoes/${selectedEvento.id}`);
         setMediaAvaliacoes(response.data);
       } catch (error) {
         console.error('Erro ao buscar a média das avaliações:', error);
@@ -1140,7 +1140,7 @@ useEffect(() => {
   const fetchImagensGaleria = async () => {
     if (selectedEvento && selectedEvento.id) {
       try {
-        const response = await axios.get(`http://localhost:3000/galeria_evento/listar_imagens_v2/${selectedEvento.id}`);
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/galeria_evento/listar_imagens_v2/${selectedEvento.id}`);
         setImagensGaleria(response.data);
       } catch (error) {
         console.error('Erro ao buscar imagens da galeria:', error);
@@ -1196,7 +1196,7 @@ const [comentariosalbuns, setComentariosalbuns] = useState([]);
 
 const handleDeleteComentarioEvento = async (comentarioId) => {
   try {
-    const response = await axios.delete(`http://localhost:3000/comentarios_albuns/apagarcomentario/${comentarioId}`);
+    const response = await axios.delete(`https://backend-teste-q43r.onrender.com/comentarios_albuns/apagarcomentario/${comentarioId}`);
     if (response.status === 200) {
       alert('Comentário excluído com sucesso');
       setComentariosalbuns(comentariosalbuns.filter(comentario => comentario.id !== comentarioId)); // Atualize a lista de comentários
@@ -1217,7 +1217,7 @@ useEffect(() => {
   // Função para buscar os tipos de albuns da API
   const fetchTiposDeEvento = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/tipodeevento/listarTipos'); // URL correta da sua API para buscar os tipos de albuns
+      const response = await axios.get('https://backend-teste-q43r.onrender.com/tipodeevento/listarTipos'); // URL correta da sua API para buscar os tipos de albuns
       setTiposDeEvento(response.data);
     } catch (error) {
       console.error('Erro ao buscar tipos de evento:', error);
@@ -1256,7 +1256,7 @@ useEffect(() => {
   
   const fetchDenuncias = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/denuncias_comentarios_albuns/denunciasPorEvento/${eventoDetailDenunciada?.id}`);
+      const response = await axios.get(`https://backend-teste-q43r.onrender.com/denuncias_comentarios_albuns/denunciasPorEvento/${eventoDetailDenunciada?.id}`);
       console.log("Fetched denuncias response:", response.data);
       setDenuncias(response.data);
       console.log(denuncias);
@@ -1272,7 +1272,7 @@ useEffect(() => {
 
 const marcarDenunciaComoResolvida = async (denunciaId) => {
   try {
-    const response = await axios.put(`http://localhost:3000/denuncias_comentarios_albuns/update/${denunciaId}`, { resolvida: true });
+    const response = await axios.put(`https://backend-teste-q43r.onrender.com/denuncias_comentarios_albuns/update/${denunciaId}`, { resolvida: true });
     if (response.status === 200) {
       setDenuncias(prevDenuncias => prevDenuncias.map(denuncia => 
         denuncia.id === denunciaId ? { ...denuncia, resolvida: true } : denuncia
@@ -1348,7 +1348,7 @@ return (
       <div className="search-wrapper">
         <input
           type="text"
-          placeholder="Procurar por Publicação..."
+          placeholder="Procurar por Álbum..."
           value={searchTerm}
           onChange={handleSearchChange}
           className="search-input"

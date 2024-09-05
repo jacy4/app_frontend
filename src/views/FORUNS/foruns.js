@@ -140,7 +140,7 @@ const ForumView = () => {
     // Buscar as áreas do backend
     const fetchAreas = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/areas/listarAreas');
+        const response = await axios.get('https://backend-teste-q43r.onrender.com/areas/listarAreas');
         setAreas(response.data);
       } catch (error) {
         console.error('Erro ao buscar áreas:', error);
@@ -185,7 +185,7 @@ const ForumView = () => {
       }
       // console.log(`Buscando publicações para centroId: ${centroId}`);
       try {
-        const response = await axios.get(`http://localhost:3000/forum/list/${areaId}`);
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/forum/list/${areaId}`);
         if (response.data && Array.isArray(response.data)) {
           // console.log(response.data);
           setforum(response.data);
@@ -276,7 +276,7 @@ const ForumView = () => {
   };
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/forum/delete/${ForumToDelete.id}`);
+      await axios.delete(`https://backend-teste-q43r.onrender.com/forum/delete/${ForumToDelete.id}`);
       setforum(forum.filter(p => p.id !== ForumToDelete.id));
       setShowSuccessMessageDelete(true); // Exibir a mensagem de sucesso após a exclusão
     } catch (error) {
@@ -342,7 +342,7 @@ const ForumView = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/forum/create', {
+      const response = await axios.post('https://backend-teste-q43r.onrender.com/forum/create', {
         nome,
         descricao,
         area_id: areaSelecionada, // Enviar a área selecionada
@@ -516,7 +516,7 @@ const ForumView = () => {
   const handleDeleteMedidas = async () => {
     try {
       // Supondo que você esteja deletando um evento baseado no eventoDetailDenunciada.id
-      const response = await axios.delete(`http://localhost:3000/forum/delete/${ForumDetailDenunciada?.id}`, {
+      const response = await axios.delete(`https://backend-teste-q43r.onrender.com/forum/delete/${ForumDetailDenunciada?.id}`, {
         data: { motivo: deleteMessage } // Passando o motivo da remoção, se necessário
       });
 
@@ -642,7 +642,7 @@ const ForumView = () => {
   useEffect(() => {
     const Comentarios = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/comentarios_forum/todoscomentarios/${selectedForum.id}`);
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/comentarios_forum/todoscomentarios/${selectedForum.id}`);
         // console.log(response.data);
         setComentarios(response.data);
       } catch (error) {
@@ -665,7 +665,7 @@ const ForumView = () => {
     };
 
     try {
-      const response = await axios.post('http://localhost:3000/comentarios_forum/criarcomentario', comentarioData, {
+      const response = await axios.post('https://backend-teste-q43r.onrender.com/comentarios_forum/criarcomentario', comentarioData, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -785,7 +785,7 @@ const ForumView = () => {
     const eventoId = selectedForum.id;
 
     try {
-      const response = await axios.post('http://localhost:3000/avaliacao_forum/criar', {
+      const response = await axios.post('https://backend-teste-q43r.onrender.com/avaliacao_forum/criar', {
         evento_id: eventoId,
         autor_id: userId,
         estrelas: estrelas
@@ -799,7 +799,7 @@ const ForumView = () => {
 
   const MediaAvaliacoes2 = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/avaliacao_forum/media/${selectedForum.id}`);
+      const response = await axios.get(`https://backend-teste-q43r.onrender.com/avaliacao_forum/media/${selectedForum.id}`);
       setMediaAvaliacoes(response.data);
     } catch (error) {
       console.error('Erro ao buscar média de avaliações:', error);
@@ -853,7 +853,7 @@ const ForumView = () => {
 
   const handleRemoveComentario = async (comentarioId) => {
     try {
-      await axios.delete(`http://localhost:3000/comentarios_forum/delete/${comentarioId}`);
+      await axios.delete(`https://backend-teste-q43r.onrender.com/comentarios_forum/delete/${comentarioId}`);
       setComentarios(comentarios.filter(comentario => comentario.id !== comentarioId));
     } catch (error) {
       console.error('Erro ao remover comentário:', error);
@@ -868,7 +868,7 @@ const ForumView = () => {
   useEffect(() => {
 
     // Carregar os usuários
-    axios.get('http://localhost:3000/users/listarallUsers')  // Ajuste a rota conforme necessário
+    axios.get('https://backend-teste-q43r.onrender.com/users/listarallUsers')  // Ajuste a rota conforme necessário
       .then(response => setUsuarios(response.data))
       .catch(error => console.error('Erro ao carregar usuários:', error));
   }, []);
@@ -879,7 +879,7 @@ const ForumView = () => {
 
   const handleRemoverParticipante = async (usuario_id) => {
     try {
-      await axios.delete('http://localhost:3000/listaForum/removerMembro', {
+      await axios.delete('https://backend-teste-q43r.onrender.com/listaForum/removerMembro', {
         data: {
           usuario_id,
           Forum_id: selectedForum.id,
@@ -913,7 +913,7 @@ const ForumView = () => {
 
     try {
       // Atualizar o Forum
-      const response = await axios.put(`http://localhost:3000/forum/update/${selectedForum.id}`, ForumData, {
+      const response = await axios.put(`https://backend-teste-q43r.onrender.com/forum/update/${selectedForum.id}`, ForumData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -922,7 +922,7 @@ const ForumView = () => {
       if (response.status === 201) {
         // Remover participantes da lista de remoção
         for (const usuario_id of participantesParaRemover) {
-          await axios.delete('http://localhost:3000/listaForum/removerMembro', {
+          await axios.delete('https://backend-teste-q43r.onrender.com/listaForum/removerMembro', {
             data: {
               usuario_id,
               Forum_id: selectedForum.id,
@@ -932,7 +932,7 @@ const ForumView = () => {
 
         // Adicionar participantes da lista de adição
         for (const usuario_id of participantesParaAdicionar) {
-          await axios.post('http://localhost:3000/listaForum/adicionarMembro', {
+          await axios.post('https://backend-teste-q43r.onrender.com/listaForum/adicionarMembro', {
             usuario_id,
             Forum_id: selectedForum.id,
           });
@@ -1002,7 +1002,7 @@ const ForumView = () => {
 
   //   // Remover os comentários marcados
   //   for (const comentarioId of comentariosParaRemover) {
-  //     await axios.delete(`http://localhost:3000/comentarios_forum/delete/${comentarioId}`);
+  //     await axios.delete(`https://backend-teste-q43r.onrender.com/comentarios_forum/delete/${comentarioId}`);
   //   }
 
   //   if (response.status === 201) { // Ajuste o código de status para 201 
@@ -1049,7 +1049,7 @@ const ForumView = () => {
   //   const fetchParticipantes = async () => {
   //       setLoading(true);
   //       try {
-  //           const response = await axios.get(`http://localhost:3000/listaForum/listarMembros/${selectedForum.id}`);
+  //           const response = await axios.get(`https://backend-teste-q43r.onrender.com/listaForum/listarMembros/${selectedForum.id}`);
   //           setParticipantes(response.data);
   //           setLoading(false);
   //       } catch (err) {
@@ -1087,7 +1087,7 @@ const ForumView = () => {
 
   const adicionarParticipante = async (Forum_id, usuarioId) => {
     try {
-      const response = await axios.post('http://localhost:3000/listaForum/adicionarMembro/', {
+      const response = await axios.post('https://backend-teste-q43r.onrender.com/listaForum/adicionarMembro/', {
         Forum_id: Forum_id,
         usuario_id: usuarioId
       });
@@ -1146,7 +1146,7 @@ const ForumView = () => {
     if (selectedForum && selectedForum.id) {
       const fetchMediaAvaliacoes = async () => {
         try {
-          const response = await axios.get(`http://localhost:3000/comentarios_forum/mediaavaliacoes/${selectedForum.id}`);
+          const response = await axios.get(`https://backend-teste-q43r.onrender.com/comentarios_forum/mediaavaliacoes/${selectedForum.id}`);
           setMediaAvaliacoes(response.data);
         } catch (error) {
           console.error('Erro ao buscar a média das avaliações:', error);
@@ -1205,7 +1205,7 @@ const ForumView = () => {
   useEffect(() => {
     const fetchDenuncias = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/denuncias_forum/Forum/${ForumDetailDenunciada?.id}`);
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/denuncias_forum/Forum/${ForumDetailDenunciada?.id}`);
         setDenunciasForum(response.data);
       } catch (error) {
         console.error('Erro ao buscar denúncias:', error);
@@ -1229,7 +1229,7 @@ const ForumView = () => {
 
   const marcarDenunciaForumComoResolvida = async (denunciaId) => {
     try {
-      const response = await axios.put(`http://localhost:3000/denuncias_mensagens_forum/update/${denunciaId}`, { resolvida: true });
+      const response = await axios.put(`https://backend-teste-q43r.onrender.com/denuncias_mensagens_forum/update/${denunciaId}`, { resolvida: true });
       if (response.status === 200) {
         setDenunciasMensagensForum(prevDenuncias => prevDenuncias.map(denuncia =>
           denuncia.id === denunciaId ? { ...denuncia, resolvida: true } : denuncia
@@ -1271,7 +1271,7 @@ const ForumView = () => {
         return;
       }
       try {
-        const response = await axios.get(`http://localhost:3000/denuncias_mensagens_forum/forum/${ForumDetailDenunciada.id}`);
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/denuncias_mensagens_forum/forum/${ForumDetailDenunciada.id}`);
         setDenunciasMensagensForum(response.data);
       } catch (error) {
         console.error('Erro ao buscar denúncias das mensagens do fórum:', error);
@@ -1288,7 +1288,7 @@ const ForumView = () => {
   useEffect(() => {
     const fetchMensagensForum = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/mensagem_forum/forum/${selectedForum.id}`);
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/mensagem_forum/forum/${selectedForum.id}`);
         setmensagensForum(response.data);
       } catch (error) {
         console.error('Erro ao buscar mensagens do fórum:', error);
@@ -1309,7 +1309,7 @@ const ForumView = () => {
 
   const handleDeleteMensagemForum = async (mensagemId) => {
     try {
-      const response = await axios.delete(`http://localhost:3000/mensagem_forum/delete/${mensagemId}`);
+      const response = await axios.delete(`https://backend-teste-q43r.onrender.com/mensagem_forum/delete/${mensagemId}`);
       if (response.status === 200) {
         alert('Mensagem excluída com sucesso');
         setmensagensForum(mensagensForum.filter(mensagem => mensagem.id !== mensagemId)); // Atualize a lista de mensagens

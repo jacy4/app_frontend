@@ -161,7 +161,7 @@ useEffect(() => {
     }
     // console.log(`Buscando publicações para centroId: ${centroId}`);
     try {
-      const response = await axios.get(`http://localhost:3000/grupos/listargrupos/${areaId}`);
+      const response = await axios.get(`https://backend-teste-q43r.onrender.com/grupos/listargrupos/${areaId}`);
       if (response.data && Array.isArray(response.data)) {
         // console.log(response.data);
         setgrupos(response.data);
@@ -252,7 +252,7 @@ const handleCancelDelete = () => {
 };
 const handleConfirmDelete = async () => {
   try {
-    await axios.delete(`http://localhost:3000/grupos/delete/${grupoToDelete.id}`);
+    await axios.delete(`https://backend-teste-q43r.onrender.com/grupos/delete/${grupoToDelete.id}`);
     setgrupos(grupos.filter(p => p.id !== grupoToDelete.id));
     setShowSuccessMessageDelete(true); // Exibir a mensagem de sucesso após a exclusão
   } catch (error) {
@@ -514,7 +514,7 @@ const handleDeleteClickMedidas = () => {
 const handleDeleteMedidas = async () => {
   try {
     // Supondo que você esteja deletando um evento baseado no eventoDetailDenunciada.id
-    const response = await axios.delete(`http://localhost:3000/grupos/delete/${grupoDetailDenunciada?.id}`, {
+    const response = await axios.delete(`https://backend-teste-q43r.onrender.com/grupos/delete/${grupoDetailDenunciada?.id}`, {
       data: { motivo: deleteMessage } // Passando o motivo da remoção, se necessário
     });
 
@@ -640,7 +640,7 @@ setShowReportedModal(true);
 useEffect(() => {
 const Comentarios = async () => {
   try {
-    const response = await axios.get(`http://localhost:3000/comentarios_grupos/todoscomentarios/${selectedGrupo.id}`);
+    const response = await axios.get(`https://backend-teste-q43r.onrender.com/comentarios_grupos/todoscomentarios/${selectedGrupo.id}`);
     // console.log(response.data);
     setComentarios(response.data);
   } catch (error) {
@@ -663,7 +663,7 @@ const user_id = sessionStorage.getItem('user_id'); // Obtendo o user_id do sessi
   };
 
   try {
-    const response = await axios.post('http://localhost:3000/comentarios_grupos/criarcomentario', comentarioData, {
+    const response = await axios.post('https://backend-teste-q43r.onrender.com/comentarios_grupos/criarcomentario', comentarioData, {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -782,7 +782,7 @@ const userId = sessionStorage.getItem('user_id');
 const eventoId = selectedGrupo.id;
 
 try {
-  const response = await axios.post('http://localhost:3000/avaliacao_grupos/criar', {
+  const response = await axios.post('https://backend-teste-q43r.onrender.com/avaliacao_grupos/criar', {
     evento_id: eventoId,
     autor_id: userId,
     estrelas: estrelas
@@ -796,7 +796,7 @@ try {
 
 const MediaAvaliacoes2 = async () => {
 try {
-  const response = await axios.get(`http://localhost:3000/avaliacao_grupos/media/${selectedGrupo.id}`);
+  const response = await axios.get(`https://backend-teste-q43r.onrender.com/avaliacao_grupos/media/${selectedGrupo.id}`);
   setMediaAvaliacoes(response.data);
 } catch (error) {
   console.error('Erro ao buscar média de avaliações:', error);
@@ -850,7 +850,7 @@ setGaleria(updatedGaleria);
 
 const handleRemoveComentario = async (comentarioId) => {
 try {
-  await axios.delete(`http://localhost:3000/comentarios_grupos/delete/${comentarioId}`);
+  await axios.delete(`https://backend-teste-q43r.onrender.com/comentarios_grupos/delete/${comentarioId}`);
   setComentarios(comentarios.filter(comentario => comentario.id !== comentarioId));
 } catch (error) {
   console.error('Erro ao remover comentário:', error);
@@ -865,7 +865,7 @@ const handleRemoverParticipanteVisual = (usuario_id) => {
 useEffect(() => {
 
   // Carregar os usuários
-  axios.get('http://localhost:3000/users/listarallUsers')  // Ajuste a rota conforme necessário
+  axios.get('https://backend-teste-q43r.onrender.com/users/listarallUsers')  // Ajuste a rota conforme necessário
     .then(response => setUsuarios(response.data))
     .catch(error => console.error('Erro ao carregar usuários:', error));
 }, []);
@@ -876,7 +876,7 @@ const usuariosDisponiveis = usuarios.filter(usuario =>
 
 const handleRemoverParticipante = async (usuario_id) => {
   try {
-    await axios.delete('http://localhost:3000/listagrupo/removerMembro', {
+    await axios.delete('https://backend-teste-q43r.onrender.com/listagrupo/removerMembro', {
       data: {
         usuario_id,
         grupo_id: selectedGrupo.id,
@@ -910,7 +910,7 @@ const handleSubmitEdit = async () => {
 
   try {
     // Atualizar o grupo
-    const response = await axios.put(`http://localhost:3000/grupos/update/${selectedGrupo.id}`, grupoData, {
+    const response = await axios.put(`https://backend-teste-q43r.onrender.com/grupos/update/${selectedGrupo.id}`, grupoData, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -919,7 +919,7 @@ const handleSubmitEdit = async () => {
     if (response.status === 201) {
       // Remover participantes da lista de remoção
       for (const usuario_id of participantesParaRemover) {
-        await axios.delete('http://localhost:3000/listagrupo/removerMembro', {
+        await axios.delete('https://backend-teste-q43r.onrender.com/listagrupo/removerMembro', {
           data: {
             usuario_id,
             grupo_id: selectedGrupo.id,
@@ -929,7 +929,7 @@ const handleSubmitEdit = async () => {
 
       // Adicionar participantes da lista de adição
       for (const usuario_id of participantesParaAdicionar) {
-        await axios.post('http://localhost:3000/listagrupo/adicionarMembro', {
+        await axios.post('https://backend-teste-q43r.onrender.com/listagrupo/adicionarMembro', {
           usuario_id,
           grupo_id: selectedGrupo.id,
         });
@@ -999,7 +999,7 @@ const [grupoId, setGrupoId] = useState(null);
 
 //   // Remover os comentários marcados
 //   for (const comentarioId of comentariosParaRemover) {
-//     await axios.delete(`http://localhost:3000/comentarios_grupos/delete/${comentarioId}`);
+//     await axios.delete(`https://backend-teste-q43r.onrender.com/comentarios_grupos/delete/${comentarioId}`);
 //   }
 
 //   if (response.status === 201) { // Ajuste o código de status para 201 
@@ -1046,7 +1046,7 @@ useEffect(() => {
   const fetchParticipantes = async () => {
       setLoading(true);
       try {
-          const response = await axios.get(`http://localhost:3000/listagrupo/listarMembros/${selectedGrupo.id}`);
+          const response = await axios.get(`https://backend-teste-q43r.onrender.com/listagrupo/listarMembros/${selectedGrupo.id}`);
           setParticipantes(response.data);
           setLoading(false);
       } catch (err) {
@@ -1063,7 +1063,7 @@ useEffect(() => {
 
 const adicionarParticipante = async (grupo_id, usuarioId) => {
   try {
-      const response = await axios.post('http://localhost:3000/listagrupo/adicionarMembro/', {
+      const response = await axios.post('https://backend-teste-q43r.onrender.com/listagrupo/adicionarMembro/', {
           grupo_id: grupo_id,
           usuario_id: usuarioId
       });
@@ -1122,7 +1122,7 @@ useEffect(() => {
   if (selectedGrupo && selectedGrupo.id) {
     const fetchMediaAvaliacoes = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/comentarios_grupos/mediaavaliacoes/${selectedGrupo.id}`);
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/comentarios_grupos/mediaavaliacoes/${selectedGrupo.id}`);
         setMediaAvaliacoes(response.data);
       } catch (error) {
         console.error('Erro ao buscar a média das avaliações:', error);
@@ -1181,7 +1181,7 @@ const { getRootProps: getCapaRootProps, getInputProps: getCapaInputProps } = use
 useEffect(() => {
   const fetchDenuncias = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/denuncias_grupos/grupo/${grupoDetailDenunciada?.id}`);
+      const response = await axios.get(`https://backend-teste-q43r.onrender.com/denuncias_grupos/grupo/${grupoDetailDenunciada?.id}`);
       setDenunciasGrupo(response.data);
     } catch (error) {
       console.error('Erro ao buscar denúncias:', error);
@@ -1200,7 +1200,7 @@ const toggleOptionsGrupo = (denunciaId) => {
 
 const marcarDenunciaGrupoComoResolvida = async (denunciaId) => {
   try {
-    const response = await axios.put(`http://localhost:3000/denuncias_grupos/update/${denunciaId}`, { resolvida: true });
+    const response = await axios.put(`https://backend-teste-q43r.onrender.com/denuncias_grupos/update/${denunciaId}`, { resolvida: true });
     if (response.status === 200) {
       setDenunciasGrupo(prevDenuncias => prevDenuncias.map(denuncia => 
         denuncia.id === denunciaId ? { ...denuncia, resolvida: true } : denuncia
@@ -1279,7 +1279,7 @@ return (
       <div className="search-wrapper">
         <input
           type="text"
-          placeholder="Procurar por Publicação..."
+          placeholder="Procurar por Grupo..."
           value={searchTerm}
           onChange={handleSearchChange}
           className="search-input"

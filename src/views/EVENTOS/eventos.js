@@ -170,7 +170,7 @@ useEffect(() => {
     }
     // console.log(`Buscando publicações para centroId: ${centroId}`);
     try {
-      const response = await axios.get(`http://localhost:3000/eventos/listarEventos/${areaId}`);
+      const response = await axios.get(`https://backend-teste-q43r.onrender.com/eventos/listarEventos/${areaId}`);
       if (response.data && Array.isArray(response.data)) {
         // console.log(response.data);
         setEventos(response.data);
@@ -215,7 +215,7 @@ useEffect(() => {
   // Função para buscar as áreas da API
   const fetchAreas = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/areas/listarAreas'); // Substitua com a URL correta da sua API para buscar as áreas
+      const response = await axios.get('https://backend-teste-q43r.onrender.com/areas/listarAreas'); // Substitua com a URL correta da sua API para buscar as áreas
       setAreas(response.data);
     } catch (error) {
       console.error('Erro ao buscar áreas:', error);
@@ -292,7 +292,7 @@ const handleCancelDelete = () => {
 };
 const handleConfirmDelete = async () => {
   try {
-    await axios.delete(`http://localhost:3000/eventos/delete/${eventoToDelete.id}`);
+    await axios.delete(`https://backend-teste-q43r.onrender.com/eventos/delete/${eventoToDelete.id}`);
     setEventos(eventos.filter(p => p.id !== eventoToDelete.id));
     setShowSuccessMessageDelete(true); // Exibir a mensagem de sucesso após a exclusão
   } catch (error) {
@@ -606,7 +606,7 @@ handleRejectAndDelete();
 
 const handleRejectAndDelete = async () => {
 try {
-  const response = await axios.delete(`http://localhost:3000/eventos/delete/${eventoDetail.id}`);
+  const response = await axios.delete(`https://backend-teste-q43r.onrender.com/eventos/delete/${eventoDetail.id}`);
   if (response.status === 200) {
     // console.log('evento eliminada com sucesso:', response.data);
     // Adicione qualquer lógica adicional, como redirecionamento ou atualização da UI
@@ -689,7 +689,7 @@ setShowReportedModal(true);
 useEffect(() => {
 const Comentarios = async () => {
   try {
-    const response = await axios.get(`http://localhost:3000/comentarios_eventos/todoscomentarios/${selectedEvento.id}`);
+    const response = await axios.get(`https://backend-teste-q43r.onrender.com/comentarios_eventos/todoscomentarios/${selectedEvento.id}`);
     // console.log(response.data);
     setComentarios(response.data);
   } catch (error) {
@@ -704,7 +704,7 @@ if (selectedEvento) {
 
 const handleLike = async (comentarioId) => {
   try {
-    await axios.post(`http://localhost:3000/likescomentarioseventos/like`, {
+    await axios.post(`https://backend-teste-q43r.onrender.com/likescomentarioseventos/like`, {
       comentario_evento_id: comentarioId,
       user_id: sessionStorage.getItem('user_id')
     });
@@ -749,7 +749,7 @@ const user_id = sessionStorage.getItem('user_id'); // Obtendo o user_id do sessi
   };
 
   try {
-    const response = await axios.post('http://localhost:3000/comentarios_eventos/criarcomentario', comentarioData, {
+    const response = await axios.post('https://backend-teste-q43r.onrender.com/comentarios_eventos/criarcomentario', comentarioData, {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -787,7 +787,7 @@ const user_id = sessionStorage.getItem('user_id'); // Obtendo o user_id do sessi
 const handleToggleVisibility = async (evento) => {
 try {
   const updatedVisivel = !evento.visivel;
-  await axios.put(`http://localhost:3000/eventos/updateVisibility/${evento.id}`, { visivel: updatedVisivel });
+  await axios.put(`https://backend-teste-q43r.onrender.com/eventos/updateVisibility/${evento.id}`, { visivel: updatedVisivel });
   setEventos(eventos.map(p => p.id === evento.id ? { ...p, visivel: updatedVisivel } : p));
 } catch (error) {
   console.error('Erro ao atualizar visibilidade da publicação:', error);
@@ -850,7 +850,7 @@ useEffect(() => {
 // Função para buscar os tópicos da API
 const Topicos = async () => {
   try {
-    const response = await axios.get(`http://localhost:3000/topicos/topicosdeumaarea/${area}`); // Substitua areaId pelo id da área
+    const response = await axios.get(`https://backend-teste-q43r.onrender.com/topicos/topicosdeumaarea/${area}`); // Substitua areaId pelo id da área
     setTopicos(response.data);
   } catch (error) {
     console.error('Erro ao buscar tópicos:', error);
@@ -862,7 +862,7 @@ Topicos();
 
 const fetchUser = async (id) => {
 try {
-  const response = await axios.get(`http://localhost:3000/users/user/${id}`);
+  const response = await axios.get(`https://backend-teste-q43r.onrender.com/users/user/${id}`);
   // console.log("Resposta da API:", response.data); // Adicione este log
   setUser(response.data);
 } catch (error) {
@@ -892,7 +892,7 @@ const userId = sessionStorage.getItem('user_id');
 const eventoId = selectedEvento.id;
 
 try {
-  const response = await axios.post('http://localhost:3000/avaliacao_eventos/criar', {
+  const response = await axios.post('https://backend-teste-q43r.onrender.com/avaliacao_eventos/criar', {
     evento_id: eventoId,
     autor_id: userId,
     estrelas: estrelas
@@ -906,7 +906,7 @@ try {
 
 const MediaAvaliacoes2 = async () => {
 try {
-  const response = await axios.get(`http://localhost:3000/avaliacao_eventos/media/${selectedEvento.id}`);
+  const response = await axios.get(`https://backend-teste-q43r.onrender.com/avaliacao_eventos/media/${selectedEvento.id}`);
   setMediaAvaliacoes(response.data);
 } catch (error) {
   console.error('Erro ao buscar média de avaliações:', error);
@@ -961,7 +961,7 @@ useEffect(() => {
 
 const handleRemoveComentario = async (comentarioId) => {
 try {
-  await axios.delete(`http://localhost:3000/comentarios_eventos/delete/${comentarioId}`);
+  await axios.delete(`https://backend-teste-q43r.onrender.com/comentarios_eventos/delete/${comentarioId}`);
   setComentarios(comentarios.filter(comentario => comentario.id !== comentarioId));
 } catch (error) {
   console.error('Erro ao remover comentário:', error);
@@ -994,7 +994,7 @@ const handleSubmitEdit = async (e) => {
   };
 
   try {
-    const response = await axios.put(`http://localhost:3000/eventos/update/${eventoToEdit.id}`, eventoData, {
+    const response = await axios.put(`https://backend-teste-q43r.onrender.com/eventos/update/${eventoToEdit.id}`, eventoData, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -1023,7 +1023,7 @@ setComentarios(comentarios.filter(comentario => comentario.id !== comentarioId))
 
 const approveLocal = async (eventoId) => {
 try {
-  const response = await axios.put(`http://localhost:3000/eventos/update/${eventoId}`, {
+  const response = await axios.put(`https://backend-teste-q43r.onrender.com/eventos/update/${eventoId}`, {
     estado: 'Ativa',
   }, {
     headers: {
@@ -1046,7 +1046,7 @@ useEffect(() => {
   const fetchParticipantes = async () => {
       setLoading(true);
       try {
-          const response = await axios.get(`http://localhost:3000/listaparticipantes_evento/evento/${selectedEvento.id}`);
+          const response = await axios.get(`https://backend-teste-q43r.onrender.com/listaparticipantes_evento/evento/${selectedEvento.id}`);
           setParticipantes(response.data);
           setLoading(false);
       } catch (err) {
@@ -1063,7 +1063,7 @@ useEffect(() => {
 
 const adicionarParticipante = async (eventoId, usuarioId) => {
   try {
-      const response = await axios.post('http://localhost:3000/listaparticipantes_evento/adicionar_participante/', {
+      const response = await axios.post('https://backend-teste-q43r.onrender.com/listaparticipantes_evento/adicionar_participante/', {
           evento_id: eventoId,
           usuario_id: usuarioId
       });
@@ -1122,7 +1122,7 @@ useEffect(() => {
   if (selectedEvento && selectedEvento.id) {
     const fetchMediaAvaliacoes = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/comentarios_eventos/mediaavaliacoes/${selectedEvento.id}`);
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/comentarios_eventos/mediaavaliacoes/${selectedEvento.id}`);
         setMediaAvaliacoes(response.data);
       } catch (error) {
         console.error('Erro ao buscar a média das avaliações:', error);
@@ -1136,7 +1136,7 @@ useEffect(() => {
 useEffect(() => {
   const fetchImagensGaleria = async () => {
       try {
-          const response = await axios.get(`http://localhost:3000/galeria_evento/listar_imagens_v2/${selectedEvento.id}`);
+          const response = await axios.get(`https://backend-teste-q43r.onrender.com/galeria_evento/listar_imagens_v2/${selectedEvento.id}`);
           setImagensGaleria(response.data);
       } catch (error) {
           console.error('Erro ao buscar imagens da galeria:', error);
@@ -1194,7 +1194,7 @@ const [comentariosEventos, setComentariosEventos] = useState([]);
 
 const handleDeleteComentarioEvento = async (comentarioId) => {
   try {
-    const response = await axios.delete(`http://localhost:3000/comentarios_eventos/apagarcomentario/${comentarioId}`);
+    const response = await axios.delete(`https://backend-teste-q43r.onrender.com/comentarios_eventos/apagarcomentario/${comentarioId}`);
     if (response.status === 200) {
       alert('Comentário excluído com sucesso');
       setComentariosEventos(comentariosEventos.filter(comentario => comentario.id !== comentarioId)); // Atualize a lista de comentários
@@ -1215,7 +1215,7 @@ useEffect(() => {
   // Função para buscar os tipos de eventos da API
   const fetchTiposDeEvento = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/tipodeevento/listarTipos'); // URL correta da sua API para buscar os tipos de eventos
+      const response = await axios.get('https://backend-teste-q43r.onrender.com/tipodeevento/listarTipos'); // URL correta da sua API para buscar os tipos de eventos
       setTiposDeEvento(response.data);
     } catch (error) {
       console.error('Erro ao buscar tipos de evento:', error);
@@ -1254,7 +1254,7 @@ useEffect(() => {
   
   const fetchDenuncias = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/denuncias_comentarios_eventos/denunciasPorEvento/${eventoDetailDenunciada?.id}`);
+      const response = await axios.get(`https://backend-teste-q43r.onrender.com/denuncias_comentarios_eventos/denunciasPorEvento/${eventoDetailDenunciada?.id}`);
       // console.log("Fetched denuncias response:", response.data);
       setDenuncias(response.data);
       // console.log(denuncias);
@@ -1270,7 +1270,7 @@ useEffect(() => {
 
 const marcarDenunciaComoResolvida = async (denunciaId) => {
   try {
-    const response = await axios.put(`http://localhost:3000/denuncias_comentarios_eventos/update/${denunciaId}`, { resolvida: true });
+    const response = await axios.put(`https://backend-teste-q43r.onrender.com/denuncias_comentarios_eventos/update/${denunciaId}`, { resolvida: true });
     if (response.status === 200) {
       setDenuncias(prevDenuncias => prevDenuncias.map(denuncia => 
         denuncia.id === denunciaId ? { ...denuncia, resolvida: true } : denuncia
@@ -1359,7 +1359,7 @@ return (
       <div className="search-wrapper">
         <input
           type="text"
-          placeholder="Procurar por Publicação..."
+          placeholder="Procurar por Evento..."
           value={searchTerm}
           onChange={handleSearchChange}
           className="search-input"
@@ -2535,13 +2535,14 @@ return (
                       <img src="https://i.ibb.co/9T565FK/Captura-de-ecr-2024-07-04-123100-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-123100-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
                     </button>
                   )}
+                  
+                </>
+              )}
                   {eventos.estado === 'Denunciada' && (
                     <button className="publications-edit-btn" onClick={() => handleReportedViewClick(eventos)}>
                       <img src="https://i.ibb.co/Cwhk8dN/Captura-de-ecr-2024-07-04-115321-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-115321-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
                     </button>
                   )}
-                </>
-              )}
             </div>
           
           {showDeleteModal && (
