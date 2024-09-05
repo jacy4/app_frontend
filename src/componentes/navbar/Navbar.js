@@ -31,7 +31,7 @@ const Navbar = () => {
     // Função para buscar as áreas da API
     const fetchAreas = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/areas/listarAreas'); // Substitua com a URL correta da sua API para buscar as áreas
+        const response = await axios.get('https://backend-teste-q43r.onrender.com/areas/listarAreas'); // Substitua com a URL correta da sua API para buscar as áreas
         // console.log(response.data)
         setAreas(response.data);
       } catch (error) {

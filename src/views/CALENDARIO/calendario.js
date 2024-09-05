@@ -24,7 +24,7 @@ const CalendarioView = () => {
   useEffect(() => {
     const buscarEventos = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/eventos/calendar_list`); // Altere para a URL correta da sua API
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/eventos/calendar_list`); // Altere para a URL correta da sua API
         if (response.data && Array.isArray(response.data)) {
           // console.log(response.data);
 
