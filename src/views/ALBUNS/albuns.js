@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../PUBLICACOES/PublicacoesView.css';
 import axios from 'axios';
-// import handleSubmit from './criar_evento';
+import handleSubmit from './criar_evento';
 import TopicSelector from './topicSelector'; // Import TopicSelector component
 import { useNavigate } from 'react-router-dom';
 import CreateEventoButton from '../../componentes/botao_view_eventos/criar_evento';
@@ -11,37 +11,36 @@ import moment from 'moment';
 import 'moment/locale/pt'; // Importar o locale português
 import Modal from 'react-modal';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import CreatePublicationButton from '../../componentes/botao_view_publicacoes/criar_publicacao';
 
 
 moment.locale('pt'); // Definir o locale para português
 
-const GruposView = () => {
-    const [grupos, setgrupos] = useState([]);
+const AlbunsView = () => {
+    const [albuns, setalbuns] = useState([]);
     const [error, setError] = useState(null);
     const [showCreateForm, setShowCreateForm] = useState(false);
-    const [showgruposList, setShowgruposList] = useState(true);
+    const [showalbunsList, setShowalbunsList] = useState(true);
     const [selectedButton, setSelectedButton] = useState('list'); // Default to "list" button
     const [centroId, setCentroId] = useState(null);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [grupoToDelete, setGrupoToDelete] = useState(null);
+    const [eventoToDelete, setEventoToDelete] = useState(null);
     const [showHideModal, setShowHideModal] = useState(false);
     const [eventoToHide, setEventoToHide] = useState(null);
     const [removalReason, setRemovalReason] = useState('');
     const [showEditForm, setShowEditForm] = useState(false);
     const [eventoToEdit, setEventoToEdit] = useState(null);
+
     const [showSuccessMessageDelete, setShowSuccessMessageDelete] = useState(false);
     const [showSuccessMessageHide, setShowSuccessMessageHide] = useState(false);
     const [filter, setFilter] = useState('all');
     const [showDetailViewDenunciada, setShowDetailViewDenunciada] = useState(false);
     const [eventoDetailDenunciada, setEventoDetailDenunciada] = useState(null);
-    const [grupoDetailDenunciada, setGrupoDetailDenunciada] = useState(null);
     const [showMedidasModal, setShowMedidasModal] = useState(false);
     const [showAlertModal, setShowAlertModal] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [showSuccessMessageAlert, setShowSuccessMessageAlert] = useState(false);
-    const [selectedGrupo, setselectedGrupo] = useState(null);
+    const [selectedEvento, setSelectedEvento] = useState(null);
     const [showDeleteModalMedidas, setShowDeleteModalMedidas] = useState(false);
     const [deleteMessage, setDeleteMessage] = useState('');
     const [showSuccessMessageMedidas, setShowSuccessMessageMedidas] = useState(false);
@@ -66,12 +65,24 @@ const GruposView = () => {
     const [formFields, setFormFields] = useState([{ name: '' }]);
     const [showFormModal, setShowFormModal] = useState(false);
     const [email, setEmail] = useState('');
-    const [denunciasGrupo, setDenunciasGrupo] = useState([]);
     const [horario, setHorario] = useState({
     "Inicio": { inicioData: '', InicioHora: '' },
     "Fim": { fimData: '', FimHora: ''}
 
 });
+
+
+const [dataInicioAtividade, setDataInicioAtividade] = useState('');
+const [dataFimAtividade, setDataFimAtividade] = useState('');
+
+
+
+const [estado, setEstado] = useState('');
+const [capaImagemEvento, setCapaImagemEvento] = useState('');
+const [latitude, setLatitude] = useState(null);
+const [longitude, setLongitude] = useState(null);
+const [tipodeevento, setTipoDeEvento] = useState('');
+
 
 const [novaClassificacao, setNovaClassificacao] = useState(0);
 
@@ -83,12 +94,7 @@ const [imageSrc, setImageSrc] = useState(null); // Estado para imagem escolhida
 const [galeria, setGaleria] = useState([]); // Estado para a galeria de imagens
 const [topicos, setTopicos] = useState([]);
 const areaId = 1; // Defina o ID da área aqui
-const [participante, setParticipante] = useState('');
-const handleAdicionarParticipanteVisual = (usuario_id) => {
-  setParticipantesParaAdicionar([...participantesParaAdicionar, usuario_id]);
-  // Remover do grupo visual, se ele estava na lista de remoção
-  setParticipantesParaRemover(participantesParaRemover.filter(id => id !== usuario_id));
-};
+
 const [showAllComentarios, setShowAllComentarios] = useState(false);
 const [comentariosExibidos, setComentariosExibidos] = useState([]);
 useEffect(() => {
@@ -153,17 +159,17 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
-  const buscargrupos = async () => {
+  const buscaralbuns = async () => {
     if (!centroId) {
       console.log('centroId não definido');
       return;
     }
     console.log(`Buscando publicações para centroId: ${centroId}`);
     try {
-      const response = await axios.get(`http://localhost:3000/grupos/listargrupos/${centroId}`);
+      const response = await axios.get(`http://localhost:3000/albuns/list/${centroId}`);
       if (response.data && Array.isArray(response.data)) {
         console.log(response.data);
-        setgrupos(response.data);
+        setalbuns(response.data);
       } else {
         console.error('Resposta da API vazia ou formato de dados incorreto');
       }
@@ -173,21 +179,30 @@ useEffect(() => {
     }
   };
 
-  buscargrupos();
+  buscaralbuns();
 }, [centroId]);
 
 
 const handleViewDetailsClick = (evento) => {
-  setselectedGrupo(evento);
+  setSelectedEvento(evento);
   setShowDetailView(true);
 };
 
-const handleReportedViewClickGrupo = (grupo) => {
-  setGrupoDetailDenunciada(grupo);
-  setShowDetailViewDenunciada(true);
-};
+const [areas, setAreas] = useState('');
 
+useEffect(() => {
+  // Função para buscar as áreas da API
+  const fetchAreas = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/areas/listarAreas'); // Substitua com a URL correta da sua API para buscar as áreas
+      setAreas(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar áreas:', error);
+    }
+  };
 
+  fetchAreas();
+}, []);
 
 
 const handlePendingViewClick = (evento) => {
@@ -207,12 +222,12 @@ const handleHideClick = (evento) => {
   setEventoToHide(evento);
   setShowHideModal(true);
 };
-const [optionsOpen, setOptionsOpen] = useState(null);
+
 const handleEditClick = (evento) => {
   setEventoToEdit(evento);
-  setselectedGrupo(evento );
+  setSelectedEvento(evento );
   setShowEditForm(true);
-  setShowgruposList(false);
+  setShowalbunsList(false);
   setShowMedidasModal(false);
   setShowDetailViewDenunciada(false); // Fechar o modal "Tomar Medidas"
 };
@@ -230,7 +245,7 @@ const handleTabClick = (tab) => {
 };
 
 const handleDeleteClick = (evento) => {
-  setGrupoToDelete(evento);
+  setEventoToDelete(evento);
   setShowDeleteModal(true);
 };
 
@@ -243,23 +258,35 @@ const handleDeleteConfirm = () => {
 
 const closeDeleteModal = () => {
   setShowDeleteModal(false);
-  setGrupoToDelete(null);
+  setEventoToDelete(null);
 };
 const handleCancelDelete = () => {
   setShowDeleteModal(false);
-  setGrupoToDelete(null);
+  setEventoToDelete(null);
 };
 const handleConfirmDelete = async () => {
   try {
-    await axios.delete(`http://localhost:3000/grupos/delete/${grupoToDelete.id}`);
-    setgrupos(grupos.filter(p => p.id !== grupoToDelete.id));
+    await axios.delete(`http://localhost:3000/albuns/delete/${eventoToDelete.id}`);
+    setalbuns(albuns.filter(p => p.id !== eventoToDelete.id));
     setShowSuccessMessageDelete(true); // Exibir a mensagem de sucesso após a exclusão
   } catch (error) {
-    console.error('Erro ao deletar publicação:', error);
-    // Aqui você pode adicionar lógica para tratar erros, como mostrar uma mensagem de erro para o usuário
+    if (error.response) {
+      // O servidor respondeu com um status fora do intervalo 2xx
+      console.error('Erro na resposta da API:', error.response.data);
+      console.error('Status:', error.response.status);
+      console.error('Headers:', error.response.headers);
+    } else if (error.request) {
+      // A requisição foi feita, mas nenhuma resposta foi recebida
+      console.error('Erro na requisição:', error.request);
+    } else {
+      // Algo aconteceu ao configurar a requisição
+      console.error('Erro ao configurar a requisição:', error.message);
+    }
+    console.error('Erro ao deletar evento:', error.config);
   }
   setShowDeleteModal(false);
 };
+
 
 
 
@@ -295,7 +322,7 @@ const formatarData = (data) => {
 
 const handleCreateEventoClick = () => {
   setShowCreateForm(true);
-  setShowgruposList(false);
+  setShowalbunsList(false);
   setSelectedButton('create'); // Set the selected button
 };
 
@@ -339,7 +366,7 @@ const handleSubmit = async (e) => {
   console.log('Dados da Publicação:', eventoData); // Log dos dados que serão enviados
 
   try {
-      const response = await axios.post('https://backend-teste-q43r.onrender.com/grupos/create', eventoData, {
+      const response = await axios.post('http://localhost:3000/albuns/create', eventoData, {
           headers: {
               'Content-Type': 'application/json',
           },
@@ -361,22 +388,22 @@ const handleSubmit = async (e) => {
 
 const handleShowEventoListClick = () => {
   setShowCreateForm(false);
-  setShowgruposList(true);
+  setShowalbunsList(true);
   setSelectedButton('list'); // Set the selected button
 };
 
-const handleCreategruposubmit = ({ nome, topico }) => {
+const handleCreatealbunsubmit = ({ nome, topico }) => {
   // Adiciona a nova publicação aos dados estáticos
   const novoEvento = {
-    id: grupos.length + 1,
+    id: albuns.length + 1,
     nome,
     topico,
     createdAt: new Date().toISOString(),
     estado: "Active"
   };
-  setgrupos([...grupos, novoEvento]);
+  setalbuns([...albuns, novoEvento]);
   setShowCreateForm(false);
-  setShowgruposList(true);
+  setShowalbunsList(true);
 };
 
 const handleSearchChange = (event) => {
@@ -387,7 +414,7 @@ const handleSearchChange = (event) => {
 const handleDelete = (evento) => {
   // Aqui você deve adicionar a lógica para deletar a publicação
   // Após deletar, você pode atualizar o estado `publicacoes` para remover a publicação
-  setgrupos(grupos.filter(p => p.id !== evento.id));
+  setalbuns(albuns.filter(p => p.id !== evento.id));
   closeDeleteModal();
 };
 
@@ -439,48 +466,63 @@ const handleAddressSubmit = async (event) => {
     }
   }
 };
-
 const handleButtonClick = (filter) => {
   setFilter(filter);
-  setShowgruposList(true);
+  setShowalbunsList(true);
   setShowCreateForm(false);
   setShowEditForm(false);
   setSelectedButton(filter);
 };
 
-const filteredgrupos = grupos.filter(evento => {
-  // Verifique se 'titulo' e 'estado' são definidos
+
+
+
+
+
+// Todos os albuns são considerados no início
+let filteredalbuns = [...albuns]; // Faça uma cópia de todos os albuns
+
+// Agora aplique os filtros por título e estado
+filteredalbuns = filteredalbuns.filter(evento => {
   if (!evento.nome || !evento.estado) return false;
 
   // Filtro por título
   const matchesTitle = evento.nome.toLowerCase().includes(searchTerm.toLowerCase());
 
   // Filtro por estado
-  let matchesState = true; // Default to true for 'all'
-  if (filter === 'por validar') {
+  let matchesState = true; // Assume que é verdadeiro para 'all' ou nenhum filtro de estado selecionado
+  switch (filter) {
+    case 'por validar':
       matchesState = evento.estado === 'Por validar';
-  } else if (filter === 'ativa') {
+      break;
+    case 'ativa':
       matchesState = evento.estado === 'Ativa';
-  } else if (filter === 'denunciada') {
+      break;
+    case 'denunciada':
       matchesState = evento.estado === 'Denunciada';
-  } else if (filter === 'inativo') {
-      matchesState = evento.estado === 'Inativo';
-}
+      break;
+    case 'finalizada':
+      matchesState = evento.estado === 'Finalizada';
+      break;
+    default:
+      matchesState = true;
+  }
 
   console.log('Filtro atual:', filter);
-console.log('Estado do evento:', evento.estado);
+  console.log('Estado do evento:', evento.estado);
 
-
-  // Combina ambos os filtros
+  // Combina ambos os filtros: título e estado
   return matchesTitle && matchesState;
 });
 
-const countgruposPorValidar = grupos.filter(p => p.estado && p.estado.toLowerCase() === 'por validar').length;
-const countgruposAtivas = grupos.filter(p => p.estado && p.estado.toLowerCase() === 'ativa').length;
-const countgruposDenunciadas = grupos.filter(p => p.estado && p.estado.toLowerCase() === 'denunciada').length;
-const countgruposInativos = grupos.filter(p => p.estado && p.estado.toLowerCase() === 'Inativa').length;
 
-const handleMedidasClickGrupo = () => {
+
+const countalbunsPorValidar = albuns.filter(p => p.estado && p.estado.toLowerCase() === 'por validar').length;
+const countalbunsAtivas = albuns.filter(p => p.estado && p.estado.toLowerCase() === 'ativa').length;
+const countalbunsDenunciadas = albuns.filter(p => p.estado && p.estado.toLowerCase() === 'denunciada').length;
+const countalbunsFinalizados = albuns.filter(p => p.estado && p.estado.toLowerCase() === 'Finalizada').length;
+
+const handleMedidasClick = () => {
   setShowMedidasModal(true);
 };
 
@@ -510,27 +552,13 @@ const handleDeleteClickMedidas = () => {
 };
 
 
-const handleDeleteMedidas = async () => {
-  try {
-    // Supondo que você esteja deletando um evento baseado no eventoDetailDenunciada.id
-    const response = await axios.delete(`http://localhost:3000/grupos/delete/${grupoDetailDenunciada?.id}`, {
-      data: { motivo: deleteMessage } // Passando o motivo da remoção, se necessário
-    });
-
-    if (response.status === 200) {
-      alert('Evento eliminado com sucesso');
-      setShowDeleteModalMedidas(false);
-      // Adicione qualquer lógica adicional que você precisar após a exclusão
-    } else {
-      console.error('Erro na exclusão do evento:', response);
-      alert('Ocorreu um erro ao eliminar o evento');
-    }
-  } catch (error) {
-    console.error('Erro ao eliminar o evento:', error);
-    alert('Ocorreu um erro ao eliminar o evento');
-  }
+const handleDeleteMedidas = () => {
+// Adicione a lógica para enviar a mensagem de remoção aqui
+console.log("Motivo da remoção:", deleteMessage);
+// Após enviar a mensagem, você pode fechar o modal
+setShowDeleteModalMedidas(false);
+setShowSuccessMessageMedidas(true);
 };
-
 
 const handleInfoClick = (evento) => {
 setEventoDetail(evento);
@@ -539,6 +567,7 @@ setShowApprovalView(true);
 
 const handleApproveClick = () => {
 setShowApproveModal(true);
+approveLocal(eventoDetail.id);
 
 };
 
@@ -556,7 +585,7 @@ handleRejectAndDelete();
 
 const handleRejectAndDelete = async () => {
 try {
-  const response = await axios.delete(`https://backend-teste-q43r.onrender.com/grupos/delete/${eventoDetail.id}`);
+  const response = await axios.delete(`http://localhost:3000/albuns/delete/${eventoDetail.id}`);
   if (response.status === 200) {
     console.log('evento eliminada com sucesso:', response.data);
     // Adicione qualquer lógica adicional, como redirecionamento ou atualização da UI
@@ -616,30 +645,30 @@ return isOpen;
 
 
 useEffect(() => {
-if (selectedGrupo && selectedGrupo.horario) {
-  setIsOpen(isOpenNow(selectedGrupo.horario));
+if (selectedEvento && selectedEvento.horario) {
+  setIsOpen(isOpenNow(selectedEvento.horario));
 }
-}, [selectedGrupo]);
+}, [selectedEvento]);
 
 
 const handlePendingClick = (evento) => {
 // Lógica para tratar clique no botão de "Por validar"
 // Exemplo: Abrir uma modal para validação
-setselectedGrupo(evento);
+setSelectedEvento(evento);
 setShowPendingModal(true);
 };
 
 const handleReportedClick = (evento) => {
 // Lógica para tratar clique no botão de "Denunciada"
 // Exemplo: Abrir uma modal para revisão de denúncia
-setselectedGrupo(evento);
+setSelectedEvento(evento);
 setShowReportedModal(true);
 };
 
 useEffect(() => {
 const Comentarios = async () => {
   try {
-    const response = await axios.get(`http://localhost:3000/comentarios_grupos/todoscomentarios/${selectedGrupo.id}`);
+    const response = await axios.get(`http://localhost:3000/comentarios_albuns/todoscomentarios/${selectedEvento.id}`);
     console.log(response.data);
     setComentarios(response.data);
   } catch (error) {
@@ -647,22 +676,59 @@ const Comentarios = async () => {
   }
 };
 
-if (selectedGrupo) {
+if (selectedEvento) {
   Comentarios();
 }
-}, [selectedGrupo]);
+}, [selectedEvento]);
+
+const handleLike = async (comentarioId) => {
+  try {
+    await axios.post(`http://localhost:3000/likescomentariosalbuns/like`, {
+      comentario_evento_id: comentarioId,
+      user_id: sessionStorage.getItem('user_id')
+    });
+
+    // Após o sucesso, você pode incrementar o número de likes no estado local
+    setComentarios(prevComentarios => prevComentarios.map(comentario => {
+      if (comentario.id === comentarioId) {
+        return { ...comentario, likes: comentario.likes + 1 };
+      }
+      return comentario;
+    }));
+  } catch (error) {
+    console.error('Erro ao adicionar like:', error);
+  }
+};
+
+const [optionsOpen, setOptionsOpen] = useState(null);
+
+const toggleOptionsEvento = (mensagemId) => {
+  setOptionsOpen(prevId => (prevId === mensagemId ? null : mensagemId));
+};
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (!event.target.closest('.comentario-options')) {
+      setOptionsOpen(null);
+    }
+  };
+
+  document.addEventListener('click', handleClickOutside);
+  return () => {
+    document.removeEventListener('click', handleClickOutside);
+  };
+}, []);
 
 const handleAddComentario = async () => {
 const user_id = sessionStorage.getItem('user_id'); // Obtendo o user_id do sessionStorage
   const comentarioData = {
-    evento_id: selectedGrupo.id,
+    evento_id: selectedEvento.id,
     texto_comentario: novoComentario,
     user_id,
     classificacao: novaClassificacao
   };
 
   try {
-    const response = await axios.post('http://localhost:3000/comentarios_grupos/criarcomentario', comentarioData, {
+    const response = await axios.post('http://localhost:3000/comentarios_albuns/criarcomentario', comentarioData, {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -700,8 +766,8 @@ const user_id = sessionStorage.getItem('user_id'); // Obtendo o user_id do sessi
 const handleToggleVisibility = async (evento) => {
 try {
   const updatedVisivel = !evento.visivel;
-  await axios.put(`https://backend-teste-q43r.onrender.com/grupos/updateVisibility/${evento.id}`, { visivel: updatedVisivel });
-  setgrupos(grupos.map(p => p.id === evento.id ? { ...p, visivel: updatedVisivel } : p));
+  await axios.put(`http://localhost:3000/albuns/updateVisibility/${evento.id}`, { visivel: updatedVisivel });
+  setalbuns(albuns.map(p => p.id === evento.id ? { ...p, visivel: updatedVisivel } : p));
 } catch (error) {
   console.error('Erro ao atualizar visibilidade da publicação:', error);
 }
@@ -731,15 +797,39 @@ if (file) {
 }
 };
 
+const uploadImage = async (file) => {
+const formData = new FormData();
+formData.append('key', '4d755673a2dc94483064445f4d5c54e9'); // substitua pela sua chave da API imgbb
+formData.append('image', file);
+
+const response = await axios.post('https://api.imgbb.com/1/upload', formData);
+return response.data.data.url; // Certifique-se de que está retornando a URL correta
+};
 
 
+const onDrop = async (acceptedFiles) => {
+const uploadedImages = await Promise.all(
+  acceptedFiles.map(async (file) => {
+    const url = await uploadImage(file);
+    return { file, preview: URL.createObjectURL(file), url };
+  })
+);
+setGaleria([...galeria, ...uploadedImages]);
+};
 
+
+const { getRootProps, getInputProps } = useDropzone({
+onDrop,
+accept: 'image/*'
+});
+
+const [area, setArea] = useState('');
 
 useEffect(() => {
 // Função para buscar os tópicos da API
 const Topicos = async () => {
   try {
-    const response = await axios.get(`https://backend-teste-q43r.onrender.com/topicos/topicosdeumaarea/${areaId}`); // Substitua areaId pelo id da área
+    const response = await axios.get(`http://localhost:3000/topicos/topicosdeumaarea/${area}`); // Substitua areaId pelo id da área
     setTopicos(response.data);
   } catch (error) {
     console.error('Erro ao buscar tópicos:', error);
@@ -747,11 +837,11 @@ const Topicos = async () => {
 };
 
 Topicos();
-}, [areaId]);
+}, [area]);
 
 const fetchUser = async (id) => {
 try {
-  const response = await axios.get(`https://backend-teste-q43r.onrender.com/users/user/${id}`);
+  const response = await axios.get(`http://localhost:3000/users/user/${id}`);
   console.log("Resposta da API:", response.data); // Adicione este log
   setUser(response.data);
 } catch (error) {
@@ -778,10 +868,10 @@ setEstrelas(e.target.value);
 const handleAvaliacaoSubmit = async (e) => {
 e.preventDefault();
 const userId = sessionStorage.getItem('user_id');
-const eventoId = selectedGrupo.id;
+const eventoId = selectedEvento.id;
 
 try {
-  const response = await axios.post('http://localhost:3000/avaliacao_grupos/criar', {
+  const response = await axios.post('http://localhost:3000/avaliacao_albuns/criar', {
     evento_id: eventoId,
     autor_id: userId,
     estrelas: estrelas
@@ -795,7 +885,7 @@ try {
 
 const MediaAvaliacoes2 = async () => {
 try {
-  const response = await axios.get(`http://localhost:3000/avaliacao_grupos/media/${selectedGrupo.id}`);
+  const response = await axios.get(`http://localhost:3000/avaliacao_albuns/media/${selectedEvento.id}`);
   setMediaAvaliacoes(response.data);
 } catch (error) {
   console.error('Erro ao buscar média de avaliações:', error);
@@ -803,216 +893,106 @@ try {
 };
 
 // useEffect(() => {
-// if (selectedGrupo) {
+// if (selectedEvento) {
 //   MediaAvaliacoes();
 // }
-// }, [selectedGrupo]);
+// }, [selectedEvento]);
+
+
 
 useEffect(() => {
-if (eventoToEdit) {
-  setNome(eventoToEdit.nome);
-  setAutor(eventoToEdit.autor_id);
-  setDescricao(eventoToEdit.descricao);
-  setTopico(eventoToEdit.topico_id);
-  setPaginaweb(eventoToEdit.paginaweb);
-  setTelemovel(eventoToEdit.telemovel);
-  setEmail(eventoToEdit.email);
-  setLocalizacao(eventoToEdit.localizacao);
-  
-  // Inicializa o estado do horário com os dados da publicação
-  if (eventoToEdit.horario) {
-    const initialHorario = Object.keys(eventoToEdit.horario).reduce((acc, dia) => {
-      const [inicio, fim] = eventoToEdit.horario[dia] === 'Fechado' ? ['', ''] : eventoToEdit.horario[dia].split('-');
-      acc[dia] = {
-        inicio: inicio || '',
-        fim: fim || '',
-        fechado: eventoToEdit.horario[dia] === 'Fechado',
-      };
-      return acc;
-    }, {});
-    setHorario(initialHorario);
-  }
+  if (eventoToEdit) {
+    setNome(eventoToEdit.nome);
+    setAutor(eventoToEdit.autor_id);
+    setDescricao(eventoToEdit.descricao);
+    setTopico(eventoToEdit.topico_id);
+    setLocalizacao(eventoToEdit.localizacao);
+    setEstado(eventoToEdit.estado);
+    // Formatar as datas para o formato datetime-local
+    const dataInicioFormatada = new Date(eventoToEdit.datainicioatividade).toISOString().slice(0, 16);
+    const dataFimFormatada = new Date(eventoToEdit.datafimatividade).toISOString().slice(0, 16);
+    setDataInicioAtividade(dataInicioFormatada);
+    setDataFimAtividade(dataFimFormatada);
+    setCapaImagemEvento(eventoToEdit.capa_imagem_evento);
+    setLatitude(eventoToEdit.latitude);
+    setLongitude(eventoToEdit.longitude);
+    setTipoDeEventoId(eventoToEdit.tipodeevento_id);
+    setArea(eventoToEdit.area_id);
 
-  // Inicializa o estado da galeria com os dados da publicação
-  if (eventoToEdit.galeria) {
-    setGaleria(eventoToEdit.galeria.map((url) => ({ url, preview: url })));
+    // Se houver uma galeria de imagens associada ao evento
+    if (eventoToEdit.imagens) {
+      setGaleria(eventoToEdit.imagens.map((image) => ({
+        id: image.id,
+        url: image.caminho_imagem,
+        preview: image.caminho_imagem
+      })));
+    }
   }
-}
 }, [eventoToEdit]);
 
 
-const handleRemoveImage = (index) => {
-const updatedGaleria = [...galeria];
-updatedGaleria.splice(index, 1);
-setGaleria(updatedGaleria);
-};
+
+// const handleRemoveImage = (index) => {
+// const updatedGaleria = [...galeria];
+// updatedGaleria.splice(index, 1);
+// setGaleria(updatedGaleria);
+// };
 
 const handleRemoveComentario = async (comentarioId) => {
 try {
-  await axios.delete(`http://localhost:3000/comentarios_grupos/delete/${comentarioId}`);
+  await axios.delete(`http://localhost:3000/comentarios_albuns/delete/${comentarioId}`);
   setComentarios(comentarios.filter(comentario => comentario.id !== comentarioId));
 } catch (error) {
   console.error('Erro ao remover comentário:', error);
 }
 };
-const [participantesParaRemover, setParticipantesParaRemover] = useState([]);
 
-const handleRemoverParticipanteVisual = (usuario_id) => {
-  setParticipantes(participantes.filter(participante => participante.usuario_id !== usuario_id));
-  setParticipantesParaRemover([...participantesParaRemover, usuario_id]);
-};
-useEffect(() => {
+const handleSubmitEdit = async (e) => {
+  e.preventDefault();
 
-  // Carregar os usuários
-  axios.get('http://localhost:3000/users/listarallUsers')  // Ajuste a rota conforme necessário
-    .then(response => setUsuarios(response.data))
-    .catch(error => console.error('Erro ao carregar usuários:', error));
-}, []);
-const [usuarios, setUsuarios] = useState([]);
-const usuariosDisponiveis = usuarios.filter(usuario => 
-  !participantes.some(participante => participante.usuario_id === usuario.id)
-);
-
-const handleRemoverParticipante = async (usuario_id) => {
-  try {
-    await axios.delete('http://localhost:3000/listagrupo/removerMembro', {
-      data: {
-        usuario_id,
-        grupo_id: selectedGrupo.id,
-      },
-    });
-
-    setParticipantes(participantes.filter(participante => participante.usuario_id !== usuario_id));
-    alert('Participante removido com sucesso!');
-  } catch (error) {
-    console.error('Erro ao remover participante:', error);
-    alert('Erro ao remover participante.');
-  }
-};
-const [participantesParaAdicionar, setParticipantesParaAdicionar] = useState([]);
-
-
-
-const handleSubmitEdit = async () => {
-  if (!selectedGrupo || !selectedGrupo.id) {
-    console.error("ID do grupo não definido.");
-    return;
+  const formattedHorario = {};
+  for (const [dia, { inicio, fim, fechado }] of Object.entries(horario)) {
+    formattedHorario[dia] = fechado ? 'Fechado' : `${inicio}-${fim}`;
   }
 
-  const grupoData = {
-    nome: nomeDoGrupo,
-    descricao: descricaoDoGrupo,
-    topico_id: topicoSelecionado,
-    estado: estadoSelecionado,
-    capa: urlCapa,
+  const eventoData = {
+    area_id: area,
+    topico_id: topico,
+    nome,  // Nome do evento
+    descricao,
+    datainicioatividade: dataInicioAtividade,
+    datafimatividade: dataFimAtividade,
+    estado,
+    centro_id: centroId,
+    autor_id: eventoToEdit.autor_id || sessionStorage.getItem('user_id'), // Mantém o autor original se já definido
+    capa_imagem_evento: capaImagemEvento,
+    latitude,
+    longitude,
+    tipodeevento_id: tipoDeEventoId,
+    imagensRemovidas,
   };
 
   try {
-    // Atualizar o grupo
-    const response = await axios.put(`http://localhost:3000/grupos/update/${selectedGrupo.id}`, grupoData, {
+    const response = await axios.put(`http://localhost:3000/albuns/update/${eventoToEdit.id}`, eventoData, {
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
-    if (response.status === 201) {
-      // Remover participantes da lista de remoção
-      for (const usuario_id of participantesParaRemover) {
-        await axios.delete('http://localhost:3000/listagrupo/removerMembro', {
-          data: {
-            usuario_id,
-            grupo_id: selectedGrupo.id,
-          },
-        });
-      }
-
-      // Adicionar participantes da lista de adição
-      for (const usuario_id of participantesParaAdicionar) {
-        await axios.post('http://localhost:3000/listagrupo/adicionarMembro', {
-          usuario_id,
-          grupo_id: selectedGrupo.id,
-        });
-      }
-
-      alert('Grupo atualizado com sucesso!');
+    if (response.status === 200) { // Ajuste o código de status para 201 
+      
+      setShowSuccessMessage(true); // Mostrar modal de sucesso
     } else {
-      console.error('Erro na resposta do Backend:', response);
+      console.error('Erro na resposta do Backend:', response); // Log de erro caso a resposta não seja 201
+      // Lógica de erro adicional, se necessário
     }
+    console.log('Evento atualizado:', response.data);
+    
   } catch (error) {
-    console.error('Erro ao atualizar grupo:', error);
+    console.error('Erro ao atualizar evento:', error);
   }
 };
 
-
-
-useEffect(() => {
-  if (selectedGrupo) {
-    setNomeDoGrupo(selectedGrupo.nome || '');
-    setDescricaoDoGrupo(selectedGrupo.descricao || '');
-    setTopicoSelecionado(selectedGrupo.topico_id || '');
-    setEstadoSelecionado(selectedGrupo.estado || 'Ativa');
-    setUrlCapa(selectedGrupo.capa || '');
-  }
-}, [selectedGrupo]);
-
-
-const [nomeDoGrupo, setNomeDoGrupo] = useState('');
-const [areaSelecionada, setAreaSelecionada] = useState('');
-const [centroSelecionado, setCentroSelecionado] = useState('');
-const [topicoSelecionado, setTopicoSelecionado] = useState('');
-const [descricaoDoGrupo, setDescricaoDoGrupo] = useState('');
-const [urlCapa, setUrlCapa] = useState('');
-const [estadoSelecionado, setEstadoSelecionado] = useState('');
-const [eventoSelecionado, setEventoSelecionado] = useState('');
-const [grupoId, setGrupoId] = useState(null);
-
-// const handleSubmitEdit = async (e) => {
-// e.preventDefault();
-
-// const formattedHorario = {};
-// for (const [dia, { inicio, fim, fechado }] of Object.entries(horario)) {
-//   formattedHorario[dia] = fechado ? 'Fechado' : `${inicio}-${fim}`;
-// }
-
-// const eventoData = {
-//   topico_id: topico,
-//   nome,
-//   descricao,
-//   horario: formattedHorario,
-//   localizacao,
-//   paginaweb,
-//   telemovel,
-//   email,
-//   galeria: galeria.map((img) => img.url), // Envia apenas as URLs das imagens
-//   centro_id: centroId,
-//   // autor_id: sessionStorage.getItem('user_id')
-//   autor_id: eventoToEdit.autor_id || sessionStorage.getItem('user_id') // Mantém o autor original se já definido
-// };
-
-// try {
-//   const response = await axios.put(`https://backend-teste-q43r.onrender.com/grupos/update/${eventoToEdit.id}`, eventoData, {
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//   });
-
-//   // Remover os comentários marcados
-//   for (const comentarioId of comentariosParaRemover) {
-//     await axios.delete(`http://localhost:3000/comentarios_grupos/delete/${comentarioId}`);
-//   }
-
-//   if (response.status === 201) { // Ajuste o código de status para 201 
-//     setShowSuccessMessage(true); // Mostrar modal de sucesso
-//   } else {
-//     console.error('Erro na resposta do Backend:', response); // Log de erro caso a resposta não seja 201
-//     // Lógica de erro adicional, se necessário
-//   }
-//   console.log('Publicação atualizada:', response.data);
-  
-// } catch (error) {
-//   console.error('Erro ao atualizar publicação:', error);
-// }
-// };
 
 const marcarComentarioParaRemover = (comentarioId) => {
 setComentariosParaRemover([...comentariosParaRemover, comentarioId]);
@@ -1022,7 +1002,7 @@ setComentarios(comentarios.filter(comentario => comentario.id !== comentarioId))
 
 const approveLocal = async (eventoId) => {
 try {
-  const response = await axios.put(`https://backend-teste-q43r.onrender.com/grupos/update/${eventoId}`, {
+  const response = await axios.put(`http://localhost:3000/albuns/update/${eventoId}`, {
     estado: 'Ativa',
   }, {
     headers: {
@@ -1032,7 +1012,7 @@ try {
   if (response.status === 200) {
     console.log('Publicação aprovada com sucesso');
     // Atualize o estado local se necessário, por exemplo:
-    setselectedGrupo((prev) => ({ ...prev, estado: 'Ativo' }));
+    setSelectedEvento((prev) => ({ ...prev, estado: 'Ativo' }));
   } else {
     console.error('Erro ao aprovar publicação:', response);
   }
@@ -1045,7 +1025,7 @@ useEffect(() => {
   const fetchParticipantes = async () => {
       setLoading(true);
       try {
-          const response = await axios.get(`http://localhost:3000/listagrupo/listarMembros/${selectedGrupo.id}`);
+          const response = await axios.get(`http://localhost:3000/listaparticipantes_evento/evento/${selectedEvento.id}`);
           setParticipantes(response.data);
           setLoading(false);
       } catch (err) {
@@ -1055,15 +1035,15 @@ useEffect(() => {
   };
 
   fetchParticipantes();
-}, [selectedGrupo]);
+}, [selectedEvento]);
 
 
 
 
-const adicionarParticipante = async (grupo_id, usuarioId) => {
+const adicionarParticipante = async (eventoId, usuarioId) => {
   try {
-      const response = await axios.post('http://localhost:3000/listagrupo/adicionarMembro/', {
-          grupo_id: grupo_id,
+      const response = await axios.post('http://localhost:3000/listaparticipantes_evento/adicionar_participante/', {
+          evento_id: eventoId,
           usuario_id: usuarioId
       });
       const data = await response.json();
@@ -1088,10 +1068,10 @@ const adicionarParticipante = async (grupo_id, usuarioId) => {
 
 // Dentro do componente, antes do return
 useEffect(() => {
-  console.log('Selected Evento:', selectedGrupo);
+  console.log('Selected Evento:', selectedEvento);
   console.log('Participantes:', participantes);
   console.log('UserId:', userId);
-}, [selectedGrupo, participantes, userId]); // Dependências para re-logar quando mudarem
+}, [selectedEvento, participantes, userId]); // Dependências para re-logar quando mudarem
 
 // async function getAddressFromCoordinates(latitude, longitude) {
 //   const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=API_KEY`);
@@ -1108,20 +1088,20 @@ useEffect(() => {
 // const [endereco, setEndereco] = useState('');
 
 // useEffect(() => {
-//   if (selectedGrupo.latitude && selectedGrupo.longitude) {
-//     getAddressFromCoordinates(selectedGrupo.latitude, selectedGrupo.longitude)
+//   if (selectedEvento.latitude && selectedEvento.longitude) {
+//     getAddressFromCoordinates(selectedEvento.latitude, selectedEvento.longitude)
 //       .then(address => setEndereco(address))
 //       .catch(error => console.error('Erro ao obter endereço:', error));
 //   }
-// }, [selectedGrupo.latitude, selectedGrupo.longitude]);
+// }, [selectedEvento.latitude, selectedEvento.longitude]);
 
 
 
 useEffect(() => {
-  if (selectedGrupo && selectedGrupo.id) {
+  if (selectedEvento && selectedEvento.id) {
     const fetchMediaAvaliacoes = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/comentarios_grupos/mediaavaliacoes/${selectedGrupo.id}`);
+        const response = await axios.get(`http://localhost:3000/comentarios_albuns/mediaavaliacoes/${selectedEvento.id}`);
         setMediaAvaliacoes(response.data);
       } catch (error) {
         console.error('Erro ao buscar a média das avaliações:', error);
@@ -1130,91 +1110,56 @@ useEffect(() => {
 
     fetchMediaAvaliacoes();
   }
-}, [selectedGrupo]);
-
-
-
-
-const handleRemoveCapa = () => {
-  setUrlCapa(''); // Limpa a capa atual
-};
-
-const uploadImage = async (file) => {
-  console.log('Uploading image:', file); // Log do arquivo sendo enviado
-
-  const formData = new FormData();
-  formData.append('key', '2e5f4a936d41606819335ae440e4264a'); // Verifique sua chave da API
-  formData.append('image', file);
-
-  try {
-    const response = await axios.post('https://api.imgbb.com/1/upload', formData);
-    console.log('Upload successful:', response.data); // Log da resposta de sucesso
-    return response.data.data.url;
-  } catch (error) {
-    console.error('Error uploading image:', error); // Log do erro detalhado
-    throw error; // Relança o erro para ser capturado na função onDropCapa
-  }
-};
-
-const onDropCapa = async (acceptedFiles) => {
-  console.log('Dropping files:', acceptedFiles); // Log dos arquivos recebidos
-  if (acceptedFiles.length > 0) {
-    try {
-      const url = await uploadImage(acceptedFiles[0]);
-      console.log('Rendered URL:', url); // Log da URL gerada
-      setUrlCapa(url); // Define a URL da capa após o upload
-    } catch (error) {
-      console.error('Error in onDropCapa:', error); // Log de erro se o upload falhar
-    }
-  }
-};
-
-
-
-const { getRootProps: getCapaRootProps, getInputProps: getCapaInputProps } = useDropzone({
-  onDrop: onDropCapa,
-  accept: 'image/*',
-});
-console.log('Dropzone initialized'); // Verifica se a dropzone foi inicializada corretamente
+}, [selectedEvento]);
 
 useEffect(() => {
-  const fetchDenuncias = async () => {
-    try {
-      const response = await axios.get(`http://localhost:3000/denuncias_grupos/grupo/${grupoDetailDenunciada?.id}`);
-      setDenunciasGrupo(response.data);
-    } catch (error) {
-      console.error('Erro ao buscar denúncias:', error);
-    }
+  const fetchImagensGaleria = async () => {
+      try {
+          const response = await axios.get(`http://localhost:3000/galeria_evento/listar_imagens_v2/${selectedEvento.id}`);
+          setImagensGaleria(response.data);
+      } catch (error) {
+          console.error('Erro ao buscar imagens da galeria:', error);
+      }
   };
 
-  if (grupoDetailDenunciada) {
-    fetchDenuncias();
-  }
-}, [grupoDetailDenunciada?.id]);
+  
+      fetchImagensGaleria();
+  
+}, [selectedEvento]);
 
 
-const toggleOptionsGrupo = (denunciaId) => {
-  setOptionsOpen(prevId => (prevId === denunciaId ? null : denunciaId));
+const [optionsOpenMarcar, setOptionsOpenMarcar] = useState(null);
+
+const toggleOptionsMarcar = (denunciaId) => {
+  console.log("Toggle Options for Denuncia ID:", denunciaId);
+  setOptionsOpenMarcar(prevId => {
+    const newId = (prevId === denunciaId ? null : denunciaId);
+    console.log("Setting optionsOpenMarcar to:", newId);
+    return newId;
+  });
 };
 
-const marcarDenunciaGrupoComoResolvida = async (denunciaId) => {
-  try {
-    const response = await axios.put(`http://localhost:3000/denuncias_grupos/update/${denunciaId}`, { resolvida: true });
-    if (response.status === 200) {
-      setDenunciasGrupo(prevDenuncias => prevDenuncias.map(denuncia => 
-        denuncia.id === denunciaId ? { ...denuncia, resolvida: true } : denuncia
-      ));
-      setOptionsOpen(null); // Fecha o menu de opções após marcar como resolvida
-    }
-  } catch (error) {
-    console.error('Erro ao marcar denúncia de grupo como resolvida:', error);
-  }
-};
+
+// No useEffect para detectar clique fora:
+// useEffect(() => {
+//   const handleClickOutside = (event) => {
+//     console.log("Clicked outside:", event.target);
+//     if (!event.target.closest('.comentario-options-publicacao')) {
+//       console.log("Resetting optionsOpenMarcar");
+//       setOptionsOpenMarcar(null);
+//     }
+//   };
+
+//   document.addEventListener('click', handleClickOutside);
+//   return () => {
+//     document.removeEventListener('click', handleClickOutside);
+//   };
+// }, []);
 
 useEffect(() => {
   const handleClickOutside = (event) => {
     if (!event.target.closest('.denuncia-actions')) {
-      setOptionsOpen(null);
+      setOptionsOpenMarcar(null);
     }
   };
 
@@ -1224,52 +1169,163 @@ useEffect(() => {
   };
 }, []);
 
+const [comentariosalbuns, setComentariosalbuns] = useState([]);
+
+const handleDeleteComentarioEvento = async (comentarioId) => {
+  try {
+    const response = await axios.delete(`http://localhost:3000/comentarios_albuns/apagarcomentario/${comentarioId}`);
+    if (response.status === 200) {
+      alert('Comentário excluído com sucesso');
+      setComentariosalbuns(comentariosalbuns.filter(comentario => comentario.id !== comentarioId)); // Atualize a lista de comentários
+    } else {
+      console.error('Erro ao excluir o comentário:', response);
+      alert('Ocorreu um erro ao excluir o comentário');
+    }
+  } catch (error) {
+    console.error('Erro ao excluir o comentário:', error);
+    alert('Ocorreu um erro ao excluir o comentário');
+  }
+};
+
+
+const [tiposDeEvento, setTiposDeEvento] = useState([]);
+
+useEffect(() => {
+  // Função para buscar os tipos de albuns da API
+  const fetchTiposDeEvento = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/tipodeevento/listarTipos'); // URL correta da sua API para buscar os tipos de albuns
+      setTiposDeEvento(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar tipos de evento:', error);
+    }
+  };
+
+  fetchTiposDeEvento();
+}, []);
+
+const [tipoDeEventoId, setTipoDeEventoId] = useState('');
+
+
+// Adicionar estado para rastrear as imagens removidas
+const [imagensRemovidas, setImagensRemovidas] = useState([]);
+
+const handleRemoveImage = (index) => {
+  // Remove a imagem do array de galeria baseado no índice
+  const updatedGallery = galeria.filter((_, i) => i !== index);
+  
+  // Atualiza o estado
+  setGaleria(updatedGallery);
+
+  // Verifique se a imagem tem um ID e o adicione à lista de imagens removidas
+  const imagemRemovida = galeria[index]; // Captura a imagem que está sendo removida
+
+  if (imagemRemovida && imagemRemovida.id) {
+    setImagensRemovidas([...imagensRemovidas, imagemRemovida.id]);
+  } else {
+    console.warn('Imagem removida não tem ID:', imagemRemovida);
+  }
+};
+
+const [denuncias, setDenuncias] = useState([]);
+
+useEffect(() => {
+  
+  const fetchDenuncias = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/denuncias_comentarios_albuns/denunciasPorEvento/${eventoDetailDenunciada?.id}`);
+      console.log("Fetched denuncias response:", response.data);
+      setDenuncias(response.data);
+      console.log(denuncias);
+    } catch (error) {
+      console.error('Erro ao buscar denúncias:', error);
+    }
+  };
+
+  if (eventoDetailDenunciada) {
+    fetchDenuncias();
+  }
+}, [eventoDetailDenunciada?.id]);
+
+const marcarDenunciaComoResolvida = async (denunciaId) => {
+  try {
+    const response = await axios.put(`http://localhost:3000/denuncias_comentarios_albuns/update/${denunciaId}`, { resolvida: true });
+    if (response.status === 200) {
+      setDenuncias(prevDenuncias => prevDenuncias.map(denuncia => 
+        denuncia.id === denunciaId ? { ...denuncia, resolvida: true } : denuncia
+      ));
+      setOptionsOpenMarcar(null); // Fecha o menu de opções após marcar como resolvida
+    }
+  } catch (error) {
+    console.error('Erro ao marcar denúncia como resolvida:', error);
+  }
+};
+
+useEffect(() => {
+  console.log('Denuncias state atualizado:', denuncias);  // Log do estado
+}, [denuncias]);
+
 
 return (
   <div className="publicacoes-div_princ"> 
-    {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de grupos deste Centro</h1>}
+    {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de albuns deste Centro</h1>}
     {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView &&(
       <div className="publicacoes-button-container">
         <div className="left-buttons">
+        {/* <div className='topicSelector'>
+            <TopicSelector
+              topics={topicos}
+              selectedTopic={topico}
+              onChange={(value) => setTopico(value)}
+            />
+            </div> */}
           <CreateEventoButton
             onClick={() => handleButtonClick('all')}
             iconSrc="https://i.ibb.co/P4nsk4w/Icon-criar.png"
             iconBgColor="#e0f7fa"
-            title="grupos Totais"
-            subtitle={grupos.length.toString()}
+            title="albuns Totais"
+            subtitle={albuns.length.toString()}
             isSelected={selectedButton === 'all'}
           />
-          
+          <CreateEventoButton
+            iconSrc="https://i.ibb.co/Y3jNfMt/pending-icon-512x504-9zrlrc78.png"
+            iconBgColor="#FFEECC"
+            title="Por validar"
+            subtitle={countalbunsPorValidar.toString()}
+            isSelected={selectedButton === 'por validar'}
+            onClick={() => handleButtonClick('por validar')}
+          />
           <CreateEventoButton
             iconSrc="https://i.ibb.co/D8QwJ6M/active-removebg-preview.png"
             iconBgColor="#CCFFCC"
             title="Ativos"
-            subtitle={countgruposAtivas.toString()}
+            subtitle={countalbunsAtivas.toString()}
             isSelected={selectedButton === 'ativa'}
             onClick={() => handleButtonClick('ativa')}
           />
+          
           <CreateEventoButton
             iconSrc="https://i.ibb.co/RPC7vW8/Icon-denuncia.png"
             iconBgColor="#FFE0EB"
             title="Denunciados"
-            subtitle={countgruposDenunciadas.toString()}
+            subtitle={countalbunsDenunciadas.toString()}
             isSelected={selectedButton === 'denunciada'}
             onClick={() => handleButtonClick('denunciada')}
           />
-          <div className="right-button">
-            <CreatePublicationButton
-              onClick={handleCreateEventoClick}
-              iconSrc="https://i.ibb.co/P4nsk4w/Icon-criar.png"
-              iconBgColor="#e0f7fa"
-              title="Criar Grupo"
-              subtitle="Criar..."
-              isSelected={selectedButton === 'create'}
-            />
-          </div>
+        </div>
+        <div className="right-button">
+          <CreateEventoButton
+            onClick={handleCreateEventoClick}
+            iconSrc="https://i.ibb.co/P4nsk4w/Icon-criar.png"
+            iconBgColor="#e0f7fa"
+            title="Criar Evento"
+            subtitle="Criar..."
+            isSelected={selectedButton === 'create'}
+          />
         </div>
       </div>
     )}
-    {!showDetailViewDenunciada && !showApprovalView && !showDetailView && showgruposList && (
+    {!showDetailViewDenunciada && !showApprovalView && !showDetailView && showalbunsList && (
       <div className="search-container">
       <div className="search-wrapper">
         <input
@@ -1285,183 +1341,237 @@ return (
     )}
     
     {showEditForm && (
-  <div className="publicacoes_div_princ">
-    <h1 className="publicacoes-title2">Editar informações do Grupo</h1>
-    <div className="header">
-      <h1 className="header-title">{selectedGrupo.nome}</h1>
+      <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Editar informações do Evento</h1>
+      <div className="header">
+      <h1 className="header-title">{selectedEvento.nome}</h1>
       <div className="author">
-        <div className="authorName"><span>Autor :</span></div>
-        <img src={selectedGrupo.autor.caminho_foto} alt={selectedGrupo.autor.nome} className="author-icon" />
-        <span>{selectedGrupo.autor.nome} {selectedGrupo.autor.sobrenome}</span>
-      </div>
-    </div>
-    <div className="tab-content2">
-    {/* Formulário de Edição do Grupo */}
-    <form onSubmit={handleSubmitEdit}>
-    <div className="form-group">
-  <label>Tópico</label>
-  <select value={topicoSelecionado} onChange={(e) => setTopicoSelecionado(e.target.value)}>
-    <option value="">Selecionar Tópico</option>
-    {topicos.map((topico) => (
-      <option key={topico.id} value={topico.id}>{topico.nome}</option>
-    ))}
-  </select>
-</div>
-
-<div className="form-group">
-  <label>Nome do Grupo</label>
-  <input
-    type="text"
-    placeholder="Inserir nome do grupo"
-    value={nomeDoGrupo}
-    onChange={(e) => setNomeDoGrupo(e.target.value)}
-  />
-</div>
-
-<div className="form-group">
-  <label>Descrição do Grupo</label>
-  <input
-    placeholder="Inserir uma breve descrição do grupo"
-    value={descricaoDoGrupo}
-    onChange={(e) => setDescricaoDoGrupo(e.target.value)}
-  />
-</div>
-
-<div className="form-group">
-  <label>Estado</label>
-  <select value={estadoSelecionado} onChange={(e) => setEstadoSelecionado(e.target.value)}>
-    <option value="Ativa">Ativa</option>
-    <option value="Denunciada">Denunciada</option>
-  </select>
-</div>
-
-<div className="form-group">
-  <label>Capa do Grupo</label>
-  <div {...getCapaRootProps({ className: 'dropzone' })} className="gallery-upload">
-    <input {...getCapaInputProps()} />
-    <div className="upload-box">
-      <span className="upload-icon">+</span>
-      <span className="upload-text">Upload</span>
-    </div>
-    {urlCapa && (
-      <div className="uploaded-images">
-        <img src={urlCapa} alt="Capa do Grupo" className="capa-preview" />
-        <button className="remove-image" onClick={handleRemoveCapa}>x</button>
-      </div>
-    )}
-  </div>
-  {/* {console.log('Rendered URL:', urlCapa)} // Log para verificar se a URL da imagem está sendo renderizada */}
-</div>
-
-{/* Lista de Participantes */}
- {/* Lista de Participantes */}
- <div className="participantes-section">
-  <h3>Participantes do Grupo</h3>
-  <ul>
-    {participantes.map(participante => (
-      <li key={participante.usuario_id} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', flexDirection: 'column', alignItems: 'flex-start' }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <img
-            src={participante.usuario.caminho_foto}
-            alt={`${participante.usuario.nome} ${participante.usuario.sobrenome}`}
-            style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '10px' }}
-          />
-          <span>{participante.usuario.nome} {participante.usuario.sobrenome}</span>
+          <div className="authorName"><span>Autor :</span></div>
+          <img src={selectedEvento.user.caminho_foto} alt={selectedEvento.user.nome} className="author-icon" />
+          <span>{selectedEvento.user.nome} {selectedEvento.user.sobrenome}</span>
+      
         </div>
-        <button 
-          onClick={() => handleRemoverParticipanteVisual(participante.usuario_id)}
-          style={{
-            backgroundColor: 'red',
-            color: 'white',
-            border: 'none',
-            borderRadius: '12px',
-            padding: '5px 10px',
-            fontSize: '10px',
-            cursor: 'pointer',
-            marginTop: '5px', // Adicione um pequeno espaçamento acima do botão
-          }}
-        >
-          Remover
-        </button>
-      </li>
-    ))}
-  </ul>
-</div>
 
-
-<div className="adicionar-participante-section">
-    <h3>Adicionar Participante</h3>
-    <select
-  value={participante}
-  onChange={(e) => setParticipante(e.target.value)}
->
-  <option value="">Selecionar Usuário</option>
-  {usuariosDisponiveis.map(usuario => (
-    <option key={usuario.id} value={usuario.id}>
-      {usuario.nome} {usuario.sobrenome}
+        </div>
+    <div className="tabs">
+      <button
+        className={`tab ${activeTab === 'descricao' ? 'active' : ''}`}
+        onClick={() => handleTabClick('descricao')}
+      >
+        <i className="fas fa-info-circle tab-icon"></i> Descrição
+      </button>
+      <button
+        className={`tab ${activeTab === 'galeria' ? 'active' : ''}`}
+        onClick={() => handleTabClick('galeria')}
+      >
+        <i className="fas fa-images tab-icon"></i> Galeria
+      </button>
+      
+      <button
+        className={`tab ${activeTab === 'localizacao' ? 'active' : ''}`}
+        onClick={() => handleTabClick('localizacao')}
+      >
+        <i className="fas fa-map-marker-alt tab-icon"></i> Localização
+      </button>
+      
+      
+    </div>
+    <div className="tab-content">
+    {activeTab === 'descricao' && (
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+  <label>Área do Local</label>
+  <select value={area} onChange={(e) => setArea(e.target.value)}>
+  <option value="">Selecionar área</option>
+  {areas.map((areaOption) => (
+    <option key={areaOption.id} value={areaOption.id}>
+      {areaOption.nome}
     </option>
   ))}
 </select>
-
-<button
-  onClick={(e) => {
-    e.preventDefault(); // Previne o comportamento padrão do botão
-    handleAdicionarParticipanteVisual(participante);
-  }}
-  className="adicionar-button"
->
-  Adicionar
-</button>
-
-  </div>
-
-
-
-      {/* Botões de Ação */}
-      <div className="form-buttons">
-        <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-        <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
-      </div>
-    </form>
 </div>
-    {/* Mensagem de Sucesso */}
-    {showSuccessMessage && <div className="modal-backdrop"></div>}
-    {showSuccessMessage && (
-      <div className="success-message_delete">
-        <div className="success-message-icon"></div>
-        <h1>Grupo editado com sucesso!</h1>
-        <button onClick={() => setShowSuccessMessage(false)}>Continuar</button>
+            <div className="form-group">
+            <label>Tópico do Local</label>
+              <select value={topico} onChange={(e) => setTopico(e.target.value)}>
+                <option value="">selecionar tópico</option>
+                {topicos.map((topico) => (
+                  <option key={topico.id} value={topico.id}>{topico.nome}</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+  <label>Nome do Evento</label>
+  <input type="text" placeholder="inserir nome do evento" value={nome} onChange={(e) => setNome(e.target.value)} />
+</div>
+<div className="form-group">
+  <label>Estado do Evento</label>
+  <select value={estado} onChange={(e) => setEstado(e.target.value)}>
+    <option value="">Selecionar estado</option>
+    <option value="Ativa">Ativa</option>
+    <option value="Denunciada">Denunciada</option>
+    <option value="Por validar">Por validar</option>
+    <option value="Finalizada">Finalizada</option>
+  </select>
+</div>
+
+<div className="form-group">
+  <label>Data de Início da Atividade</label>
+  <input 
+    type="datetime-local" 
+    value={dataInicioAtividade} 
+    onChange={(e) => setDataInicioAtividade(e.target.value)} 
+  />
+</div>
+<div className="form-group">
+  <label>Data de Fim da Atividade</label>
+  <input 
+    type="datetime-local" 
+    value={dataFimAtividade} 
+    onChange={(e) => setDataFimAtividade(e.target.value)} 
+  />
+</div>
+
+<div className="form-group">
+  <label>Descrição do Evento</label>
+  <input type="text" placeholder="inserir uma breve descrição do evento" value={descricao} onChange={(e) => setDescricao(e.target.value)}/>
+</div>
+<div className="form-group">
+  <label>Tipo de Evento</label>
+  <select value={tipoDeEventoId} onChange={(e) => setTipoDeEventoId(e.target.value)}>
+    <option value="">Selecionar Tipo de Evento</option>
+    {tiposDeEvento.map((tipo) => (
+      <option key={tipo.id} value={tipo.id}>{tipo.nome_tipo}</option>  
+    ))}
+  </select>
+</div>
+
+
+            <div className="form-buttons">
+              <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
+              <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
+            </div>
+          </form>
+        )}
+
+{activeTab === 'galeria' && (
+  <div className="tab-content_galeria">
+    <h2>Galeria do evento</h2>
+    <div {...getRootProps({ className: 'dropzone' })} className="gallery-upload">
+      <input {...getInputProps()} />
+      <div className="upload-box">
+        <span className="upload-icon">+</span>
+        <span className="upload-text">Upload</span>
       </div>
-    )}
+      <p className="gallery-info">
+        <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do evento
+      </p>
+    </div>
+    <div className="uploaded-images">
+      {galeria.map((file, index) => (
+        <div key={index} className="image-preview">
+          <img src={file.preview} alt={`preview ${index}`} />
+          <button className="remove-image" onClick={() => handleRemoveImage(index)}>x</button>
+        </div>
+      ))}
+    </div>
+    <div className="form-buttons">
+      <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
+      <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
+    </div>
   </div>
 )}
 
 
-  {showDetailView && selectedGrupo && (
+
+
+
+
+
+        {activeTab === 'localizacao' && (
+          <div className="tab-content_localizacao">
+            <h2>Localização do local</h2>
+            <div className="localizacao-content">
+            <div className="form-group">
+  <label>Latitude</label>
+  <input type="text" placeholder="Latitude" value={latitude} onChange={(e) => setLatitude(e.target.value)} />
+</div>
+<div className="form-group">
+  <label>Longitude</label>
+  <input type="text" placeholder="Longitude" value={longitude} onChange={(e) => setLongitude(e.target.value)} />
+</div>
+
+<a 
+        href={`https://www.google.com/maps?q=${selectedEvento.latitude},${selectedEvento.longitude}`} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="map-button"
+      >
+        Ver no Google Maps
+      </a>
+            </div>
+            <div className="form-buttons">
+              <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
+              <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
+            </div>
+          </div>
+        )}
+
+
+
+
+        
+  {showSuccessMessage && <div className="modal-backdrop"></div>}
+            {showSuccessMessage && (
+              <div className="success-message_delete">
+                <div className="success-message-icon"></div>
+                <h1>Publicação editada com sucesso!</h1>
+                <button onClick={() => setShowSuccessMessage(false)}>Continuar</button>
+              </div>
+            )}
+    
+
+    </div>
+  </div>
+  )}
+
+  {showDetailView && selectedEvento && (
     <div className="publicacoes_div_princ">
-      <h1 className="publicacoes-title2">Informações do Grupo</h1>
+      {selectedEvento && console.log('selectedEvento:', selectedEvento)}
+      <h1 className="publicacoes-title2">Informações do evento</h1>
       <div className="header">
-        <h1 className="header-title">{selectedGrupo.nome}</h1>
+        <h1 className="header-title">{selectedEvento.nome}</h1>
         <div className="author">
           <div className="authorName"><span>Autor :</span></div>
-          <img src={selectedGrupo.autor.caminho_foto} alt={selectedGrupo.autor.nome} className="author-icon" />
-          <span>{selectedGrupo.autor.nome} {selectedGrupo.autor.sobrenome}</span>
+          <img src={selectedEvento.user.caminho_foto} alt={selectedEvento.user.nome} className="author-icon" />
+          <span>{selectedEvento.user.nome} {selectedEvento.user.sobrenome}</span>
       
         </div>
 
       </div>
   <div className="tab-content2">
-  {selectedGrupo.capa && (
-  <>
-    <button className="tab active"><i className="fas fa-images tab-icon"></i> Capa do grupo</button>
-    <div className="gallery">
-      <img src={selectedGrupo.capa} alt="Capa do grupo" className="gallery-image" />
-    </div>
-  </>
-)}
+    {/* {selectedEvento.galeria && selectedEvento.galeria.length > 0 && (
+      <>
+        <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do evento</button>
+        <div className="gallery">
+          {selectedEvento.galeria.map((image, index) => (
+            <img key={index} src={image} alt={`Galeria ${index}`} className="gallery-image" />
+          ))}
+        </div>
+      </>
+    )} */}
+    <div className="tab-content2">
+  {imagensGaleria && imagensGaleria.length > 0 && (
+    <>
+      <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Evento</button>
+      <div className="gallery">
+        {imagensGaleria.map((image, index) => (
+          <img key={index} src={image.caminho_imagem} alt={`Galeria ${index}`} className="gallery-image" />
+        ))}
+      </div>
+    </>
+  )}
+</div>
 
-
-{selectedGrupo.autor && (
+{selectedEvento.user && (
   <>
     <button className="tab active">
   <i className="fas fa-check tab-icon"></i>
@@ -1470,8 +1580,8 @@ return (
 
   {/* Mostra o botão apenas se o usuário não estiver na lista de participantes */}
   {!participantes.some(participante =>  Number(participante.usuario.id) === Number(userId))  && (
-      <button className="user-plus-button" onClick={() => adicionarParticipante(selectedGrupo.id, userId)}>
-        <i className="fas fa-user-plus tab-icon user-plus-icon"></i> Entrar no Grupo
+      <button className="user-plus-button" onClick={() => adicionarParticipante(selectedEvento.id, userId)}>
+        <i className="fas fa-user-plus tab-icon user-plus-icon"></i> Participar no Evento
       </button>
     )}
   
@@ -1522,49 +1632,231 @@ return (
   </>
 )}
 
-{selectedGrupo.topico &&  (
+
+
+{selectedEvento.datainicioatividade && (
   <>
     <button className="tab active">
-      <i className="fas fa-tag tab-icon"></i> Relacionado com Este Grupo
+      <i className="fas fa-calendar-alt tab-icon"></i> Data do Evento
+    </button>
+    <div className="description">
+      <p><strong>Data:</strong> {new Date(selectedEvento.datainicioatividade).toLocaleString()}</p>
+    </div>
+  </>
+)}
+
+
+
+    {selectedEvento.descricao && (
+      <>
+        <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Evento</button>
+        <div className="description">
+          <p>{selectedEvento.descricao}</p>
+        </div>
+      </>
+    )}
+    {selectedEvento.latitude && (
+  <>
+    <button className="tab active">
+      <i className="fas fa-map-marker-alt tab-icon"></i> Localização
+    </button>
+    <div className="location">
+      <p><strong>Localização:</strong> {selectedEvento.latitude}, {selectedEvento.longitude}</p>
+      <a 
+        href={`https://www.google.com/maps?q=${selectedEvento.latitude},${selectedEvento.longitude}`} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="map-button"
+      >
+        Ver no Google Maps
+      </a>
+    </div>
+  </>
+)}
+
+{selectedEvento.topico &&  (
+  <>
+    <button className="tab active">
+      <i className="fas fa-tag tab-icon"></i> Relacionado com Este Evento
     </button>
     <div className="description tags-container">
       <span className="tag">
-        <i className="fas fa-tags tag-icon"></i> {selectedGrupo.topico.nome}
+        <i className="fas fa-tags tag-icon"></i> {selectedEvento.topico.nome}
       </span>
+      
+      <p>
+        <i className="fas fa-tag"></i> {selectedEvento.tipo_evento.nome_tipo}
+      </p>
     
     </div>
   </>
 )}
 
-{selectedGrupo.createdAt && (
-  <>
-    <button className="tab active">
-      <i className="fas fa-calendar-alt tab-icon"></i> Data da criação do Grupo
-    </button>
-    <div className="description">
-      <p> {new Date(selectedGrupo.createdAt).toLocaleString()}</p>
+{/* <div className="tab-content2">
+  {imagensGaleria && imagensGaleria.length > 0 && (
+    <>
+      <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Evento</button>
+      <div className="gallery">
+        {imagensGaleria.map((image, index) => (
+          <img key={index} src={image.caminho_imagem} alt={`Galeria ${index}`} className="gallery-image" />
+        ))}
+      </div>
+    </>
+  )}
+</div> */}
+
+
+    {/* Seção de Comentários */}
+    {/* Seção de Comentários */}
+    {selectedEvento && (selectedEvento.estado === 'Ativa' || selectedEvento.estado === 'Denunciada') && (
+  // Seu código aqui, que será executado se o estado for 'Ativa' ou 'Denunciada'
+
+<div> 
+  <button className="tab active"><i className="fas fa-comments tab-icon"></i> Comentários e Avaliações</button>
+  <div className="comentarios-section">
+    <div className="avaliacoes-resumo">
+      
+      <div className="avaliacoes-info">
+        {mediaAvaliacoes && mediaAvaliacoes.total > 0 ? (
+          <>
+            <span className="avaliacoes-media">
+              {mediaAvaliacoes.media.toFixed(1)}
+            </span>
+            <div className="stars">
+              {Array.from({ length: 5 }, (_, index) => (
+                <i
+                  key={index}
+                  className={`fas fa-star${index < Math.round(mediaAvaliacoes.media) ? '' : '-o'}`}
+                />
+              ))}
+            </div>
+            <span className="avaliacoes-total">
+              com base em {mediaAvaliacoes.total} {mediaAvaliacoes.total === 1 ? 'avaliação' : 'avaliações'}
+            </span>
+          </>
+        ) : (
+          <span className="avaliacoes-media">Sê o primeiro a avaliar este Evento!</span>
+        )}
+      </div>
     </div>
-  </>
+
+    <div className="comentarios-list">
+      {comentariosExibidos.map((comentario) => (
+        <div key={comentario.id} className="comentario">
+          <div className="comentario-header">
+            {comentario.usuario && comentario.usuario.caminho_foto && (
+              <img src={comentario.usuario.caminho_foto} alt={`${comentario.usuario.nome} ${comentario.usuario.sobrenome}`} className="comentario-avatar" />
+            )}
+            <div className="comentario-info">
+              {comentario.usuario && (
+                <>
+                  <span className="comentario-autor">{comentario.usuario.nome} {comentario.usuario.sobrenome}</span>
+                  <span className="comentario-data">{new Date(comentario.createdat).toLocaleDateString()}</span>
+                </>
+              )}
+            </div>
+            
+          </div>
+
+          {/* Aqui você adiciona a lógica para exibir a classificação textual */}
+          <div className="comentario-rating">
+            {comentario.classificacao > 0 && (
+              <>
+                <div className="stars">
+                  {Array.from({ length: 5 }, (_, index) => (
+                    <i
+                      key={index}
+                      className={`fas fa-star${index < comentario.classificacao ? '' : '-o'}`}
+                    />
+                  ))}
+                </div>
+                <span className="rating-text">
+                  {comentario.classificacao === 5 && 'Excelente'}
+                  {comentario.classificacao === 4 && 'Bom'}
+                  {comentario.classificacao === 3 && 'Médio'}
+                  {comentario.classificacao === 2 && 'Fraco'}
+                  {comentario.classificacao === 1 && 'Péssimo'}
+                </span>
+              </>
+            )}
+          </div>
+          <div className="comentario-options">
+        <div className="options-button" onClick={() => toggleOptionsEvento(comentario.id)}>
+          <i className="fas fa-ellipsis-v"></i>
+        </div>
+        {optionsOpen === comentario.id && (
+          <div className="options-menu">
+            <button onClick={() => handleDeleteComentarioEvento(comentario.id)}>
+              <i className="fas fa-trash-alt custom-delete-icon"></i> Excluir Mensagem
+            </button>
+          </div>
+        )}
+      </div>
+          <div className="comentario-conteudo">
+            <p>{comentario.texto_comentario}</p>
+          </div>
+          {/* Botão de Like */}
+      <div className="comentario-like">
+  <button className="comentario-like-button" onClick={() => handleLike(comentario.id)}>
+    {comentario.likes} <i className="fas fa-thumbs-up" style={{color: '#1877F2'}}></i>
+  </button>
+</div>
+        </div>
+      ))}
+    </div>
+
+    <button className="btn-comentarios margin-bottom" onClick={() => setShowAllComentarios(!showAllComentarios)}>
+      {showAllComentarios ? 'Esconder Comentários' : 'Mostrar todos os Comentários'}
+    </button>
+
+    <div className="comment-button-container">
+      <button className="btn-comentar" onClick={() => setShowComentarioModal(true)}>Comentar</button>
+    </div>
+
+</div>
+{showComentarioModal && (
+  <div className="modal">
+    <div className="modal-content">
+      <span className="close" onClick={() => setShowComentarioModal(false)}>&times;</span>
+      <div className="modal-header">
+        <h2>Classifique o Evento</h2>
+      </div>
+      <div className="modal-body">
+        <div className="rating">
+          <select 
+            value={novaClassificacao} 
+            onChange={(e) => setNovaClassificacao(parseInt(e.target.value))}
+            style={{ fontSize: '2rem' }}
+          >
+            <option value="0">Sem Classificação</option>
+            <option value="1">★☆☆☆☆</option>
+            <option value="2">★★☆☆☆</option>
+            <option value="3">★★★☆☆</option>
+            <option value="4">★★★★☆</option>
+            <option value="5">★★★★★</option>
+          </select>
+        </div>
+
+        <textarea
+          className="comment-textarea"
+          placeholder="Escreva o Comentário"
+          value={novoComentario}
+          onChange={(e) => setNovoComentario(e.target.value)}
+        />
+      </div>
+
+      <div className="modal-footer">
+        <button onClick={handleAddComentario} className="btn-comentar">Publicar</button>
+      </div>
+    </div>
+  </div>
 )}
 
 
 
-    {selectedGrupo.descricao && (
-      <>
-        <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Evento</button>
-        <div className="description">
-          <p>{selectedGrupo.descricao}</p>
-        </div>
-      </>
-    )}
 
-
-
-
-
-
-
-
+</div>
+)}
 
   </div>
 </div>
@@ -1576,96 +1868,96 @@ return (
 
 
 {showApprovalView && eventoDetail && (
-<div className="publicacoes_div_princ">
-<h1 className="publicacoes-title2">Informações do Evento</h1>
-<div className="header">
-  <h1 className="header-title">{eventoDetail.nome}</h1>
-  <div className="author">
-    <div className="authorName"><span>Autor :</span></div>
-    <img src={eventoDetail.autor.caminho_foto} alt={eventoDetail.autor.nome} className="author-icon" />
-    <span>{eventoDetail.autor.nome} {eventoDetail.autor.sobrenome}</span>
-
-  </div>
-
-</div>
-<div className="tab-content2">
-  {eventoDetail.galeria && eventoDetail.galeria.length > 0 && (
-    <>
-      <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Evento</button>
-      <div className="gallery">
-        {eventoDetail.galeria.map((image, index) => (
-          <img key={index} src={image} alt={`Galeria ${index}`} className="gallery-image" />
-        ))}
-      </div>
-    </>
-  )}
-
-
-  {eventoDetail.descricao && (
-    <>
-      <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Evento</button>
-      <div className="description">
-        <p>{eventoDetail.descricao}</p>
-      </div>
-    </>
-  )}
-  
-
-  {eventoDetail.horario && (
-    <>
-      <button className="tab active"><i className="fas fa-clock tab-icon"></i> Horário do Evento</button>
-      <div className="additional-info">
-        <div className="status">
-          <i className="fas fa-check-circle"></i> {isOpen ? 'Aberto Agora' : 'Fechado Agora'}
+  <div className="publicacoes_div_princ">
+     {console.log('eventoDetail:', eventoDetail)}
+      <h1 className="publicacoes-title2">Informações do evento</h1>
+      <div className="header">
+        <h1 className="header-title">{eventoDetail.nome}</h1>
+        <div className="author">
+          <div className="authorName"><span>Autor :</span></div>
+          <img src={eventoDetail.user.caminho_foto} alt={eventoDetail.user.nome} className="author-icon" />
+          <span>{eventoDetail.user.nome} {eventoDetail.user.sobrenome}</span>
+      
         </div>
-        <div className="schedule">
-          {weekDays.map((dia) => (
-            <p key={dia}><strong>{dia}:</strong> {eventoDetail.horario[dia] || 'Fechado'}</p>
-          ))}
+
+      </div>
+  <div className="tab-content2">
+    
+  {eventoDetail.imagens && eventoDetail.imagens.length > 0 && (
+    <>
+        <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Evento</button>
+        <div className="gallery">
+            {eventoDetail.imagens.map((image, index) => (
+                <img key={index} src={image.caminho_imagem} alt={`Galeria ${index}`} className="gallery-image" />
+            ))}
         </div>
-      </div>
     </>
-  )}
-  {eventoDetail.estado && (
-    <>
-      <button className="tab active"><i className="fas fa-tasks tab-icon"></i> Estado do Evento</button>
-      <div className="estado">
-        <p><strong>Estado:</strong> {eventoDetail.estado}</p>
-      </div>
-    </>
-  )}
-  {eventoDetail.localizacao && (
-    <>
-      <button className="tab active"><i className="fas fa-map-marker-alt tab-icon"></i> Localização</button>
-      <div className="location">
-        <p><strong>Localização:</strong> {eventoDetail.localizacao}</p>
-      </div>
-    </>
-  )}
-  {eventoDetail.paginaweb && (
-    <>
-      <button className="tab active"><i className="fas fa-globe tab-icon"></i> Página Web</button>
-      <div className="website">
-        <p><strong>Página web:</strong> {eventoDetail.paginaweb}</p>
-      </div>
-    </>
-  )}
-  {eventoDetail.telemovel && (
-    <>
-      <button className="tab active"><i className="fas fa-phone tab-icon"></i> Telefone</button>
-      <div className="phone">
-        <p><strong>Telemóvel/Telefone: </strong>{eventoDetail.telemovel}</p>
-      </div>
-    </>
-  )}
-  {eventoDetail.email && (
-    <>
-      <button className="tab active"><i className="fas fa-envelope tab-icon"></i> Email</button>
-      <div className="email">
-        <p><strong>Email:</strong> {eventoDetail.email}</p>
-      </div>
-    </>
-  )}
+)}
+
+
+
+{eventoDetail.datainicioatividade && (
+  <>
+    <button className="tab active">
+      <i className="fas fa-calendar-alt tab-icon"></i> Data do Evento
+    </button>
+    <div className="description">
+      <p><strong>Data:</strong> {new Date(eventoDetail.datainicioatividade).toLocaleString()}</p>
+    </div>
+  </>
+)}
+
+
+
+    {eventoDetail.descricao && (
+      <>
+        <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Evento</button>
+        <div className="description">
+          <p>{eventoDetail.descricao}</p>
+        </div>
+      </>
+    )}
+    {eventoDetail.latitude && (
+  <>
+    <button className="tab active">
+      <i className="fas fa-map-marker-alt tab-icon"></i> Localização
+    </button>
+    <div className="location">
+      <p><strong>Localização:</strong> {eventoDetail.latitude}, {eventoDetail.longitude}</p>
+      <a 
+        href={`https://www.google.com/maps?q=${eventoDetail.latitude},${eventoDetail.longitude}`} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="map-button"
+      >
+        Ver no Google Maps
+      </a>
+    </div>
+  </>
+)}
+
+{eventoDetail.topico &&  (
+  <>
+    <button className="tab active">
+      <i className="fas fa-tag tab-icon"></i> Relacionado com Este Evento
+    </button>
+    <div className="description tags-container">
+      <span className="tag">
+        <i className="fas fa-tags tag-icon"></i> {eventoDetail.topico.nome}
+      </span>
+      
+      <p>
+        <i className="fas fa-tag"></i> {eventoDetail.tipo_evento.nome_tipo}
+      </p>
+    
+    </div>
+  </>
+)}
+
+
+
+
+ 
   
 
     <div className="form-buttons">
@@ -1735,74 +2027,77 @@ return (
 
 
 
-{showDetailViewDenunciada && grupoDetailDenunciada && (
+  {showDetailViewDenunciada &&  eventoDetailDenunciada&& (
   <div className="publicacoes_div_princ">
-    <h1 className="publicacoes-title2">Denúncias do Grupo</h1>
+    <h1 className="publicacoes-title2">Denúncias do Evento</h1>
     <div className="header">
-      <h1 className="header-title">{grupoDetailDenunciada.nome}</h1>
+      <h1 className="header-title">{eventoDetailDenunciada.nome}</h1>
       <div className="author">
         <div className="authorName"><span>Autor :</span></div>
-        {grupoDetailDenunciada.autor?.caminho_foto && (
-          <img src={grupoDetailDenunciada.autor.caminho_foto} alt={grupoDetailDenunciada.autor.nome} className="author-icon" />
+        {eventoDetailDenunciada.user?.caminho_foto && (
+          <img src={eventoDetailDenunciada.user.caminho_foto} alt={eventoDetailDenunciada.user.nome} className="author-icon" />
         )}
-        {grupoDetailDenunciada.autor && (
-          <span>{grupoDetailDenunciada.autor.nome} {grupoDetailDenunciada.autor.sobrenome}</span>
+        {eventoDetailDenunciada.user && (
+          <span>{eventoDetailDenunciada.user.nome} {eventoDetailDenunciada.user.sobrenome}</span>
         )}
       </div>
     </div>
     <div className="tab-content2">
       <div className="denuncia-header2">
         <h2>Lista de Denúncias</h2>
-        <span className="total-denuncias">Total: {denunciasGrupo.length} {denunciasGrupo.length === 1 ? 'Denúncia' : 'Denúncias'}</span>
+        <span className="total-denuncias">Total: {denuncias.length} {denuncias.length === 1 ? 'Denúncia' : 'Denúncias'}</span>
       </div>
       <div className="denuncias-list">
-        {denunciasGrupo.map((denuncia) => (
+      
+      
+        {denuncias.map((denuncia) => (
+          
           <div key={denuncia.id} className="denuncia">
-            <div className="denuncia-header">
-              <div className="denunciante-info">
-                {denuncia.denunciante?.caminho_foto && (
-                  <img src={denuncia.denunciante.caminho_foto} alt={`${denuncia.denunciante.nome} ${denuncia.denunciante.sobrenome}`} className="denuncia-avatar" />
-                )}
-                <div className="denunciante-texto">
-                  {denuncia.denunciante && (
-                    <>
-                      <span className="denuncia-autor">{denuncia.denunciante.nome} {denuncia.denunciante.sobrenome}</span>
-                      <span className="denuncia-data">{new Date(denuncia.createdAt).toLocaleDateString()}</span>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="denuncia-actions">
+             <div className="denuncia-header">
+             <div className="denunciante-info">
+          {denuncia.denunciador?.caminho_foto && (
+            <img src={denuncia.denunciador.caminho_foto} alt={`${denuncia.denunciador.nome} ${denuncia.denunciador.sobrenome}`} className="denuncia-avatar" />
+          )}
+          <div className="denunciante-texto">
+          {denuncia.denunciador && (
+            <>
+              <span className="denuncia-autor">{denuncia.denunciador.nome} {denuncia.denunciador.sobrenome}</span>
+              <span className="denuncia-data">{new Date(denuncia.data_denuncia).toLocaleDateString()}</span>
+            </>
+          )}
+        </div> </div>
+        <div className="denuncia-actions">
                 {!denuncia.resolvida && (
-                  <div className="options-button" onClick={() => toggleOptionsGrupo(denuncia.id)}>
+                  <div className="options-button" onClick={() => toggleOptionsMarcar(denuncia.id)}>
                     <i className="fas fa-ellipsis-v"></i>
                   </div>
                 )}
-                {optionsOpen === denuncia.id && (
-                  <div className="options-menu">
-                    <button onClick={() => marcarDenunciaGrupoComoResolvida(denuncia.id)}>
-                      <i className="fas fa-check-circle custom-check-icon"></i> Marcar como Resolvida
-                    </button>
-                  </div>
-                )}
+                {optionsOpenMarcar === denuncia.id && (
+  <div className="options-menu">
+    <button onClick={() => marcarDenunciaComoResolvida(denuncia.id)}>
+      <i className="fas fa-check-circle custom-check-icon"></i> Marcar como Resolvida
+    </button>
+  </div>
+)}
                 {denuncia.resolvida && (
                   <span className="denuncia-resolvida">Denúncia Resolvida</span>
                 )}
               </div>
             </div>
-            <div className="denuncia-conteudo">
-              <p><strong>Motivo:</strong> {denuncia.motivo}</p>
-              <p><strong>Informação Adicional:</strong> {denuncia.informacao_adicional}</p>
-            </div>
+      <div className="denuncia-conteudo">
+        <p><strong>Motivo:</strong> {denuncia.motivo_denuncia}</p>
+        <p><strong>Informação Adicional:</strong> {denuncia.descricao_denuncia}</p>
+      </div>
           </div>
         ))}
       </div>
       <div className="form-buttons">
         <button type="button" className="cancel-button" onClick={() => setShowDetailViewDenunciada(false)}>Cancelar</button>
-        <button type="button" className="save-button" onClick={handleMedidasClickGrupo}>Tomar Medidas</button>
+        <button type="button" className="save-button" onClick={handleMedidasClick}>Tomar Medidas</button>
       </div>
     </div>
-  </div>
+    </div>
+  
 )}
 
 
@@ -1822,7 +2117,7 @@ return (
         <img src="https://i.ibb.co/18XzT1q/Captura-de-ecr-2024-06-26-171433.png" alt="Captura-de-ecr-2024-06-26-171433" />
         <span>Eliminar Local</span>
       </div>
-      <div className="option" onClick={() => handleEditClick(grupoDetailDenunciada)}>
+      <div className="option" onClick={() => handleEditClick(eventoDetailDenunciada)}>
         <img src="https://i.ibb.co/9hm2v8B/Captura-de-ecr-2024-06-26-171921.png" alt="Captura-de-ecr-2024-06-26-171921" />
         <span>Editar Local</span>
       </div>
@@ -1999,7 +2294,7 @@ return (
         </form>
       )}
 
-{/* {activeTab === 'galeria' && (
+{activeTab === 'galeria' && (
 <div className="tab-content_galeria">
   <h2>Galeria do Evento</h2>
   <div {...getRootProps({ className: 'dropzone' })} className="gallery-upload">
@@ -2025,7 +2320,7 @@ return (
     <button type="button" className="submit-button" onClick={handleContinue}>Continuar</button>
   </div>
 </div>
-)} */}
+)}
 
 {activeTab === 'horario' && (
 <div>
@@ -2168,50 +2463,54 @@ return (
       </div>
     )}
 
-    {!showDetailViewDenunciada && !showApprovalView && !showDetailView && showgruposList && (
+    {!showDetailViewDenunciada && !showApprovalView && !showDetailView && showalbunsList && (
       <div className="publications-view">
         <table className="publications-table">
           <thead>
             <tr>
               <th>#</th>
-              <th>Nome do Evento</th>
-              <th>Tópico</th>
+              <th>Nome do Álbum</th>
               <th>Data de Criação</th>
               <th>Estado</th>
               <th>Editar</th>
             </tr>
           </thead>
           <tbody>
-       {filteredgrupos.map((grupos, index) => {
+       {filteredalbuns.map((albuns, index) => {
   
-  console.log('grupos filtrados:', filteredgrupos);
+  console.log('albuns filtrados:', filteredalbuns);
 
-  return (
-    <tr key={grupos.id}>
-      <td>{index + 1}</td>
-      <td>{grupos.nome}</td>
-      <td>{grupos.topico.nome}</td>
-      <td>{formatarData(grupos.createdAt)}</td>
-      
-      <td>
-        <span className={`publications-status ${grupos.estado.toLowerCase().replace(' ', '-')}`}>
-          {grupos.estado}
-        </span>
-      </td>
-      <td>
-        <div className="edit-buttons-container">
-          <button className="edit-btn" onClick={() => handleViewDetailsClick(grupos)}>i</button>
-          
-          <button className="publications-edit-btn"onClick={() => handleEditClick(grupos)}>✏️</button>
-          <button className="publications-edit-btn" onClick={() => handleDeleteClick(grupos)}>🗑️</button>
-          
-          {grupos.estado === 'Denunciada' && (
-            <button className="publications-edit-btn" onClick={() => handleReportedViewClickGrupo(grupos)}>
-              <img src="https://i.ibb.co/Cwhk8dN/Captura-de-ecr-2024-07-04-115321-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-115321-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
+    return (
+      <tr key={albuns.id}>
+        <td>{index + 1}</td>
+        <td>{albuns.nome}</td>
+        <td>{formatarData(albuns.createdAt)}</td>
+        <td>
+          <span className={`publications-status ${albuns.estado.toLowerCase().replace(' ', '-')}`}>
+            {albuns.estado}
+          </span>
+        </td>
+        <td>
+          <div className="edit-buttons-container">
+            <button className="edit-btn" onClick={() => handleViewDetailsClick(albuns)}>i</button>
+            <button 
+              className="publications-edit-btn" 
+              onClick={() => handleHideClick(albuns)}>
+              <i className={`fas ${albuns.visivel ? 'fa-eye' : 'fa-eye-slash'}`}></i>
             </button>
-          )}
-        </div>
-
+            <button className="publications-edit-btn"onClick={() => handleEditClick(albuns)}>✏️</button>
+            <button className="publications-edit-btn" onClick={() => handleDeleteClick(albuns)}>🗑️</button>
+            {albuns.estado === 'Por validar' && (
+              <button className="publications-edit-btn" onClick={() => handlePendingViewClick(albuns)}>
+                <img src="https://i.ibb.co/9T565FK/Captura-de-ecr-2024-07-04-123100-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-123100-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
+              </button>
+            )}
+            {albuns.estado === 'Denunciada' && (
+              <button className="publications-edit-btn" onClick={() => handleReportedViewClick(albuns)}>
+                <img src="https://i.ibb.co/Cwhk8dN/Captura-de-ecr-2024-07-04-115321-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-115321-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
+              </button>
+            )}
+          </div>
           {showDeleteModal && (
             <div className="modal">
               <div className="modal-icon">❌</div>
@@ -2276,4 +2575,4 @@ return (
   );
 };
 
-export default GruposView;
+export default AlbunsView;

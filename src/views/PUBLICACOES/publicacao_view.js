@@ -1179,7 +1179,7 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
               <input type="text" placeholder="inserir nome do local" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
             </div>
             <div className="form-group">
-  <label>Estado do Evento</label>
+  <label>Estado da Publicação</label>
   <select value={estado} onChange={(e) => setEstado(e.target.value)}>
     <option value="">Selecionar estado</option>
     <option value="Ativa">Ativa</option>
@@ -1594,7 +1594,7 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
 </div>
 )} */}
 
-{selectedPublication && selectedPublication.estado === 'Ativa' && (
+{selectedPublication && (selectedPublication.estado === 'Ativa' || selectedPublication.estado === 'Denunciada') && (
 <div> 
   <button className="tab active"><i className="fas fa-comments tab-icon"></i> Comentários e Avaliações</button>
   <div className="comentarios-section">

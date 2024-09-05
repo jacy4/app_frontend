@@ -1716,7 +1716,9 @@ return (
 
     {/* Seção de Comentários */}
     {/* Seção de Comentários */}
-{selectedEvento && selectedEvento.estado === 'Ativa' && (
+    {selectedEvento && (selectedEvento.estado === 'Ativa' || selectedEvento.estado === 'Denunciada') && (
+  // Seu código aqui, que será executado se o estado for 'Ativa' ou 'Denunciada'
+
 <div> 
   <button className="tab active"><i className="fas fa-comments tab-icon"></i> Comentários e Avaliações</button>
   <div className="comentarios-section">

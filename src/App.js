@@ -11,7 +11,7 @@ import Desporto from './views/DESPORTO/desporto';
 import EditarDesporto from './views/DESPORTO/editar_desporto';    
 import AdicionarDesporto from './views/DESPORTO/adicionar_desporto';
 import DefinicoesView from './views/DEFENICOES/definicoes';
-import PartilhasView from './views/AlbumPartilha/AlbumPartilha';
+
 import CalendarioView from './views/CALENDARIO/calendario';
 import EventosView from './views/EVENTOS/eventos';
 import ForumView from './views/FORUNS/foruns';
@@ -19,6 +19,7 @@ import GruposView from './views/GRUPOS/grupos';
 import axios from 'axios';
 
 import './App.css'; 
+import AlbunsView from './views/ALBUNS/albuns';
 
 const TopicsPage = () => {
     const { areaId } = useParams(); // Extrair o areaId dos parâmetros da URL
@@ -66,7 +67,7 @@ axios.interceptors.request.use(
                 <Route path="/defenicoes" element={<DefinicoesView />} />
                 <Route path="/criar_publicacao" element={<PublicacoesView />} />
                 <Route path="/pagina_inicial" element={<PaginaInicial />} />
-                <Route path="/pagina_partilhas" element={<PartilhasView />} />
+                <Route path="/pagina_partilhas" element={<AlbunsView />} />
                 <Route path="/pagina_calendario" element={<CalendarioView />} />
                 <Route path="/pagina_eventos" element={<EventosView />} />
                 <Route path="/pagina_foruns" element={<ForumView />} />
