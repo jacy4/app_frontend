@@ -5,6 +5,7 @@ import axios from 'axios';
 import TopicSelector from './topicSelector'; // Import TopicSelector component
 import { useNavigate } from 'react-router-dom';
 import CreateEventoButton from '../../componentes/botao_view_eventos/criar_evento';
+import CreatePublicationButton from '../../componentes/botao_view_publicacoes/criar_publicacao';
 import { GoogleMap, LoadScript, Marker, useJsApiLoader } from '@react-google-maps/api';
 import { useDropzone } from 'react-dropzone';
 import moment from 'moment';
@@ -160,7 +161,7 @@ useEffect(() => {
     }
     // console.log(`Buscando publicações para centroId: ${centroId}`);
     try {
-      const response = await axios.get(`http://localhost:3000/grupos/listargrupos`);
+      const response = await axios.get(`http://localhost:3000/grupos/listargrupos/${areaId}`);
       if (response.data && Array.isArray(response.data)) {
         // console.log(response.data);
         setgrupos(response.data);
@@ -168,7 +169,7 @@ useEffect(() => {
         console.error('Resposta da API vazia ou formato de dados incorreto');
       }
     } catch (error) {
-      console.error('Erro ao buscar publicações:', error);
+      console.error('Erro ao buscar grupos:', error);
       setError(error.message);
     }
   };
@@ -1224,7 +1225,11 @@ useEffect(() => {
   };
 }, []);
 
-
+const handleCreateGrupoClick = () => {
+  setShowCreateForm(true);
+  setShowgruposList(false);
+  setSelectedButton('create'); // Set the selected button
+};
 return (
   <div className="publicacoes-div_princ"> 
     {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de grupos deste Centro</h1>}
@@ -1256,6 +1261,16 @@ return (
             isSelected={selectedButton === 'denunciada'}
             onClick={() => handleButtonClick('denunciada')}
           />
+          <div className="right-button">
+            <CreatePublicationButton
+              onClick={handleCreateGrupoClick}
+              iconSrc="https://i.ibb.co/P4nsk4w/Icon-criar.png"
+              iconBgColor="#e0f7fa"
+              title="Criar Grupo"
+              subtitle="Criar..."
+              isSelected={selectedButton === 'create'}
+            />
+          </div>
         </div>
       </div>
     )}

@@ -11,7 +11,7 @@ const Login = ({ onLogin }) => {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('https://backend-teste-q43r.onrender.com/admin/login', {
+      const response = await axios.post('http://localhost:3000/admin/login', {
         email,
         password,
       }, {

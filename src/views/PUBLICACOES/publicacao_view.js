@@ -72,7 +72,8 @@ const PublicacoesView = () => {
     "Sábado": { inicio: '', fim: '', fechado: false },
     "Domingo": { inicio: '', fim: '', fechado: false },
 });
-  
+const [latitude, setLatitude] = useState(null);
+const [longitude, setLongitude] = useState(null);
   const [showComentarioModal, setShowComentarioModal] = useState(false);
   const [novaClassificacao, setNovaClassificacao] = useState(0);
   const [localizacao, setLocalizacao] = useState('');
@@ -278,6 +279,8 @@ useEffect(() => {
         paginaweb,
         telemovel,
         email,
+        latitude,
+        longitude,
         galeria: galeria.map((img) => img.url), // Envia apenas as URLs das imagens
         centro_id: centroId,
         autor_id: sessionStorage.getItem('user_id') 
@@ -1502,14 +1505,24 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
           </div>
         </>
       )}
-      {selectedPublication.localizacao && (
-        <>
-          <button className="tab active"><i className="fas fa-map-marker-alt tab-icon"></i> Localização</button>
-          <div className="location">
-            <p><strong>Localização:</strong> {selectedPublication.localizacao}</p>
-          </div>
-        </>
-      )}
+      {selectedPublication.latitude && (
+  <>
+    <button className="tab active">
+      <i className="fas fa-map-marker-alt tab-icon"></i> Localização
+    </button>
+    <div className="location">
+      <p><strong>Localização:</strong> {selectedPublication.latitude}, {selectedPublication.longitude}</p>
+      <a 
+        href={`https://www.google.com/maps?q=${selectedPublication.latitude},${selectedPublication.longitude}`} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="map-button"
+      >
+        Ver no Google Maps
+      </a>
+    </div>
+  </>
+)}
       {selectedPublication.paginaweb && (
         <>
           <button className="tab active"><i className="fas fa-globe tab-icon"></i> Página Web</button>
@@ -2144,9 +2157,16 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
                   {activeTab === 'descricao' && (
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-                <label>Área do Local</label>
-                <input type="text" value="Desporto" readOnly />
-              </div>
+            <label>Área do Local</label>
+  <select value={area} onChange={(e) => setArea(e.target.value)}>
+  <option value="">Selecionar área</option>
+  {areas.map((areaOption) => (
+    <option key={areaOption.id} value={areaOption.id}>
+      {areaOption.nome}
+    </option>
+  ))}
+</select>
+</div>
               <div className="form-group">
             <label>Tópico do Local</label>
               <select value={topico} onChange={(e) => setTopico(e.target.value)}>
@@ -2245,14 +2265,13 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
             <h2>Localização do local</h2>
             <div className="localizacao-content">
               <div className="form-group">
-                <label>Endereço do local:</label>
-                <input
-                  type="text"
-                  placeholder="inserir local"
-                  value={localizacao}
-                  onChange={(e) => setLocalizacao(e.target.value)}
-                />
-              </div>
+              <label>Latitude</label>
+  <input type="text" placeholder="Latitude" value={latitude} onChange={(e) => setLatitude(e.target.value)} />
+</div>
+<div className="form-group">
+  <label>Longitude</label>
+  <input type="text" placeholder="Longitude" value={longitude} onChange={(e) => setLongitude(e.target.value)} />
+</div>
               <div className="map-placeholder">
                 <LoadScript googleMapsApiKey={API_KEY}>
                   <GoogleMap

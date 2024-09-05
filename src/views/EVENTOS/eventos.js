@@ -2274,9 +2274,17 @@ return (
                 {activeTab === 'descricao' && (
           <form onSubmit={handleSubmit}>
           <div className="form-group">
-              <label>Área do Evento</label>
-              <input type="text" value="Desporto" readOnly />
-            </div>
+              <label>Área do Local</label>
+  <select value={area} onChange={(e) => setArea(e.target.value)}>
+  <option value="">Selecionar área</option>
+  {areas.map((areaOption) => (
+    <option key={areaOption.id} value={areaOption.id}>
+      {areaOption.nome}
+    </option>
+  ))}
+</select>
+</div>
+            
             <div className="form-group">
             <label>Tópico do Evento</label>
             <select value={topico} onChange={(e) => setTopico(e.target.value)}>

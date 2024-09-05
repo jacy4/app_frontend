@@ -11,12 +11,13 @@ import moment from 'moment';
 import 'moment/locale/pt'; // Importar o locale português
 import Modal from 'react-modal';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
+import { useParams } from 'react-router-dom';
 
 moment.locale('pt'); // Definir o locale para português
 
 const AlbunsView = () => {
-    const [albuns, setalbuns] = useState([]);
+  const { areaId } = useParams();
+  const [albuns, setAlbuns] = useState([]); // Inicialize como um array vazio
     const [error, setError] = useState(null);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [showalbunsList, setShowalbunsList] = useState(true);
@@ -93,7 +94,8 @@ const navigate = useNavigate();
 const [imageSrc, setImageSrc] = useState(null); // Estado para imagem escolhida
 const [galeria, setGaleria] = useState([]); // Estado para a galeria de imagens
 const [topicos, setTopicos] = useState([]);
-const areaId = 1; // Defina o ID da área aqui
+
+; // Defina o ID da área aqui
 
 const [showAllComentarios, setShowAllComentarios] = useState(false);
 const [comentariosExibidos, setComentariosExibidos] = useState([]);
@@ -160,16 +162,16 @@ useEffect(() => {
 
 useEffect(() => {
   const buscaralbuns = async () => {
-    if (!centroId) {
-      console.log('centroId não definido');
+    if (!areaId) {
+      console.log('areaid não definido');
       return;
     }
-    console.log(`Buscando publicações para centroId: ${centroId}`);
+    console.log(`Buscando albuns para areaid: ${areaId}`);
     try {
-      const response = await axios.get(`http://localhost:3000/albuns/list/${areaId}`);
+      const response = await axios.get(`http://localhost:3000/albuns/listByArea/${areaId}`);
       if (response.data && Array.isArray(response.data)) {
         console.log(response.data);
-        setalbuns(response.data);
+        setAlbuns(response.data);
       } else {
         console.error('Resposta da API vazia ou formato de dados incorreto');
       }
@@ -180,7 +182,7 @@ useEffect(() => {
   };
 
   buscaralbuns();
-}, [centroId]);
+}, [areaId]);
 
 
 const handleViewDetailsClick = (evento) => {
@@ -267,7 +269,7 @@ const handleCancelDelete = () => {
 const handleConfirmDelete = async () => {
   try {
     await axios.delete(`http://localhost:3000/albuns/delete/${eventoToDelete.id}`);
-    setalbuns(albuns.filter(p => p.id !== eventoToDelete.id));
+    setAlbuns(albuns.filter(p => p.id !== eventoToDelete.id));
     setShowSuccessMessageDelete(true); // Exibir a mensagem de sucesso após a exclusão
   } catch (error) {
     if (error.response) {
@@ -339,34 +341,20 @@ const handleSubmit = async (e) => {
   
   console.log('Iniciando handleSubmit'); // Log para verificar se a função está sendo chamada
 
-  // Formatando o horário para o formato desejado
-  const formattedHorario = {};
-  for (const [dia, { inicio, fim, fechado }] of Object.entries(horario)) {
-      if (fechado) {
-          formattedHorario[dia] = 'Fechado';
-      } else {
-          formattedHorario[dia] = `${inicio}-${fim}`;
-      }
-  }
+  
 
-  const eventoData = {
-      topico_id: topico,
-      nome,
-      descricao,
-      horario: formattedHorario,
-      localizacao,
-      paginaweb,
-      telemovel,
-      email,
-      galeria: galeria.map((img) => img.url), // Envia apenas as URLs das imagens
-      centro_id: centroId,
-      autor_id: sessionStorage.getItem('user_id') 
+  const albumData = {
+    nome, 
+    area_id: area, // Nome do evento
+    descricao, 
+    centro_id: centroId,
+    autor_id: sessionStorage.getItem('user_id')
   };
   
-  console.log('Dados da Publicação:', eventoData); // Log dos dados que serão enviados
+  console.log('Dados do Album:', albumData); // Log dos dados que serão enviados
 
   try {
-      const response = await axios.post('http://localhost:3000/albuns/create', eventoData, {
+      const response = await axios.post('http://localhost:3000/albuns/create', albumData, {
           headers: {
               'Content-Type': 'application/json',
           },
@@ -381,7 +369,7 @@ const handleSubmit = async (e) => {
           // Lógica de erro
       }
   } catch (error) {
-      console.error('Erro ao criar evento:', error); // Log do erro
+      console.error('Erro ao criar album:', error); // Log do erro
   }
 };
 
@@ -401,7 +389,7 @@ const handleCreatealbunsubmit = ({ nome, topico }) => {
     createdAt: new Date().toISOString(),
     estado: "Active"
   };
-  setalbuns([...albuns, novoEvento]);
+  setAlbuns([...albuns, novoEvento]);
   setShowCreateForm(false);
   setShowalbunsList(true);
 };
@@ -414,7 +402,7 @@ const handleSearchChange = (event) => {
 const handleDelete = (evento) => {
   // Aqui você deve adicionar a lógica para deletar a publicação
   // Após deletar, você pode atualizar o estado `publicacoes` para remover a publicação
-  setalbuns(albuns.filter(p => p.id !== evento.id));
+  setAlbuns(albuns.filter(p => p.id !== evento.id));
   closeDeleteModal();
 };
 
@@ -474,42 +462,37 @@ const handleButtonClick = (filter) => {
   setSelectedButton(filter);
 };
 
-
-
-
-
-
 // Todos os albuns são considerados no início
 let filteredalbuns = [...albuns]; // Faça uma cópia de todos os albuns
 
 // Agora aplique os filtros por título e estado
 filteredalbuns = filteredalbuns.filter(album => {
-  if (!evento.nome || !evento.estado) return false;
+  if (!album.nome || !album.estado) return false;
 
   // Filtro por título
-  const matchesTitle = evento.nome.toLowerCase().includes(searchTerm.toLowerCase());
+  const matchesTitle = album.nome.toLowerCase().includes(searchTerm.toLowerCase());
 
   // Filtro por estado
   let matchesState = true; // Assume que é verdadeiro para 'all' ou nenhum filtro de estado selecionado
   switch (filter) {
     case 'por validar':
-      matchesState = evento.estado === 'Por validar';
+      matchesState = album.estado === 'Por validar';
       break;
     case 'ativa':
-      matchesState = evento.estado === 'Ativa';
+      matchesState = album.estado === 'Ativa';
       break;
     case 'denunciada':
-      matchesState = evento.estado === 'Denunciada';
+      matchesState = album.estado === 'Denunciada';
       break;
     case 'finalizada':
-      matchesState = evento.estado === 'Finalizada';
+      matchesState = album.estado === 'Finalizada';
       break;
     default:
       matchesState = true;
   }
 
   console.log('Filtro atual:', filter);
-  console.log('Estado do evento:', evento.estado);
+  console.log('Estado do evento:', album.estado);
 
   // Combina ambos os filtros: título e estado
   return matchesTitle && matchesState;
@@ -767,7 +750,7 @@ const handleToggleVisibility = async (evento) => {
 try {
   const updatedVisivel = !evento.visivel;
   await axios.put(`http://localhost:3000/albuns/updateVisibility/${evento.id}`, { visivel: updatedVisivel });
-  setalbuns(albuns.map(p => p.id === evento.id ? { ...p, visivel: updatedVisivel } : p));
+  setAlbuns(albuns.map(p => p.id === evento.id ? { ...p, visivel: updatedVisivel } : p));
 } catch (error) {
   console.error('Erro ao atualizar visibilidade da publicação:', error);
 }
@@ -829,7 +812,7 @@ useEffect(() => {
 // Função para buscar os tópicos da API
 const Topicos = async () => {
   try {
-    const response = await axios.get(`http://localhost:3000/topicos/topicosdeumaarea/${area}`); // Substitua areaId pelo id da área
+    const response = await axios.get(`http://localhost:3000/topicos/topicosdeumaarea/${areaId}`); // Substitua areaId pelo id da área
     setTopicos(response.data);
   } catch (error) {
     console.error('Erro ao buscar tópicos:', error);
@@ -955,25 +938,18 @@ const handleSubmitEdit = async (e) => {
     formattedHorario[dia] = fechado ? 'Fechado' : `${inicio}-${fim}`;
   }
 
-  const eventoData = {
-    area_id: area,
-    topico_id: topico,
-    nome,  // Nome do evento
+  const albumData = {
+    nome, 
+    area_id: area, // Nome do evento
     descricao,
-    datainicioatividade: dataInicioAtividade,
-    datafimatividade: dataFimAtividade,
-    estado,
+    capa_imagem_album: capaImagemEvento, 
     centro_id: centroId,
-    autor_id: eventoToEdit.autor_id || sessionStorage.getItem('user_id'), // Mantém o autor original se já definido
-    capa_imagem_evento: capaImagemEvento,
-    latitude,
-    longitude,
-    tipodeevento_id: tipoDeEventoId,
-    imagensRemovidas,
+    autor_id: eventoToEdit.autor_id || sessionStorage.getItem('user_id'),
+   
   };
 
   try {
-    const response = await axios.put(`http://localhost:3000/albuns/update/${eventoToEdit.id}`, eventoData, {
+    const response = await axios.put(`http://localhost:3000/albuns/update/${eventoToEdit.id}`, albumData, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -1038,7 +1014,25 @@ useEffect(() => {
 }, [selectedEvento]);
 
 
+useEffect(() => {
+  const fetchAlbuns = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/albuns/listByArea/${areaId}`);
+      setAlbuns(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar álbuns por área:', error);
+    }
+  };
 
+  if (areaId) {
+    fetchAlbuns ();
+  }
+}, [areaId]);
+
+
+useEffect(() => {
+  console.log('Álbuns carregados:', albuns); // Verifique se os álbuns estão sendo atualizados
+}, [albuns]);
 
 const adicionarParticipante = async (eventoId, usuarioId) => {
   try {
@@ -1066,12 +1060,16 @@ const adicionarParticipante = async (eventoId, usuarioId) => {
   }
 };
 
-// Dentro do componente, antes do return
 useEffect(() => {
-  console.log('Selected Evento:', selectedEvento);
-  console.log('Participantes:', participantes);
-  console.log('UserId:', userId);
+  if (selectedEvento) {
+    console.log('Selected Evento:', selectedEvento);
+    console.log('Participantes:', participantes);
+    console.log('UserId:', userId);
+  } else {
+    console.log('Evento ainda não foi carregado ou está nulo.');
+  }
 }, [selectedEvento, participantes, userId]); // Dependências para re-logar quando mudarem
+
 
 // async function getAddressFromCoordinates(latitude, longitude) {
 //   const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=API_KEY`);
@@ -1096,6 +1094,28 @@ useEffect(() => {
 // }, [selectedEvento.latitude, selectedEvento.longitude]);
 
 
+// Exemplo para garantir que o selectedEvento e userId estejam definidos
+const eventoId = selectedEvento ? selectedEvento.id : null; // Certifique-se de que está pegando o ID corretamente
+
+useEffect(() => {
+  const fetchEvento = async () => {
+    // Verifica se o eventoId não é null
+    if (eventoId) {
+      try {
+        const response = await axios.get(`http://localhost:3000/eventos/${eventoId}`);
+        setSelectedEvento(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar o evento:', error);
+      }
+    } else {
+      console.log("eventoId não está definido");
+    }
+  };
+
+  fetchEvento();
+}, [eventoId]); // Certifique-se de passar o eventoId corretamente
+
+
 
 useEffect(() => {
   if (selectedEvento && selectedEvento.id) {
@@ -1109,24 +1129,27 @@ useEffect(() => {
     };
 
     fetchMediaAvaliacoes();
+  } else {
+    console.log("selectedEvento ou eventoId não está definido");
   }
 }, [selectedEvento]);
 
+
+
 useEffect(() => {
   const fetchImagensGaleria = async () => {
+    if (selectedEvento && selectedEvento.id) {
       try {
-          const response = await axios.get(`http://localhost:3000/galeria_evento/listar_imagens_v2/${selectedEvento.id}`);
-          setImagensGaleria(response.data);
+        const response = await axios.get(`http://localhost:3000/galeria_evento/listar_imagens_v2/${selectedEvento.id}`);
+        setImagensGaleria(response.data);
       } catch (error) {
-          console.error('Erro ao buscar imagens da galeria:', error);
+        console.error('Erro ao buscar imagens da galeria:', error);
       }
+    }
   };
 
-  
-      fetchImagensGaleria();
-  
+  fetchImagensGaleria();
 }, [selectedEvento]);
-
 
 const [optionsOpenMarcar, setOptionsOpenMarcar] = useState(null);
 
@@ -1266,19 +1289,14 @@ useEffect(() => {
 }, [denuncias]);
 
 
+
 return (
   <div className="publicacoes-div_princ"> 
     {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de albuns deste Centro</h1>}
     {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView &&(
       <div className="publicacoes-button-container">
         <div className="left-buttons">
-        {/* <div className='topicSelector'>
-            <TopicSelector
-              topics={topicos}
-              selectedTopic={topico}
-              onChange={(value) => setTopico(value)}
-            />
-            </div> */}
+        {}
           <CreateEventoButton
             onClick={() => handleButtonClick('all')}
             iconSrc="https://i.ibb.co/P4nsk4w/Icon-criar.png"
@@ -1374,21 +1392,21 @@ return (
       </button>
       
       
-    </div>
-    <div className="tab-content">
-    {activeTab === 'descricao' && (
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-  <label>Área do Local</label>
-  <select value={area} onChange={(e) => setArea(e.target.value)}>
-  <option value="">Selecionar área</option>
-  {areas.map((areaOption) => (
-    <option key={areaOption.id} value={areaOption.id}>
-      {areaOption.nome}
-    </option>
-  ))}
-</select>
-</div>
+          </div>
+          <div className="tab-content">
+          {activeTab === 'descricao' && (
+                <form onSubmit={handleSubmit}>
+                  <div className="form-group">
+        <label>Área do Local</label>
+        <select value={area} onChange={(e) => setArea(e.target.value)}>
+        <option value="">Selecionar área</option>
+        {areas.map((areaOption) => (
+          <option key={areaOption.id} value={areaOption.id}>
+            {areaOption.nome}
+          </option>
+        ))}
+      </select>
+      </div>
             <div className="form-group">
             <label>Tópico do Local</label>
               <select value={topico} onChange={(e) => setTopico(e.target.value)}>
@@ -1413,22 +1431,6 @@ return (
   </select>
 </div>
 
-<div className="form-group">
-  <label>Data de Início da Atividade</label>
-  <input 
-    type="datetime-local" 
-    value={dataInicioAtividade} 
-    onChange={(e) => setDataInicioAtividade(e.target.value)} 
-  />
-</div>
-<div className="form-group">
-  <label>Data de Fim da Atividade</label>
-  <input 
-    type="datetime-local" 
-    value={dataFimAtividade} 
-    onChange={(e) => setDataFimAtividade(e.target.value)} 
-  />
-</div>
 
 <div className="form-group">
   <label>Descrição do Evento</label>
@@ -1443,8 +1445,6 @@ return (
     ))}
   </select>
 </div>
-
-
             <div className="form-buttons">
               <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
               <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
@@ -1479,12 +1479,6 @@ return (
     </div>
   </div>
 )}
-
-
-
-
-
-
 
         {activeTab === 'localizacao' && (
           <div className="tab-content_localizacao">
@@ -1536,13 +1530,13 @@ return (
   {showDetailView && selectedEvento && (
     <div className="publicacoes_div_princ">
       {selectedEvento && console.log('selectedEvento:', selectedEvento)}
-      <h1 className="publicacoes-title2">Informações do evento</h1>
+      <h1 className="publicacoes-title2">Informações do álbum</h1>
       <div className="header">
         <h1 className="header-title">{selectedEvento.nome}</h1>
         <div className="author">
           <div className="authorName"><span>Autor :</span></div>
-          <img src={selectedEvento.user.caminho_foto} alt={selectedEvento.user.nome} className="author-icon" />
-          <span>{selectedEvento.user.nome} {selectedEvento.user.sobrenome}</span>
+          <img src={selectedEvento.autor.caminho_foto} alt={selectedEvento.autor.nome} className="author-icon" />
+          <span>{selectedEvento.autor.nome} {selectedEvento.autor.sobrenome}</span>
       
         </div>
 
@@ -1864,9 +1858,6 @@ return (
 
 
 
-
-
-
 {showApprovalView && eventoDetail && (
   <div className="publicacoes_div_princ">
      {console.log('eventoDetail:', eventoDetail)}
@@ -1955,10 +1946,6 @@ return (
 )}
 
 
-
-
- 
-  
 
     <div className="form-buttons">
     <button className="reject-button" onClick={handleRejectClick}>
@@ -2215,9 +2202,9 @@ return (
 
 
 {showCreateForm && (
-      <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Criar Evento</h1>
+      <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Criar Álbum</h1>
         <div className="header">
-          <h1 className="header-title">Nome do evento</h1>
+          <h1 className="header-title">Nome do álbum</h1>
           <div className="author">
           <div className="authorName"><span>Autor :</span></div>
           <img src={user.caminho_foto} alt="Eu" className="author-icon" />
@@ -2231,221 +2218,38 @@ return (
           >
             <i className="fas fa-info-circle tab-icon"></i> Descrição
           </button>
-          <button
-            className={`tab ${activeTab === 'galeria' ? 'active' : ''}`}
-            onClick={() => handleTabClick('galeria')}
-          >
-            <i className="fas fa-images tab-icon"></i> Galeria
-          </button>
-          <button
-            className={`tab ${activeTab === 'horario' ? 'active' : ''}`}
-            onClick={() => handleTabClick('horario')}
-          >
-            <i className="fas fa-clock tab-icon"></i> Horário
-          </button>
-          <button
-            className={`tab ${activeTab === 'localizacao' ? 'active' : ''}`}
-            onClick={() => handleTabClick('localizacao')}
-          >
-            <i className="fas fa-map-marker-alt tab-icon"></i> Localização
-          </button>
-          <button
-            className={`tab ${activeTab === 'comentarios' ? 'active' : ''}`}
-            onClick={() => handleTabClick('comentarios')}
-          >
-            <i className="fas fa-comment tab-icon"></i> Comentários
-          </button>
-          <button
-            className={`tab ${activeTab === 'mais_informacoes' ? 'active' : ''}`}
-            onClick={() => handleTabClick('mais_informacoes')}
-          >
-            <i className="fas fa-info tab-icon"></i> Formulário de Inscrição
-          </button>
+          
          </div>
           <div className="tab-content">
                 {activeTab === 'descricao' && (
           <form onSubmit={handleSubmit}>
           <div className="form-group">
-              <label>Área do Evento</label>
-              <input type="text" value="Desporto" readOnly />
-            </div>
-            <div className="form-group">
-            <label>Tópico do Evento</label>
-            <select value={topico} onChange={(e) => setTopico(e.target.value)}>
-              <option value="">selecionar tópico</option>
-              {topicos.map((topico) => (
-                <option key={topico.id} value={topico.id}>{topico.nome}</option>
-              ))}
-            </select>
-          </div>
+          <label>Área do Local</label>
+  <select value={area} onChange={(e) => setArea(e.target.value)}>
+  <option value="">Selecionar área</option>
+  {areas.map((areaOption) => (
+    <option key={areaOption.id} value={areaOption.id}>
+      {areaOption.nome}
+    </option>
+  ))}
+</select>
+</div>
 
             <div className="form-group">
-            <label>Nome do Evento</label>
+            <label>Nome do Álbum</label>
             <input type="text" placeholder="inserir nome do local" value={nome} onChange={(e) => setNome(e.target.value)} />
             </div>
             <div className="form-group">
-            <label>Descrição do Evento</label>
+            <label>Descrição do Álbum</label>
             <input type="text" placeholder="inserir uma breve descrição do local" value={descricao} onChange={(e) => setDescricao(e.target.value)}/>
             </div>
            <div className="form-buttons">
             <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-            <button type="button" className="submit-button" onClick={handleContinue} >Continuar</button>
+            <button type="button" className="submit-button" onClick={handleSubmit} >Continuar</button>
           </div>
         </form>
       )}
 
-{activeTab === 'galeria' && (
-<div className="tab-content_galeria">
-  <h2>Galeria do Evento</h2>
-  <div {...getRootProps({ className: 'dropzone' })} className="gallery-upload">
-    <input {...getInputProps()} />
-    <div className="upload-box">
-      <span className="upload-icon">+</span>
-      <span className="upload-text">Upload</span>
-    </div>
-    <p className="gallery-info">
-      <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do evento
-    </p>
-  </div>
-  <div className="uploaded-images">
-    {galeria.map((file, index) => (
-      <div key={index} className="image-preview">
-        <img src={file.preview} alt={`preview ${index}`} />
-        <button className="remove-image" onClick={() => handleRemoveImage(index)}>x</button>
-      </div>
-    ))}
-  </div>
-  <div className="form-buttons">
-    <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-    <button type="button" className="submit-button" onClick={handleContinue}>Continuar</button>
-  </div>
-</div>
-)}
-
-{activeTab === 'horario' && (
-<div>
-  <h2>Horário do evento</h2>
-  {Object.keys(horario).map((dia) => (
-    <div key={dia} className="form-group_horario">
-      <label>{dia}</label>
-      <div className="horario-inputs">
-        <input
-          type="text"
-          placeholder="HH:mm"
-          value={horario[dia].inicio}
-          disabled={horario[dia].fechado}
-          onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], inicio: e.target.value } })}
-        />
-        <input
-          type="text"
-          placeholder="dd/mm/aaaa"
-          value={horario[dia].fim}
-          disabled={horario[dia].fechado}
-          onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], fim: e.target.value } })}
-        />
-        <label>
-          <input
-            type="checkbox"
-            checked={horario[dia].fechado}
-            onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], fechado: e.target.checked, inicio: '', fim: '' } })}
-          />
-        </label>
-      </div>
-    </div>
-  ))}
-  <div className="form-buttons">
-    <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-    <button type="button" className="submit-button" onClick={handleContinue}>Continuar</button>
-  </div>
-</div>
-)}
-
-      {activeTab === 'localizacao' && (
-        <div className="tab-content_localizacao">
-          <h2>Localização do evento</h2>
-          <div className="localizacao-content">
-            <div className="form-group">
-              <label>Endereço do evento:</label>
-              <input
-                type="text"
-                placeholder="inserir local"
-                value={localizacao}
-                onChange={(e) => setLocalizacao(e.target.value)}
-              />
-            </div>
-            <div className="map-placeholder">
-              <LoadScript googleMapsApiKey={API_KEY}>
-                <GoogleMap
-                  mapContainerStyle={containerStyle}
-                  center={center}
-                  zoom={10}
-                >
-                  <Marker position={center} />
-                </GoogleMap>
-              </LoadScript>
-            </div>
-          </div>
-          <div className="form-buttons">
-            <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-            <button type="button" className="submit-button" onClick={handleContinue} >Continuar</button>
-          </div>
-        </div>
-      )}
-
-
-      {activeTab === 'comentarios' && (
-        <div className="tab-content_comentarios">
-          <div className="comentarios-content">
-          <i class="fas fa-comment-slash"></i>
-          <p>Ainda sem comentários</p>
-          </div>
-          <div className="form-buttons">
-            <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-            <button type="button" className="submit-button" onClick={handleContinue}>Continuar</button>
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'mais_informacoes' && (
-        <div className="tab-content_mais_informacoes">
-          <form>
-          <div>
-      <label htmlFor="firstName" class="firstName">Primeiro Nome</label>
-      <input
-        type="text"
-        id="firstName"
-        value={firstName}
-        onChange={handleChange}
-        placeholder="...inserir primeiro nome..."
-        size="60"
-      />
-      <button onClick={handleClear} class="button_comment">✏️
-      </button>
-      <button onClick={handleClear} class="button_comment">🗑️
-      </button>
-    </div>
-    <button onClick={handleApproveClick} class="adicionar_botao"> <span className="plus-sign">+</span>  Adicionar Campo
-      
-    </button>
-            <div className="form-buttons">
-              <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-              <button type="submit" className="submit-button_maisinfos" onClick={handleSubmit}>Publicar</button>
-            </div>
-          </form>
-        </div>
-      )}
-
-
-{showFormModal && (
-        <>
-          <div className="modal-backdrop"></div>
-          <div className="modal-content">
-            <h2>Adicionar Novo Campo</h2>
-          
-           
-          </div>
-        </>
-      )}
       
 
 
@@ -2476,97 +2280,36 @@ return (
             </tr>
           </thead>
           <tbody>
-       {filteredalbuns.map((albuns, index) => {
-  
-  console.log('albuns filtrados:', filteredalbuns);
-
-    return (
-      <tr key={albuns.id}>
+  {albuns.length > 0 ? (
+    albuns.map((album, index) => (
+      <tr key={album.id}>
         <td>{index + 1}</td>
-        <td>{albuns.nome}</td>
-        <td>{formatarData(albuns.createdAt)}</td>
+        <td>{album.nome}</td>
+        <td>{formatarData(album.createdAt)}</td>
         <td>
-          <span className={`publications-status ${albuns.estado.toLowerCase().replace(' ', '-')}`}>
-            {albuns.estado}
+          <span className={`publications-status ${album.estado ? album.estado.toLowerCase().replace(' ', '-') : ''}`}>
+            {album.estado || 'Sem estado'}
           </span>
         </td>
         <td>
           <div className="edit-buttons-container">
-            <button className="edit-btn" onClick={() => handleViewDetailsClick(albuns)}>i</button>
-            <button 
-              className="publications-edit-btn" 
-              onClick={() => handleHideClick(albuns)}>
-              <i className={`fas ${albuns.visivel ? 'fa-eye' : 'fa-eye-slash'}`}></i>
+            <button className="edit-btn" onClick={() => handleViewDetailsClick(album)}>i</button>
+            <button className="publications-edit-btn" onClick={() => handleHideClick(album)}>
+              <i className={`fas ${album.visivel ? 'fa-eye' : 'fa-eye-slash'}`}></i>
             </button>
-            <button className="publications-edit-btn"onClick={() => handleEditClick(albuns)}>✏️</button>
-            <button className="publications-edit-btn" onClick={() => handleDeleteClick(albuns)}>🗑️</button>
-            {albuns.estado === 'Por validar' && (
-              <button className="publications-edit-btn" onClick={() => handlePendingViewClick(albuns)}>
-                <img src="https://i.ibb.co/9T565FK/Captura-de-ecr-2024-07-04-123100-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-123100-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
-              </button>
-            )}
-            {albuns.estado === 'Denunciada' && (
-              <button className="publications-edit-btn" onClick={() => handleReportedViewClick(albuns)}>
-                <img src="https://i.ibb.co/Cwhk8dN/Captura-de-ecr-2024-07-04-115321-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-115321-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
-              </button>
-            )}
+            <button className="publications-edit-btn" onClick={() => handleEditClick(album)}>✏️</button>
+            <button className="publications-edit-btn" onClick={() => handleDeleteClick(album)}>🗑️</button>
           </div>
-          {showDeleteModal && (
-            <div className="modal">
-              <div className="modal-icon">❌</div>
-              <div className="modal-header">Eliminar Publicação?</div>
-              <div className="modal-body">
-                O user que criou esta publicação irá ser notificado sobre a sua ação!
-              </div>
-              <div className="modal-buttons">
-                <button className="delete-button" onClick={handleConfirmDelete}>Eliminar</button>
-                <button className="cancel-button_delete" onClick={handleCancelDelete}>Cancelar</button>
-              </div>
-            </div>
-          )}
-          {showHideModal && (
-            <div className="modal_hide">
-              <div className="modal-icon_hide">👁️</div>
-              <div className="modal-header_hide">Ocultar Publicação</div>
-              <div className="modal-body_hide">
-                <p>Ao ocultar Publicação, este irá ser oculto aos utilizadores mas não será eliminado.</p>
-                <p>Insira abaixo o motivo por qual removeu o comentário deste utilizador, o qual vai ser notificado da sua ação.</p>
-                <textarea
-                  className="large-textareaAlert"
-                  placeholder="...motivo de remoção..."
-                  value={removalReason}
-                  onChange={(e) => setRemovalReason(e.target.value)}
-                  maxLength="240"
-                />
-                <div className="character-count">{removalReason.length}/240</div>
-              </div>
-              <div className="modal-buttons">
-                <button className="cancel-button_hide" onClick={handleCancelHide}>Cancelar</button>
-                <button className="hide-button" onClick={handleConfirmHide}>Ocultar</button>
-              </div>
-            </div>
-          )}
-          {showSuccessMessageHide && <div className="modal-backdrop"></div>}
-          {showSuccessMessageHide && (
-            <div className="success-message_delete">
-              <div className="success-message-icon"></div>
-              <h1>Ação aplicada com sucesso!</h1>
-              <button onClick={() => setShowSuccessMessageHide(false)}>Continuar</button>
-            </div>
-          )}
-          {showSuccessMessageDelete && <div className="modal-backdrop"></div>}
-          {showSuccessMessageDelete && (
-            <div className="success-message_delete">
-              <div className="success-message-icon"></div>
-              <h1>Ação aplicada com sucesso!</h1>
-              <button onClick={() => setShowSuccessMessageDelete(false)}>Continuar</button>
-            </div>
-          )}
         </td>
       </tr>
-    );
-  })}
+    ))
+  ) : (
+    <tr>
+      <td colSpan="5">Nenhum álbum encontrado</td>
+    </tr>
+  )}
 </tbody>
+
 
           </table>
         </div>
