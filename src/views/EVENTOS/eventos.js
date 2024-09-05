@@ -12,6 +12,7 @@ import 'moment/locale/pt'; // Importar o locale português
 import Modal from 'react-modal';
 import { useParams } from 'react-router-dom';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { useRef } from 'react';
 
 
 moment.locale('pt'); // Definir o locale para português
@@ -103,7 +104,7 @@ useEffect(() => {
 }, [comentarios, showAllComentarios]);
 
 const [loading, setLoading] = useState(false);
-
+const [showAction, setShowAction] = useState(false);
 const [isOpen, setIsOpen] = useState(false); 
 // Form states
 const [nome, setNome] = useState('');
@@ -186,19 +187,23 @@ useEffect(() => {
 }, [centroId]);
 
 
+const ellipsisRef = useRef(null); // Criar uma ref
+
 const handleViewDetailsClick = (evento) => {
-  if(evento.centro_id == parseInt(centroId)) {
+  if (evento.centro_id == parseInt(centroId)) {
     setshowDeleteMessage(true);
     setTimeout(() => {
-      document.getElementById('ellipsis-da-denuncia').style.display = 'block';
+      if (ellipsisRef.current) {
+        ellipsisRef.current.style.display = 'block'; // Usando ref ao invés de getElementById
+      }
     }, 500);
-    
   } else {
     setshowDeleteMessage(false);
     setTimeout(() => {
-      document.getElementById('ellipsis-da-denuncia').style.display = 'none';
+      if (ellipsisRef.current) {
+        ellipsisRef.current.style.display = 'none'; // Usando ref ao invés de getElementById
+      }
     }, 500);
-    
   }
   setSelectedEvento(evento);
   setShowDetailView(true);
@@ -227,6 +232,11 @@ const handlePendingViewClick = (evento) => {
 };
 
 const handleReportedViewClick = (evento) => {
+  if(evento.centro_id === parseInt(centroId)) {
+    setShowAction(true);
+  } else {
+    setShowAction(false);
+  }
   setEventoDetailDenunciada(evento);
   setShowDetailViewDenunciada(true);
 };
@@ -352,52 +362,47 @@ const handleCreateForm = () => {
 
 const handleSubmit = async (e) => {
   e.preventDefault();
-  
-  // console.log('Iniciando handleSubmit'); // Log para verificar se a função está sendo chamada
 
-  // Formatando o horário para o formato desejado
-  const formattedHorario = {};
-  for (const [dia, { inicio, fim, fechado }] of Object.entries(horario)) {
-      if (fechado) {
-          formattedHorario[dia] = 'Fechado';
-      } else {
-          formattedHorario[dia] = `${inicio}-${fim}`;
-      }
-  }
+  // Combine data e hora para datainicioatividade e datafimatividade
+  const datainicioatividade = new Date(`${horario.Inicio.inicioData}T${horario.Inicio.InicioHora}`).toISOString();
+  const datafimatividade = new Date(`${horario.Fim.fimData}T${horario.Fim.FimHora}`).toISOString();
+
+  // Enviar apenas a primeira imagem como capa
+  const capaImagemEvento = galeria.length > 0 ? galeria[0].url : ''; // Se não houver imagem, envia uma string vazia
 
   const eventoData = {
-      topico_id: topico,
-      nome,
-      descricao,
-      horario: formattedHorario,
-      localizacao,
-      paginaweb,
-      telemovel,
-      email,
-      galeria: galeria.map((img) => img.url), // Envia apenas as URLs das imagens
-      centro_id: centroId,
-      autor_id: sessionStorage.getItem('user_id') 
-  };
-  
-  // console.log('Dados da Publicação:', eventoData); // Log dos dados que serão enviados
+    topico_id: topico,
+    nome,
+    descricao,
+    datainicioatividade,  // Data e hora de início formatada
+    datafimatividade,     // Data e hora de fim formatada
+    estado: 'Ativa',  // Defina o estado do evento
+    centro_id: centroId,  // Certifique-se de que este valor é válido
+    autor_id: sessionStorage.getItem('user_id'),  // ID do autor
+    capa_imagem_evento: galeria.length > 0 ? galeria[0].url : null,  // Se não houver imagem, envie `null`
+    latitude: latitude || null,  // Use `null` se a latitude estiver indefinida
+    longitude: longitude || null,  // Use `null` se a longitude estiver indefinida
+    area_id: area || null,  // Certifique-se de que o `area_id` é um número ou `null`
+    tipodeevento_id: 1  // Certifique-se de que o `tipodeevento_id` é um número ou `null`
+};
+
+
+  console.log('Dados do Evento:', eventoData);  // Verifica os dados no console
 
   try {
-      const response = await axios.post('http://localhost:3000/eventos/create', eventoData, {
+      const response = await axios.post('https://backend-teste-q43r.onrender.com/eventos/create', eventoData, {
           headers: {
               'Content-Type': 'application/json',
           },
       });
 
-      // console.log('Resposta do Backend:', response); // Log da resposta do backend
-
-      if (response.status === 201) { // Ajuste o código de status para 201 Created
-          setShowSuccessMessage(true); // Mostrar modal de sucesso
+      if (response.status === 201) {  // Verifica se a criação foi bem-sucedida
+          setShowSuccessMessage(true);  // Mostra a mensagem de sucesso
       } else {
-          console.error('Erro na resposta do Backend:', response); // Log de erro caso a resposta não seja 201
-          // Lógica de erro
+          console.error('Erro na resposta do Backend:', response);
       }
   } catch (error) {
-      console.error('Erro ao criar evento:', error); // Log do erro
+      console.error('Erro ao criar evento:', error);
   }
 };
 
@@ -1284,7 +1289,7 @@ useEffect(() => {
 
 return (
   <div className="publicacoes-div_princ"> 
-    {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de Eventos deste Centro</h1>}
+    {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de Eventos</h1>}
     {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView &&(
       <div className="publicacoes-button-container">
         <div className="left-buttons">
@@ -1789,7 +1794,7 @@ return (
           </div>
           <div className="comentario-options">
         
-          <div className="options-button" id="ellipsis-da-denuncia" onClick={() => toggleOptionsEvento(comentario.id)}>
+          <div className="options-button" id="ellipsis-da-denuncia" ref={ellipsisRef} onClick={() => toggleOptionsEvento(comentario.id)}>
             <i className="fas fa-ellipsis-v"></i>
           </div>
         {optionsOpen === comentario.id && showDeleteMessage && (
@@ -2074,6 +2079,7 @@ return (
             </>
           )}
         </div> </div>
+        {showAction  && (
         <div className="denuncia-actions">
                 {!denuncia.resolvida && (
                   <div className="options-button" onClick={() => toggleOptionsMarcar(denuncia.id)}>
@@ -2089,8 +2095,9 @@ return (
 )}
                 {denuncia.resolvida && (
                   <span className="denuncia-resolvida">Denúncia Resolvida</span>
+                
                 )}
-              </div>
+              </div>)}
             </div>
       <div className="denuncia-conteudo">
         <p><strong>Motivo:</strong> {denuncia.motivo_denuncia}</p>
@@ -2227,10 +2234,10 @@ return (
         <div className="header">
           <h1 className="header-title">Nome do evento</h1>
           <div className="author">
-          <div className="authorName"><span>Autor :</span></div>
-          <img src={user.caminho_foto} alt="Eu" className="author-icon" />
-  <span>{user.nome} {user.sobrenome}</span> 
-</div>
+            <div className="authorName"><span>Autor :</span></div>
+            <img src={user.caminho_foto} alt="Eu" className="author-icon" />
+            <span>{user.nome} {user.sobrenome}</span>
+          </div>
         </div>
         <div className="tabs">
           <button
@@ -2257,223 +2264,224 @@ return (
           >
             <i className="fas fa-map-marker-alt tab-icon"></i> Localização
           </button>
-          <button
-            className={`tab ${activeTab === 'comentarios' ? 'active' : ''}`}
-            onClick={() => handleTabClick('comentarios')}
-          >
-            <i className="fas fa-comment tab-icon"></i> Comentários
-          </button>
-          <button
-            className={`tab ${activeTab === 'mais_informacoes' ? 'active' : ''}`}
-            onClick={() => handleTabClick('mais_informacoes')}
-          >
-            <i className="fas fa-info tab-icon"></i> Formulário de Inscrição
-          </button>
-         </div>
-          <div className="tab-content">
-                {activeTab === 'descricao' && (
-          <form onSubmit={handleSubmit}>
-          <div className="form-group">
-              <label>Área do Local</label>
-  <select value={area} onChange={(e) => setArea(e.target.value)}>
-  <option value="">Selecionar área</option>
-  {areas.map((areaOption) => (
-    <option key={areaOption.id} value={areaOption.id}>
-      {areaOption.nome}
-    </option>
-  ))}
-</select>
-</div>
-            
-            <div className="form-group">
-            <label>Tópico do Evento</label>
-            <select value={topico} onChange={(e) => setTopico(e.target.value)}>
-              <option value="">selecionar tópico</option>
-              {topicos.map((topico) => (
-                <option key={topico.id} value={topico.id}>{topico.nome}</option>
+        </div>
+        <div className="tab-content">
+          {activeTab === 'descricao' && (
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>Área do Evento</label>
+                <select value={area} onChange={(e) => setArea(e.target.value)}>
+                  <option value="">Selecionar área</option>
+                  {areas.map((areaOption) => (
+                    <option key={areaOption.id} value={areaOption.id}>
+                      {areaOption.nome}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Tópico do Evento</label>
+                <select value={topico} onChange={(e) => setTopico(e.target.value)}>
+                  <option value="">Selecionar tópico</option>
+                  {topicos.map((topico) => (
+                    <option key={topico.id} value={topico.id}>
+                      {topico.nome}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Nome do Evento</label>
+                <input type="text" placeholder="inserir nome do local" value={nome} onChange={(e) => setNome(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label>Descrição do Evento</label>
+                <input type="text" placeholder="inserir uma breve descrição do local" value={descricao} onChange={(e) => setDescricao(e.target.value)} />
+              </div>
+              <div className="form-buttons">
+                <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
+                <button type="button" className="submit-button" onClick={handleContinue} >Continuar</button>
+              </div>
+            </form>
+          )}
+
+          {activeTab === 'galeria' && (
+            <div className="tab-content_galeria">
+              <h2>Galeria do Evento</h2>
+              <div {...getRootProps({ className: 'dropzone' })} className="gallery-upload">
+                <input {...getInputProps()} />
+                <div className="upload-box">
+                  <span className="upload-icon">+</span>
+                  <span className="upload-text">Upload</span>
+                </div>
+                <p className="gallery-info">
+                  <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do evento
+                </p>
+              </div>
+              <div className="uploaded-images">
+                {galeria.map((file, index) => (
+                  <div key={index} className="image-preview">
+                    <img src={file.preview} alt={`preview ${index}`} />
+                    <button className="remove-image" onClick={() => handleRemoveImage(index)}>x</button>
+                  </div>
+                ))}
+              </div>
+              <div className="form-buttons">
+                <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
+                <button type="button" className="submit-button" onClick={handleContinue}>Continuar</button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'horario' && (
+            <div>
+              <h2>Horário do evento</h2>
+              {Object.keys(horario).map((dia) => (
+                <div key={dia} className="form-group_horario">
+                  <label>{dia}</label>
+                  <div className="horario-inputs">
+                  <input
+  type="time"
+  value={horario.Inicio.InicioHora}
+  onChange={(e) => setHorario({ ...horario, Inicio: { ...horario.Inicio, InicioHora: e.target.value } })}
+/>
+
+<input
+  type="date"
+  value={horario.Inicio.inicioData}
+  onChange={(e) => setHorario({ ...horario, Inicio: { ...horario.Inicio, inicioData: e.target.value } })}
+/>
+
+<input
+  type="time"
+  value={horario.Fim.FimHora}
+  onChange={(e) => setHorario({ ...horario, Fim: { ...horario.Fim, FimHora: e.target.value } })}
+/>
+
+<input
+  type="date"
+  value={horario.Fim.fimData}
+  onChange={(e) => setHorario({ ...horario, Fim: { ...horario.Fim, fimData: e.target.value } })}
+/>
+
+                  </div>
+                </div>
               ))}
-            </select>
-          </div>
-
-            <div className="form-group">
-            <label>Nome do Evento</label>
-            <input type="text" placeholder="inserir nome do local" value={nome} onChange={(e) => setNome(e.target.value)} />
+              <div className="form-buttons">
+                <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
+                <button type="button" className="submit-button" onClick={handleContinue}>Continuar</button>
+              </div>
             </div>
-            <div className="form-group">
-            <label>Descrição do Evento</label>
-            <input type="text" placeholder="inserir uma breve descrição do local" value={descricao} onChange={(e) => setDescricao(e.target.value)}/>
+          )}
+
+          {activeTab === 'localizacao' && (
+            <div className="tab-content_localizacao">
+              <h2>Localização do evento</h2>
+              <div className="localizacao-content">
+                <div className="form-group">
+                  <label>Latitude</label>
+                  <input
+                    type="text"
+                    placeholder="inserir local"
+                    value={latitude}
+                    onChange={(e) => setLatitude(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Longitude:</label>
+                  <input
+                    type="text"
+                    placeholder="inserir local"
+                    value={longitude}
+                    onChange={(e) => setLongitude(e.target.value)}
+                  />
+                </div>
+                <div className="map-placeholder">
+                  <LoadScript googleMapsApiKey={API_KEY}>
+                    <GoogleMap
+                      mapContainerStyle={containerStyle}
+                      center={center}
+                      zoom={10}
+                    >
+                      <Marker position={center} />
+                    </GoogleMap>
+                  </LoadScript>
+                </div>
+              </div>
+              <div className="form-buttons">
+                <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
+                <button type="button" className="submit-button" onClick={handleSubmit} >Publicar</button>
+              </div>
             </div>
-           <div className="form-buttons">
-            <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-            <button type="button" className="submit-button" onClick={handleContinue} >Continuar</button>
-          </div>
-        </form>
-      )}
+          )}
 
-{activeTab === 'galeria' && (
-<div className="tab-content_galeria">
-  <h2>Galeria do Evento</h2>
-  <div {...getRootProps({ className: 'dropzone' })} className="gallery-upload">
-    <input {...getInputProps()} />
-    <div className="upload-box">
-      <span className="upload-icon">+</span>
-      <span className="upload-text">Upload</span>
-    </div>
-    <p className="gallery-info">
-      <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do evento
-    </p>
-  </div>
-  <div className="uploaded-images">
-    {galeria.map((file, index) => (
-      <div key={index} className="image-preview">
-        <img src={file.preview} alt={`preview ${index}`} />
-        <button className="remove-image" onClick={() => handleRemoveImage(index)}>x</button>
-      </div>
-    ))}
-  </div>
-  <div className="form-buttons">
-    <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-    <button type="button" className="submit-button" onClick={handleContinue}>Continuar</button>
-  </div>
-</div>
-)}
+          {/*
+            {activeTab === 'comentarios' && (
+              <div className="tab-content_comentarios">
+                <div className="comentarios-content">
+                  <i class="fas fa-comment-slash"></i>
+                  <p>Ainda sem comentários</p>
+                </div>
+                <div className="form-buttons">
+                  <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
+                  <button type="button" className="submit-button" onClick={handleSubmit}>Publicar</button>
+                </div>
+              </div>
+            )}
 
-{activeTab === 'horario' && (
-<div>
-  <h2>Horário do evento</h2>
-  {Object.keys(horario).map((dia) => (
-    <div key={dia} className="form-group_horario">
-      <label>{dia}</label>
-      <div className="horario-inputs">
-        <input
-          type="text"
-          placeholder="HH:mm"
-          value={horario[dia].inicio}
-          disabled={horario[dia].fechado}
-          onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], inicio: e.target.value } })}
-        />
-        <input
-          type="text"
-          placeholder="dd/mm/aaaa"
-          value={horario[dia].fim}
-          disabled={horario[dia].fechado}
-          onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], fim: e.target.value } })}
-        />
-        <label>
-          <input
-            type="checkbox"
-            checked={horario[dia].fechado}
-            onChange={(e) => setHorario({ ...horario, [dia]: { ...horario[dia], fechado: e.target.checked, inicio: '', fim: '' } })}
-          />
-        </label>
-      </div>
-    </div>
-  ))}
-  <div className="form-buttons">
-    <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-    <button type="button" className="submit-button" onClick={handleContinue}>Continuar</button>
-  </div>
-</div>
-)}
+            {activeTab === 'mais_informacoes' && (
+              <div className="tab-content_mais_informacoes">
+                <form>
+                  <div>
+                    <label htmlFor="firstName" class="firstName">Primeiro Nome</label>
+                    <input
+                      type="text"
+                      id="firstName"
+                      value={firstName}
+                      onChange={handleChange}
+                      placeholder="...inserir primeiro nome..."
+                      size="60"
+                    />
+                    <button onClick={handleClear} class="button_comment">✏️
+                    </button>
+                    <button onClick={handleClear} class="button_comment">🗑️
+                    </button>
+                  </div>
+                  <button onClick={handleApproveClick} class="adicionar_botao"> <span className="plus-sign">+</span>  Adicionar Campo
 
-      {activeTab === 'localizacao' && (
-        <div className="tab-content_localizacao">
-          <h2>Localização do evento</h2>
-          <div className="localizacao-content">
-            <div className="form-group">
-              <label>Endereço do evento:</label>
-              <input
-                type="text"
-                placeholder="inserir local"
-                value={localizacao}
-                onChange={(e) => setLocalizacao(e.target.value)}
-              />
+                  </button>
+                  <div className="form-buttons">
+                    <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
+                    <button type="submit" className="submit-button_maisinfos" onClick={handleSubmit}>Publicar</button>
+                  </div>
+                </form>
+              </div>
+            )}*/}
+
+
+          {showFormModal && (
+            <>
+              <div className="modal-backdrop"></div>
+              <div className="modal-content">
+                <h2>Adicionar Novo Campo</h2>
+
+
+              </div>
+            </>
+          )}
+
+
+
+          {showSuccessMessage && <div className="modal-backdrop"></div>}
+          {showSuccessMessage && (
+            <div className="success-message_delete">
+              <div className="success-message-icon"></div>
+              <h1>Evento criado com sucesso!</h1>
+              <p>Como é o administrador do seu centro, não será necessário passar pelo processo de validação.</p>
+              <button onClick={() => setShowSuccessMessage(false)}>Continuar</button>
             </div>
-            <div className="map-placeholder">
-              <LoadScript googleMapsApiKey={API_KEY}>
-                <GoogleMap
-                  mapContainerStyle={containerStyle}
-                  center={center}
-                  zoom={10}
-                >
-                  <Marker position={center} />
-                </GoogleMap>
-              </LoadScript>
-            </div>
-          </div>
-          <div className="form-buttons">
-            <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-            <button type="button" className="submit-button" onClick={handleContinue} >Continuar</button>
-          </div>
-        </div>
-      )}
-
-
-      {activeTab === 'comentarios' && (
-        <div className="tab-content_comentarios">
-          <div className="comentarios-content">
-          <i class="fas fa-comment-slash"></i>
-          <p>Ainda sem comentários</p>
-          </div>
-          <div className="form-buttons">
-            <button type="button" className="cancel-button" onClick={handleCancel}>Cancelar</button>
-            <button type="button" className="submit-button" onClick={handleContinue}>Continuar</button>
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'mais_informacoes' && (
-        <div className="tab-content_mais_informacoes">
-          <form>
-          <div>
-      <label htmlFor="firstName" class="firstName">Primeiro Nome</label>
-      <input
-        type="text"
-        id="firstName"
-        value={firstName}
-        onChange={handleChange}
-        placeholder="...inserir primeiro nome..."
-        size="60"
-      />
-      <button onClick={handleClear} class="button_comment">✏️
-      </button>
-      <button onClick={handleClear} class="button_comment">🗑️
-      </button>
-    </div>
-    <button onClick={handleApproveClick} class="adicionar_botao"> <span className="plus-sign">+</span>  Adicionar Campo
-      
-    </button>
-            <div className="form-buttons">
-              <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
-              <button type="submit" className="submit-button_maisinfos" onClick={handleSubmit}>Publicar</button>
-            </div>
-          </form>
-        </div>
-      )}
-
-
-{showFormModal && (
-        <>
-          <div className="modal-backdrop"></div>
-          <div className="modal-content">
-            <h2>Adicionar Novo Campo</h2>
-          
-           
-          </div>
-        </>
-      )}
-      
-
-
-      {showSuccessMessage && <div className="modal-backdrop"></div>}
-        {showSuccessMessage && (
-          <div className="success-message_delete">
-            <div className="success-message-icon"></div>
-            <h1>Evento criado com sucesso!</h1>
-            <p>Como é o administrador do seu centro, não será necessário passar pelo processo de validação.</p>
-            <button onClick={() => setShowSuccessMessage(false)}>Continuar</button>
-          </div>
-        )}
+          )}
 
         </div>
       </div>

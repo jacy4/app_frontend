@@ -13,6 +13,7 @@ import 'moment/locale/pt'; // Importar o locale português
 import Modal from 'react-modal';
 import { useParams } from 'react-router-dom';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { useRef } from 'react';
 
 
 moment.locale('pt'); // Definir o locale para português
@@ -80,7 +81,7 @@ const ForumView = () => {
   });
 
   const [novaClassificacao, setNovaClassificacao] = useState(0);
-
+  const [showDeleteMessage, setshowDeleteMessage] = useState(false);
   const [imagensGaleria, setImagensGaleria] = useState([]);
   const [denunciasMensagensForum, setDenunciasMensagensForum] = useState([]);
 
@@ -201,10 +202,10 @@ const ForumView = () => {
   }, [centroId]);
 
 
-  const handleViewDetailsClick = (evento) => {
-    setselectedForum(evento);
-    setShowDetailView(true);
-  };
+  // const handleViewDetailsClick = (evento) => {
+  //   setselectedForum(evento);
+  //   setShowDetailView(true);
+  // };
 
   const handleReportedViewClickForum = (Forum) => {
     setForumDetailDenunciada(Forum);
@@ -1060,7 +1061,28 @@ const ForumView = () => {
   //   fetchParticipantes();
   // }, [selectedForum]);
 
+  const ellipsisRef = useRef(null); // Criar uma ref
 
+  const handleViewDetailsClick = (forum) => {
+    if (forum.centro_id == parseInt(centroId)) {
+      setshowDeleteMessage(true);
+      setTimeout(() => {
+        if (ellipsisRef.current) {
+          ellipsisRef.current.style.display = 'block'; // Usando ref ao invés de getElementById
+        }
+      }, 500);
+    } else {
+      setshowDeleteMessage(false);
+      setTimeout(() => {
+        if (ellipsisRef.current) {
+          ellipsisRef.current.style.display = 'none'; // Usando ref ao invés de getElementById
+        }
+      }, 500);
+    }
+    setselectedForum(forum);
+    setShowDetailView(true);
+  };
+  
 
 
   const adicionarParticipante = async (Forum_id, usuarioId) => {
@@ -1304,7 +1326,7 @@ const ForumView = () => {
 
   return (
     <div className="publicacoes-div_princ">
-      {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de forum deste Centro</h1>}
+      {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de Fóruns</h1>}
       {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && (
         <div className="publicacoes-button-container">
           <div className="left-buttons">
@@ -1342,7 +1364,7 @@ const ForumView = () => {
           <div className="search-wrapper">
             <input
               type="text"
-              placeholder="Procurar por Publicação..."
+              placeholder="Procurar por fórum..."
               value={searchTerm}
               onChange={handleSearchChange}
               className="search-input"
@@ -1544,10 +1566,10 @@ const ForumView = () => {
                       </div>
                     </div>
                     <div className="denuncia-actions">
-                      <div className="options-button" onClick={() => toggleOptionsForum(mensagem.id)}>
+                      <div className="options-button" id="ellipsis-da-denuncia" ref={ellipsisRef} onClick={() => toggleOptionsForum(mensagem.id)}>
                         <i className="fas fa-ellipsis-v"></i>
                       </div>
-                      {optionsOpen === mensagem.id && (
+                      {optionsOpen === mensagem.id && showDeleteMessage && (
                         <div className="options-menu">
                           <button onClick={() => handleDeleteMensagemForum(mensagem.id)}>
                             <i className="fas fa-trash-alt custom-delete-icon"></i> Excluir Mensagem

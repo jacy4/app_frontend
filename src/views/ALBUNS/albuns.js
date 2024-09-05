@@ -1292,7 +1292,7 @@ useEffect(() => {
 
 return (
   <div className="publicacoes-div_princ"> 
-    {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de albuns deste Centro</h1>}
+    {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de álbuns</h1>}
     {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView &&(
       <div className="publicacoes-button-container">
         <div className="left-buttons">

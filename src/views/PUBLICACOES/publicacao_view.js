@@ -9,6 +9,8 @@ import { useParams } from 'react-router-dom';
 import 'moment/locale/pt'; // Importar o locale português
 import { useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
+import { useRef } from 'react';
+
 
 
 
@@ -87,7 +89,7 @@ const [longitude, setLongitude] = useState(null);
 useEffect(() => {
   setComentariosExibidos(showAllComentarios ? comentarios : comentarios.slice(0, 1));
 }, [comentarios, showAllComentarios]);
-
+const [showDeleteMessage, setshowDeleteMessage] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false); 
   // Form states
@@ -142,7 +144,7 @@ useEffect(() => {
       }
       // console.log(`Buscando publicações para centroId: ${centroId}`);
       try {
-        const response = await axios.get(`http://localhost:3000/publicacoes/listarPublicacoes`);
+        const response = await axios.get(`http://localhost:3000/publicacoes/listarPublicacoes/${areaId}`);
         if (response.data && Array.isArray(response.data)) {
           // console.log(response.data);
           setPublicacoes(response.data);
@@ -158,10 +160,34 @@ useEffect(() => {
     buscarPublicacoes();
   }, [centroId]);
 
+  // const handleViewDetailsClick = (publication) => {
+    
+  //   setSelectedPublication(publication);
+  //   setShowDetailView(true);
+  // };
+  
+const ellipsisRef = useRef(null); // Criar uma ref
+
   const handleViewDetailsClick = (publication) => {
+    if (publication.centro_id == parseInt(centroId)) {
+      setshowDeleteMessage(true);
+      setTimeout(() => {
+        if (ellipsisRef.current) {
+          ellipsisRef.current.style.display = 'block'; // Usando ref ao invés de getElementById
+        }
+      }, 500);
+    } else {
+      setshowDeleteMessage(false);
+      setTimeout(() => {
+        if (ellipsisRef.current) {
+          ellipsisRef.current.style.display = 'none'; // Usando ref ao invés de getElementById
+        }
+      }, 500);
+    }
     setSelectedPublication(publication);
     setShowDetailView(true);
   };
+  
   
   
 
@@ -1041,7 +1067,7 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
 
   return (
     <div className="publicacoes-div_princ"> 
-      {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de Publicações deste Centro</h1>}
+      {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView && <h1 className="publicacoes-title2">Lista de Publicações</h1>}
       {!showCreateForm && !showEditForm && !showDetailViewDenunciada && !showApprovalView && !showDetailView &&(
         <div className="publicacoes-button-container">
           <div className="left-buttons">
@@ -1598,7 +1624,7 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
 </div>
 )} */}
 
-{selectedPublication && selectedPublication.estado === 'Ativa' && (
+{selectedPublication && (selectedPublication.estado === 'Ativa' || selectedPublication.estado === 'Denunciada') && (
 <div> 
   <button className="tab active"><i className="fas fa-comments tab-icon"></i> Comentários e Avaliações</button>
   <div className="comentarios-section">
@@ -1669,10 +1695,10 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
         )}
       </div>
       <div className="comentario-options-publicacao">
-  <div className="options-button" onClick={() => toggleOptionsPublicacao(comentario.id)}>
+  <div className="options-button" id="ellipsis-da-denuncia" ref={ellipsisRef} onClick={() => toggleOptionsPublicacao(comentario.id)}>
     <i className="fas fa-ellipsis-v"></i>
   </div>
-  {optionsOpenExcluir === comentario.id && (
+  {optionsOpenExcluir === comentario.id && showDeleteMessage && (
     <div className="options-menu">
       <button onClick={() => handleDeleteComentarioPublicacao(comentario.id)}>
         <i className="fas fa-trash-alt custom-delete-icon"></i> Excluir Comentário
