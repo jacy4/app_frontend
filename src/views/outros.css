@@ -1,0 +1,81 @@
+/* Aplica o estilo apenas a elementos dentro da classe .gerenciamento-areas-centros */
+.gerenciamento-areas-centros {
+    width: 85%;
+    margin-left: 15%;
+
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Define a altura da página para preencher 100% da tela */
+    padding: 20px;
+    background-color: #2f6aa6; /* Fundo azul semelhante ao da imagem */
+    color: #fff;
+    box-sizing: border-box;
+    overflow-y: auto; /* Permite rolagem vertical */
+  }
+  
+  /* Para garantir que o conteúdo dentro da lista se ajuste corretamente */
+  .gerenciamento-areas-centros ul {
+    list-style-type: none; /* Remove as bolinhas da lista */
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Estilo para cada item da lista */
+  .gerenciamento-areas-centros li {
+    background-color: #fff;
+    color: #000;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+  
+  /* Adiciona um efeito de hover nos itens da lista */
+  .gerenciamento-areas-centros li:hover {
+    transform: scale(1.02);
+  }
+  
+  /* Estilo para os parágrafos dentro dos itens da lista */
+  .gerenciamento-areas-centros li p {
+    margin: 5px 0;
+  }
+  
+  /* Estilo para as imagens */
+  .gerenciamento-areas-centros li img {
+    max-width: 100px;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 5px;
+  }
+  
+  /* Estilo para o botão de criar áreas/centros */
+  .gerenciamento-areas-centros button {
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+  
+  /* Estilo para inputs de texto e selects */
+  .gerenciamento-areas-centros input, 
+  .gerenciamento-areas-centros select {
+    padding: 10px;
+    border: 2px solid #0056b3;
+    border-radius: 5px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    width: 300px;
+    max-width: 100%;
+  }
+  
+  /* Permite que o conteúdo interno das divs possa ocupar o espaço necessário */
+  .gerenciamento-areas-centros div {
+    margin-bottom: 30px;
+    flex-shrink: 0; /* Garante que os elementos internos não encolham com o flex */
+  }
+  

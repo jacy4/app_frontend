@@ -38,7 +38,7 @@ const Navbar = () => {
         console.error('Erro ao buscar áreas:', error);
       }
     };
-  
+
     fetchAreas();
   }, []);
 
@@ -122,12 +122,12 @@ const Navbar = () => {
               <span>Português</span>
             </div>
             <div className="navbar-user">
-  {userPhoto && <img src={userPhoto} alt="User avatar" className="user-avatar" />}
-  <div className="user-info">
-    <span className="user-name">{`${userName} ${userSurname}`}</span>
-    <span className="user-role">Gestor</span>
-  </div>
-</div>
+              {userPhoto && <img src={userPhoto} alt="User avatar" className="user-avatar" />}
+              <div className="user-info">
+                <span className="user-name">{`${userName} ${userSurname}`}</span>
+                <span className="user-role">Gestor</span>
+              </div>
+            </div>
 
           </div>
         </div>
@@ -159,7 +159,7 @@ const Navbar = () => {
               <ul className="sub-menu">
                 {areas.map(area => (
                   <li id={area.createdAt} key={area.id} onClick={(e) => { e.stopPropagation(); toggleSubMenu(area.nome); }}>
-                    {area.nome} 
+                    {area.nome}
                     <span className={`fas fa-chevron-${subMenuOpen[area.nome] ? 'up' : 'down'}`}></span>
                     {subMenuOpen[area.nome] && (
                       <ul className="sub-menu">
@@ -192,7 +192,7 @@ const Navbar = () => {
                         </li>
                         <li>
                           <Link
-                            to={ `/criar_publicacao/${area.id}`}
+                            to={`/criar_publicacao/${area.id}`}
                             className={selectedMenu === 'Publicações' ? 'active' : ''}
                             onClick={() => handleMenuClick('Publicações', area.nome)}
                           >
@@ -225,10 +225,19 @@ const Navbar = () => {
               </ul>
             )}
           </li>
-          
+
         </ul>
         <div className="bottom-menu">
           <ul className="sidebar-menu">
+            <li>
+              <Link
+                to="/pagina_outros"
+                className={selectedMenu === 'Outros' ? 'active' : ''}
+                onClick={() => handleMenuClick('Outros')}
+              >
+                Outros
+              </Link>
+            </li>
             <li>
               <Link
                 to="/listar_users"

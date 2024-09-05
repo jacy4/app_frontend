@@ -17,7 +17,7 @@ import EventosView from './views/EVENTOS/eventos';
 import ForumView from './views/FORUNS/foruns';
 import GruposView from './views/GRUPOS/grupos';
 import axios from 'axios';
-
+import Outros from './views/outros';
 import './App.css'; 
 
 const TopicsPage = () => {
@@ -71,7 +71,7 @@ axios.interceptors.request.use(
                 <Route path="/pagina_eventos/:areaId" element={<EventosView />} />
                 <Route path="/pagina_foruns/:areaId" element={<ForumView />} />
                 <Route path="/pagina_grupos/:areaId" element={<GruposView />} />
-
+                <Route path="/pagina_outros" element={<Outros/>}/>
 
 
 
