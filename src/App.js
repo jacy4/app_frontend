@@ -11,7 +11,7 @@ import Desporto from './views/DESPORTO/desporto';
 import EditarDesporto from './views/DESPORTO/editar_desporto';    
 import AdicionarDesporto from './views/DESPORTO/adicionar_desporto';
 import DefinicoesView from './views/DEFENICOES/definicoes';
-import PartilhasView from './views/AlbumPartilha/AlbumPartilha';
+import AlbunsView from './views/ALBUNS/albuns';
 import CalendarioView from './views/CALENDARIO/calendario';
 import EventosView from './views/EVENTOS/eventos';
 import ForumView from './views/FORUNS/foruns';
@@ -66,7 +66,7 @@ axios.interceptors.request.use(
                 <Route path="/defenicoes" element={<DefinicoesView />} />
                 <Route path="/criar_publicacao/:areaId" element={<PublicacoesView />} />
                 <Route path="/pagina_inicial" element={<PaginaInicial />} />
-                <Route path="/pagina_partilhas/:areaId" element={<PartilhasView />} />
+                <Route path="/pagina_partilhas/:areaId" element={<AlbunsView />} />
                 <Route path="/pagina_calendario" element={<CalendarioView />} />
                 <Route path="/pagina_eventos/:areaId" element={<EventosView />} />
                 <Route path="/pagina_foruns/:areaId" element={<ForumView />} />

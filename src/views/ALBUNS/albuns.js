@@ -30,7 +30,7 @@ const AlbunsView = () => {
     const [removalReason, setRemovalReason] = useState('');
     const [showEditForm, setShowEditForm] = useState(false);
     const [eventoToEdit, setEventoToEdit] = useState(null);
-
+    const [evento, setEvento] = useState(null);
     const [showSuccessMessageDelete, setShowSuccessMessageDelete] = useState(false);
     const [showSuccessMessageHide, setShowSuccessMessageHide] = useState(false);
     const [filter, setFilter] = useState('all');
@@ -166,7 +166,7 @@ useEffect(() => {
     }
     console.log(`Buscando publicações para centroId: ${centroId}`);
     try {
-      const response = await axios.get(`http://localhost:3000/albuns/list/${centroId}`);
+      const response = await axios.get(`http://localhost:3000/albuns/list/${areaId}`);
       if (response.data && Array.isArray(response.data)) {
         console.log(response.data);
         setalbuns(response.data);
