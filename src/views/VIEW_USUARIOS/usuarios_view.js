@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './UserView.css'; 
 import CreateUserButton from '../../componentes/botao_view_usuarios/criar_user';
-import { Password } from '@mui/icons-material';
 
 const UsuariosView = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -17,7 +16,7 @@ const UsuariosView = () => {
   const [nome, setNome] = useState('');
   const [sobrenome, setSobrenome] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [senha, setSenha] = useState('');
 
   useEffect(() => {
     const storedCentroId = sessionStorage.getItem('centro_id');
@@ -29,14 +28,14 @@ const UsuariosView = () => {
   useEffect(() => {
     const buscarUsuarios = async () => {
       if (!centroId) {
-        console.log('centroId não definido');
+        // console.log('centroId não definido');
         return;
       }
-      console.log(`Buscando usuários para centroId: ${centroId}`);
+      // console.log(`Buscando usuários para centroId: ${centroId}`);
       try {
-        const response = await axios.get(`http://localhost:3000/users/listarUsers/${centroId}`);
+        const response = await axios.get(`http://localhost:3000/users/listarUsers`);
         if (response.data && Array.isArray(response.data)) {
-          console.log(response.data);
+          // console.log(response.data);
           setUsuarios(response.data);
         } else {
           console.error('Resposta da API vazia ou formato de dados incorreto');
@@ -58,9 +57,10 @@ const UsuariosView = () => {
 
   async function ativarUser(id) {
     try {
+      // const response = await axios.get(`https://backend-teste-q43r.onrender.com/users/ativar/${id}`);
       const response = await axios.get(`http://localhost:3000/users/user/ativar/${id}`);
-      // const response = await axios.get(`http://localhost:3000/users/ativar/${id}`);
       if (response.data.error) {
+        // console.log(response.data.error)
         setError(response.error);
       } else {
         console.error('Utilizador ativado com sucesso');
@@ -79,10 +79,13 @@ const UsuariosView = () => {
   }
 
   async function desativarUser(id) {
+    // console.log('desativar')
     try {
+      // const response = await axios.get(`https://backend-teste-q43r.onrender.com/users/desativar/${id}`);
       const response = await axios.get(`http://localhost:3000/users/user/desativar/${id}`);
-      // const response = await axios.get(`http://localhost:3000/users/desativar/${id}`);
+      // console.log(response)
       if (response.data.error) {
+        // console.log(response.data.error)
         setError(response.error);
       } else {
         console.error('Utilizador desativado com sucesso');
@@ -136,39 +139,35 @@ const UsuariosView = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      // Se a imagem não é obrigatória, podemos comentar essa parte ou deixá-la para o caso de você querer usá-la depois.
-      // const fileInput = document.querySelector('input[type="file"]');
-      // let imageUrl = null;
-      // if (fileInput && fileInput.files.length > 0) {
-      //   imageUrl = await uploadImage(fileInput.files[0]);
-      // }
-  
-      // Envio da solicitação com ou sem a imagem (se comentado)
-      const response = await axios.post('http://localhost:3000/users/create', {
-        nome,
-        sobrenome,
-        email,
-        password,
-        sobre_min: "Olá, sou novo na SoftShare!!",
-        // caminho_foto: imageUrl, // Se quiser incluir a imagem depois
-        centro_id: centroId // Certifique-se de que o centroId está definido corretamente
-      });
-  
-      if (response.status === 200) {
-        alert('Usuário criado com sucesso!');
-        setShowCreateForm(false);
-        setShowUserList(true);
-        // Atualize a lista de usuários após criar um novo usuário
-        setUsuarios([...usuarios, response.data]);
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput.files.length > 0) {
+        const imageUrl = await uploadImage(fileInput.files[0]);
+        const response = await axios.post('https://backend-teste-q43r.onrender.com/users/create', {
+          nome,
+          sobrenome,
+          email,
+          senha,
+          sobre_min: "Olá, sou novo na SoftShare!!",
+          caminho_foto: imageUrl,
+          centro_id: centroId // Passar o centro_id correto aqui
+        });
+        if (response.status === 200) {
+          alert('Usuário criado com sucesso!');
+          setShowCreateForm(false);
+          setShowUserList(true);
+          // Atualize a lista de usuários após criar um novo usuário
+          setUsuarios([...usuarios, response.data]);
+        } else {
+          alert('Erro ao criar usuário.');
+        }
       } else {
-        alert('Erro ao criar usuário.');
+        alert('Por favor, selecione uma imagem.');
       }
     } catch (error) {
       console.error('Erro ao criar usuário:', error);
       alert('Erro ao criar usuário.');
     }
   };
-  
 
   if (error) {
     return <div className='error-message'>Erro ao buscar usuários: {error}</div>;
@@ -227,10 +226,10 @@ const UsuariosView = () => {
               </label>
               <label>
                 Senha:
-                <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <input type="password" name="senha" value={senha} onChange={(e) => setSenha(e.target.value)} />
               </label>
             </div>
-            {/* <div className="form-right">
+            <div className="form-right">
               <label className="image-label">
                 Escolher Imagem:
                 <input type="file" onChange={handleImageChange} />
@@ -238,7 +237,7 @@ const UsuariosView = () => {
               {imageSrc && (
                 <img src={imageSrc} alt="Avatar" className="avatar" />
               )}
-            </div> */}
+            </div>
             <button type="submit">Criar</button>
           </form>
         </div>
@@ -259,27 +258,46 @@ const UsuariosView = () => {
               </tr>
             </thead>
             <tbody>
-              {usuarios.map((usuarios, index) => (
-                <tr key={usuarios.id}>
-                  <td>{index + 1}</td>
-                  <td>
-                    <div className="user-info2">
-                      <img src={usuarios.caminho_foto} alt={usuarios.name} className="user-avatar" />
-                      {usuarios.nome + ' '}{usuarios.sobrenome}
-                    </div>
-                  </td>
-                  <td>{formatarData(usuarios.createdAt)}</td>
-                  <td>{usuarios.eventsCreated}</td>
-                  <td>{usuarios.sharesCreated}</td>
-                  <td>{usuarios.postsCreated}</td>
-                  <td className="flex" id={`btn_${usuarios.id}`}>
-                    <button className="edit-btn">i</button>
-                    <button className={`edit-btn ${usuarios.active === false ? 'btn-green' : 'btn-red'}`} onClick={() => (usuarios.active === false ? ativarUser(usuarios.id) : desativarUser(usuarios.id))} >
-                      {usuarios.active === false ? 'Act' : 'Des'}
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {usuarios.map((usuario, index) => {
+                // console.log(usuario)
+                  return (
+                    <tr key={usuario.id}>
+                      <td>{index + 1}</td>
+                      <td>
+                        <div className="user-info2">
+                          <img
+                            src={usuario.caminho_foto}
+                            alt={usuario.name}
+                            className="user-avatar"
+                          />
+                          {`${usuario.nome} ${usuario.sobrenome}`}
+                        </div>
+                      </td>
+                
+                      <td>{formatarData(usuario.createdAt)}</td>
+                
+                      <td>{usuario.eventsCreated}</td>
+                      <td>{usuario.sharesCreated}</td>
+                      <td>{usuario.postsCreated}</td>
+                
+                      <td className="flex" id={`btn_${usuario.id}`}>
+                        <button className="edit-btn">i</button>
+                        {usuario.centro_id === parseInt(centroId) && (
+                          <>
+                          <button
+                            className={`edit-btn ${usuario.active ? 'btn-red' : 'btn-green'}`}
+                            onClick={() =>
+                              usuario.active ? desativarUser(usuario.id) : ativarUser(usuario.id)
+                            }
+                          >
+                            {usuario.active ? 'Des' : 'Act'}
+                          </button>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>

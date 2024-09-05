@@ -483,7 +483,7 @@ const handleButtonClick = (filter) => {
 let filteredalbuns = [...albuns]; // Faça uma cópia de todos os albuns
 
 // Agora aplique os filtros por título e estado
-filteredalbuns = filteredalbuns.filter(evento => {
+filteredalbuns = filteredalbuns.filter(album => {
   if (!evento.nome || !evento.estado) return false;
 
   // Filtro por título

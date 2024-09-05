@@ -5,6 +5,7 @@ import axios from 'axios';
 import CreatePublicationButton from '../../componentes/botao_view_publicacoes/criar_publicacao';
 import { GoogleMap, LoadScript, Marker, useJsApiLoader } from '@react-google-maps/api';
 import moment from 'moment';
+import { useParams } from 'react-router-dom';
 import 'moment/locale/pt'; // Importar o locale português
 import { useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
@@ -14,6 +15,7 @@ import { useDropzone } from 'react-dropzone';
 moment.locale('pt'); // Definir o locale para português
 
 const PublicacoesView = () => {
+  const { areaId } = useParams();
   const [publicacoes, setPublicacoes] = useState([]);
   const [error, setError] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -60,6 +62,7 @@ const PublicacoesView = () => {
   const [paginaweb, setPaginaweb] = useState('');
   const [telemovel, setTelemovel] = useState('');
   const [email, setEmail] = useState('');
+  const [showAction, setShowAction] = useState(false);
   const [horario, setHorario] = useState({
     "Segunda-feira": { inicio: '', fim: '', fechado: false },
     "Terça-feira": { inicio: '', fim: '', fechado: false },
@@ -69,8 +72,6 @@ const PublicacoesView = () => {
     "Sábado": { inicio: '', fim: '', fechado: false },
     "Domingo": { inicio: '', fim: '', fechado: false },
 });
-const [latitude, setLatitude] = useState(null);
-const [longitude, setLongitude] = useState(null);
   
   const [showComentarioModal, setShowComentarioModal] = useState(false);
   const [novaClassificacao, setNovaClassificacao] = useState(0);
@@ -79,7 +80,6 @@ const [longitude, setLongitude] = useState(null);
   const [imageSrc, setImageSrc] = useState(null); // Estado para imagem escolhida
   const [galeria, setGaleria] = useState([]); // Estado para a galeria de imagens
   const [topicos, setTopicos] = useState([]);
-  const areaId = 1; // Defina o ID da área aqui
 
   const [showAllComentarios, setShowAllComentarios] = useState(false);
   const [comentariosExibidos, setComentariosExibidos] = useState([]);
@@ -136,14 +136,14 @@ useEffect(() => {
   useEffect(() => {
     const buscarPublicacoes = async () => {
       if (!centroId) {
-        console.log('centroId não definido');
+        // console.log('centroId não definido');
         return;
       }
-      console.log(`Buscando publicações para centroId: ${centroId}`);
+      // console.log(`Buscando publicações para centroId: ${centroId}`);
       try {
-        const response = await axios.get(`http://localhost:3000/publicacoes/listarPublicacoes/${centroId}`);
+        const response = await axios.get(`http://localhost:3000/publicacoes/listarPublicacoes`);
         if (response.data && Array.isArray(response.data)) {
-          console.log(response.data);
+          // console.log(response.data);
           setPublicacoes(response.data);
         } else {
           console.error('Resposta da API vazia ou formato de dados incorreto');
@@ -170,6 +170,11 @@ useEffect(() => {
   };
   
   const handleReportedViewClick = (publication) => {
+    if(publication.centro_id === parseInt(centroId)) {
+      setShowAction(true);
+    } else {
+      setShowAction(false);
+    }
     setPublicationDetailDenunciada(publication);
     setShowDetailViewDenunciada(true);
   };
@@ -251,7 +256,7 @@ useEffect(() => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    console.log('Iniciando handleSubmit'); // Log para verificar se a função está sendo chamada
+    // console.log('Iniciando handleSubmit'); // Log para verificar se a função está sendo chamada
 
     // Formatando o horário para o formato desejado
     const formattedHorario = {};
@@ -273,14 +278,12 @@ useEffect(() => {
         paginaweb,
         telemovel,
         email,
-        latitude,
-        longitude,
         galeria: galeria.map((img) => img.url), // Envia apenas as URLs das imagens
         centro_id: centroId,
         autor_id: sessionStorage.getItem('user_id') 
     };
     
-    console.log('Dados da Publicação:', publicacaoData); // Log dos dados que serão enviados
+    // console.log('Dados da Publicação:', publicacaoData); // Log dos dados que serão enviados
 
     try {
         const response = await axios.post('http://localhost:3000/publicacoes/create', publicacaoData, {
@@ -289,7 +292,7 @@ useEffect(() => {
             },
         });
 
-        console.log('Resposta do Backend:', response); // Log da resposta do backend
+        // console.log('Resposta do Backend:', response); // Log da resposta do backend
 
         if (response.status === 201) { // Ajuste o código de status para 201 Created
             setShowSuccessMessage(true); // Mostrar modal de sucesso
@@ -438,7 +441,7 @@ useEffect(() => {
   
   const handleSendAlert = () => {
     // Adicione a lógica para enviar o alerta aqui
-    console.log("Alerta enviado:", alertMessage);
+    // console.log("Alerta enviado:", alertMessage);
   
     // Mostrar mensagem de sucesso
     setShowSuccessMessageAlert(true);
@@ -455,7 +458,7 @@ useEffect(() => {
 
 const handleDeleteMedidas = () => {
   // Adicione a lógica para enviar a mensagem de remoção aqui
-  console.log("Motivo da remoção:", deleteMessage);
+  // console.log("Motivo da remoção:", deleteMessage);
   // Após enviar a mensagem, você pode fechar o modal
   setShowDeleteModalMedidas(false);
   setShowSuccessMessageMedidas(true);
@@ -473,7 +476,7 @@ const handleApproveClick = () => {
 
 const handleConfirmApprove = () => {
   // Adicione a lógica para aprovar o local aqui
-  console.log("Local aprovado!");
+  // console.log("Local aprovado!");
   setShowApproveModal(false);
   setShowSuccessMessageMedidas(true); // Mostrar a mensagem de sucesso após a aprovação
 };
@@ -487,7 +490,7 @@ const handleRejectAndDelete = async () => {
   try {
     const response = await axios.delete(`http://localhost:3000/publicacoes/delete/${publicationDetail.id}`);
     if (response.status === 200) {
-      console.log('Publicação eliminada com sucesso:', response.data);
+      // console.log('Publicação eliminada com sucesso:', response.data);
       // Adicione qualquer lógica adicional, como redirecionamento ou atualização da UI
     } else {
       console.error('Erro ao eliminar publicação:', response);
@@ -499,32 +502,32 @@ const handleRejectAndDelete = async () => {
 
 const handleRejectApprove = () => {
   // Adicione a lógica para aprovar o local aqui
-  console.log("Local rejeitado!");
+  // console.log("Local rejeitado!");
   setShowRejectModal(false);
   setShowSuccessMessageMedidas(true); // Mostrar a mensagem de sucesso após a aprovação
 };
 
 const handleRejectSubmit = () => {
   // Adicione a lógica para enviar a rejeição aqui
-  console.log("Rejeição enviada:", rejectMessage);
+  // console.log("Rejeição enviada:", rejectMessage);
   setShowRejectModal(false);
 };
 const isOpenNow = (horario) => {
   const currentDay = moment().format('dddd'); // Dia da semana atual em português
   const currentTime = moment(); // Hora atual
 
-  console.log("Horário Completo:", horario);
-  console.log("Dia Atual:", currentDay);
-  console.log("Hora Atual:", currentTime.format('HH:mm'));
+  // console.log("Horário Completo:", horario);
+  // console.log("Dia Atual:", currentDay);
+  // console.log("Hora Atual:", currentTime.format('HH:mm'));
 
   if (!horario || !horario[currentDay]) {
-    console.log("Horário não definido para o dia atual ou horário é nulo.");
+    // console.log("Horário não definido para o dia atual ou horário é nulo.");
     return false;
   }
 
   const todaySchedule = horario[currentDay];
   if (todaySchedule.toLowerCase() === 'fechado') {
-    console.log("O local está fechado hoje.");
+    // console.log("O local está fechado hoje.");
     return false;
   }
 
@@ -532,11 +535,11 @@ const isOpenNow = (horario) => {
   const openMoment = moment(openTime, 'HH:mm');
   const closeMoment = moment(closeTime, 'HH:mm');
 
-  console.log("Horário de Abertura:", openMoment.format('HH:mm'));
-  console.log("Horário de Fechamento:", closeMoment.format('HH:mm'));
+  // console.log("Horário de Abertura:", openMoment.format('HH:mm'));
+  // console.log("Horário de Fechamento:", closeMoment.format('HH:mm'));
 
   const isOpen = currentTime.isBetween(openMoment, closeMoment);
-  console.log("Está Aberto Agora:", isOpen);
+  // console.log("Está Aberto Agora:", isOpen);
 
   return isOpen;
 };
@@ -569,7 +572,7 @@ useEffect(() => {
   const Comentarios = async () => {
     try {
       const response = await axios.get(`http://localhost:3000/comentarios/todospubcomentarios/${selectedPublication.id}`);
-      console.log(response.data);
+      // console.log(response.data);
       setComentarios(response.data);
     } catch (error) {
       console.error('Erro ao buscar comentários:', error);
@@ -690,7 +693,7 @@ const headers = {
 
 const uploadImage = async (file) => {
   const formData = new FormData();
-  console.log(file);
+  // console.log(file);
   formData.set('key', headers.Authorization); // Use a chave da API do objeto headers
   formData.append('image', file);
 
@@ -699,7 +702,7 @@ const uploadImage = async (file) => {
     { params: {
       key: '4d755673a2dc94483064445f4d5c54e9'
     }});
-    console.log('Upload bem-sucedido:', response.data);
+    // console.log('Upload bem-sucedido:', response.data);
     return response.data.data.url; // Certifique-se de que está acessando a URL corretamente
   } catch (error) {
     console.error('Erro ao fazer upload da imagem:', error);
@@ -746,7 +749,7 @@ useEffect(() => {
 const fetchUser = async (id) => {
   try {
     const response = await axios.get(`http://localhost:3000/users/user/${id}`);
-    console.log("Resposta da API:", response.data); // Adicione este log
+    // console.log("Resposta da API:", response.data); // Adicione este log
     setUser(response.data);
   } catch (error) {
     console.error('Error fetching user:', error);
@@ -756,7 +759,7 @@ const fetchUser = async (id) => {
 
 useEffect(() => {
   const id = sessionStorage.getItem('user_id'); // ou de onde quer que você esteja obtendo o ID do usuário
-  console.log("ID do usuário logado:", id);
+  // console.log("ID do usuário logado:", id);
   if (id) {
     setUserId(id);
     fetchUser(id);
@@ -780,7 +783,7 @@ const handleAvaliacaoSubmit = async (e) => {
       autor_id: userId,
       estrelas: estrelas
     });
-    console.log('Avaliação criada:', response.data);
+    // console.log('Avaliação criada:', response.data);
     // Atualizar a UI ou fazer outras ações necessárias após criar a avaliação
   } catch (error) {
     console.error('Erro ao criar avaliação:', error);
@@ -909,7 +912,7 @@ const handleSubmitEdit = async (e) => {
       console.error('Erro na resposta do Backend:', response); // Log de erro caso a resposta não seja 201
       // Lógica de erro adicional, se necessário
     }
-    console.log('Publicação atualizada:', response.data);
+    // console.log('Publicação atualizada:', response.data);
     
   } catch (error) {
     console.error('Erro ao atualizar publicação:', error);
@@ -933,7 +936,7 @@ const approveLocal = async (publicationId) => {
       },
     });
     if (response.status === 200) {
-      console.log('Publicação aprovada com sucesso');
+      // console.log('Publicação aprovada com sucesso');
       // Atualize o estado local se necessário, por exemplo:
       setSelectedPublication((prev) => ({ ...prev, estado: 'Ativo' }));
     } else {
@@ -949,7 +952,7 @@ useEffect(() => {
   const fetchDenuncias = async () => {
     try {
       const response = await axios.get(`http://localhost:3000/denuncias/listarDenunciasPorPublicacao/${publicationDetailDenunciada?.id}`);
-      console.log("Fetched denuncias response:", response.data);
+      // console.log("Fetched denuncias response:", response.data);
       setDenuncias(response.data);
     } catch (error) {
       console.error('Erro ao buscar denúncias:', error);
@@ -994,7 +997,7 @@ useEffect(() => {
 
 
 const toggleOptionsPublicacao = (comentarioId) => {
-  console.log('Toggle Options for:', comentarioId);
+  // console.log('Toggle Options for:', comentarioId);
   setOptionsOpenExcluir(prevId => (prevId === comentarioId ? null : comentarioId));
 };
 
@@ -1179,7 +1182,7 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
               <input type="text" placeholder="inserir nome do local" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
             </div>
             <div className="form-group">
-  <label>Estado da Publicação</label>
+  <label>Estado do Evento</label>
   <select value={estado} onChange={(e) => setEstado(e.target.value)}>
     <option value="">Selecionar estado</option>
     <option value="Ativa">Ativa</option>
@@ -1499,26 +1502,14 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
           </div>
         </>
       )}
-      
-      
-    {selectedPublication.latitude && (
-  <>
-    <button className="tab active">
-      <i className="fas fa-map-marker-alt tab-icon"></i> Localização
-    </button>
-    <div className="location">
-      <p><strong>Localização:</strong> {selectedPublication.latitude}, {selectedPublication.longitude}</p>
-      <a 
-        href={`https://www.google.com/maps?q=${selectedPublication.latitude},${selectedPublication.longitude}`} 
-        target="_blank" 
-        rel="noopener noreferrer" 
-        className="map-button"
-      >
-        Ver no Google Maps
-      </a>
-    </div>
-  </>
-)}
+      {selectedPublication.localizacao && (
+        <>
+          <button className="tab active"><i className="fas fa-map-marker-alt tab-icon"></i> Localização</button>
+          <div className="location">
+            <p><strong>Localização:</strong> {selectedPublication.localizacao}</p>
+          </div>
+        </>
+      )}
       {selectedPublication.paginaweb && (
         <>
           <button className="tab active"><i className="fas fa-globe tab-icon"></i> Página Web</button>
@@ -1594,7 +1585,7 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
 </div>
 )} */}
 
-{selectedPublication && (selectedPublication.estado === 'Ativa' || selectedPublication.estado === 'Denunciada') && (
+{selectedPublication && selectedPublication.estado === 'Ativa' && (
 <div> 
   <button className="tab active"><i className="fas fa-comments tab-icon"></i> Comentários e Avaliações</button>
   <div className="comentarios-section">
@@ -1957,23 +1948,26 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
             </>
           )}
         </div> </div>
-        <div className="denuncia-actions">
-                {!denuncia.resolvida && (
-                  <div className="options-button" onClick={() => toggleOptions(denuncia.id)}>
-                    <i className="fas fa-ellipsis-v"></i>
-                  </div>
-                )}
-                {optionsOpen === denuncia.id && (
-                  <div className="options-menu">
-                    <button onClick={() => marcarDenunciaComoResolvida(denuncia.id)}>
-                    <i className="fas fa-check-circle custom-check-icon"></i> Marcar como Resolvida
-                    </button>
-                  </div>
-                )}
-                {denuncia.resolvida && (
-                  <span className="denuncia-resolvida">Denúncia Resolvida</span>
-                )}
+        {showAction  && (
+          <div className="denuncia-actions">
+            {!denuncia.resolvida && (
+              <div className="options-button" onClick={() => toggleOptions(denuncia.id)}>
+                <i className="fas fa-ellipsis-v"></i>
               </div>
+            )}
+            {optionsOpen === denuncia.id && (
+              <div className="options-menu">
+                <button onClick={() => marcarDenunciaComoResolvida(denuncia.id)}>
+                <i className="fas fa-check-circle custom-check-icon"></i> Marcar como Resolvida
+                </button>
+              </div>
+            )}
+            {denuncia.resolvida && (
+              <span className="denuncia-resolvida">Denúncia Resolvida</span>
+            )}
+          </div>
+        )}
+        
             </div>
       <div className="denuncia-conteudo">
         <p><strong>Motivo:</strong> {denuncia.motivo}</p>
@@ -2150,16 +2144,9 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
                   {activeTab === 'descricao' && (
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-  <label>Área do Local</label>
-  <select value={area} onChange={(e) => setArea(e.target.value)}>
-  <option value="">Selecionar área</option>
-  {areas.map((areaOption) => (
-    <option key={areaOption.id} value={areaOption.id}>
-      {areaOption.nome}
-    </option>
-  ))}
-</select>
-</div>
+                <label>Área do Local</label>
+                <input type="text" value="Desporto" readOnly />
+              </div>
               <div className="form-group">
             <label>Tópico do Local</label>
               <select value={topico} onChange={(e) => setTopico(e.target.value)}>
@@ -2258,13 +2245,14 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
             <h2>Localização do local</h2>
             <div className="localizacao-content">
               <div className="form-group">
-  <label>Latitude</label>
-  <input type="text" placeholder="Latitude" value={latitude} onChange={(e) => setLatitude(e.target.value)} />
-</div>
-<div className="form-group">
-  <label>Longitude</label>
-  <input type="text" placeholder="Longitude" value={longitude} onChange={(e) => setLongitude(e.target.value)} />
-</div>
+                <label>Endereço do local:</label>
+                <input
+                  type="text"
+                  placeholder="inserir local"
+                  value={localizacao}
+                  onChange={(e) => setLocalizacao(e.target.value)}
+                />
+              </div>
               <div className="map-placeholder">
                 <LoadScript googleMapsApiKey={API_KEY}>
                   <GoogleMap
@@ -2353,7 +2341,6 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
             <tbody>
   {filteredPublicacoes.map((publicacoes, index) => {
     
-    
     return (
       <tr key={publicacoes.id}>
         <td>{index + 1}</td>
@@ -2368,23 +2355,28 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
         <td>
           <div className="edit-buttons-container">
             <button className="edit-btn" onClick={() => handleViewDetailsClick(publicacoes)}>i</button>
-            <button 
-              className="publications-edit-btn" 
-              onClick={() => handleHideClick(publicacoes)}>
-              <i className={`fas ${publicacoes.visivel ? 'fa-eye' : 'fa-eye-slash'}`}></i>
-            </button>
-            <button className="publications-edit-btn"onClick={() => handleEditClick(publicacoes)}>✏️</button>
-            <button className="publications-edit-btn" onClick={() => handleDeleteClick(publicacoes)}>🗑️</button>
-            {publicacoes.estado === 'Por validar' && (
-              <button className="publications-edit-btn" onClick={() => handlePendingViewClick(publicacoes)}>
-                <img src="https://i.ibb.co/9T565FK/Captura-de-ecr-2024-07-04-123100-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-123100-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
+            {publicacoes.centro_id === parseInt(centroId) && (
+              <>
+              <button  
+                className="publications-edit-btn" 
+                onClick={() => handleHideClick(publicacoes)}>
+                <i className={`fas ${publicacoes.visivel ? 'fa-eye' : 'fa-eye-slash'}`}></i>
               </button>
+              <button className="publications-edit-btn"onClick={() => handleEditClick(publicacoes)}>✏️</button>
+              <button className="publications-edit-btn" onClick={() => handleDeleteClick(publicacoes)}>🗑️</button>
+              {publicacoes.estado === 'Por validar' && (
+                <button className="publications-edit-btn" onClick={() => handlePendingViewClick(publicacoes)}>
+                  <img src="https://i.ibb.co/9T565FK/Captura-de-ecr-2024-07-04-123100-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-123100-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
+                </button>
+              )}
+              </>
             )}
             {publicacoes.estado === 'Denunciada' && (
               <button className="publications-edit-btn" onClick={() => handleReportedViewClick(publicacoes)}>
                 <img src="https://i.ibb.co/Cwhk8dN/Captura-de-ecr-2024-07-04-115321-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-115321-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
               </button>
             )}
+              
           </div>
           {showDeleteModal && (
             <div className="modal">

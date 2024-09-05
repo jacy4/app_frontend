@@ -25,8 +25,8 @@ const Login = ({ onLogin }) => {
         sessionStorage.setItem('centro_id', data.centro_id);
         sessionStorage.setItem('user_id', data.user_id);
         sessionStorage.setItem('token', data.token);
-        console.log('Token JWT:', data.token);
-        console.log('User ID salvo no sessionStorage:', data.user_id); // Adicione este log
+        // console.log('Token JWT:', data.token);
+        // console.log('User ID salvo no sessionStorage:', data.user_id); // Adicione este log
         onLogin();
       } else {
         alert(response.data.error || 'Credenciais inválidas!');

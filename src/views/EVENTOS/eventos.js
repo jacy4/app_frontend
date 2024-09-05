@@ -10,12 +10,14 @@ import { useDropzone } from 'react-dropzone';
 import moment from 'moment';
 import 'moment/locale/pt'; // Importar o locale português
 import Modal from 'react-modal';
+import { useParams } from 'react-router-dom';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 
 moment.locale('pt'); // Definir o locale para português
 
 const EventosView = () => {
+    const { areaId } = useParams();
     const [eventos, setEventos] = useState([]);
     const [error, setError] = useState(null);
     const [showCreateForm, setShowCreateForm] = useState(false);
@@ -93,7 +95,6 @@ const navigate = useNavigate();
 const [imageSrc, setImageSrc] = useState(null); // Estado para imagem escolhida
 const [galeria, setGaleria] = useState([]); // Estado para a galeria de imagens
 const [topicos, setTopicos] = useState([]);
-const areaId = 1; // Defina o ID da área aqui
 
 const [showAllComentarios, setShowAllComentarios] = useState(false);
 const [comentariosExibidos, setComentariosExibidos] = useState([]);
@@ -122,6 +123,7 @@ const [firstName, setFirstName] = useState('');
 const [participantes, setParticipantes] = useState([]);
 
 const [modalIsOpen, setModalIsOpen] = useState(false);
+const [showDeleteMessage, setshowDeleteMessage] = useState(false);
 
 const [dataEvento, setDataEvento] = useState('');
 
@@ -130,14 +132,14 @@ const openModalParticipantes = () => {
 };
 
 const closeModalParticipantes = () => {
-  setModalIsOpen(false); // Fecha o modal
+  setModalIsOpen(false); // Fecha o modal 
 };
 
 const [showComentarioModal, setShowComentarioModal] = useState(false);
 
 useEffect(() => {
   if (modalIsOpen) {
-    console.log("Modal está aberto agora!");
+    // console.log("Modal está aberto agora!");
     // Aqui você poderia, por exemplo, carregar dados adicionais necessários para o modal.
   }
 }, [modalIsOpen]); // A dependência modalIsOpen faz com que o efeito seja executado sempre que modalIsOpen muda.
@@ -153,6 +155,7 @@ const handleClear = () => {
 
 useEffect(() => {
   const storedCentroId = sessionStorage.getItem('centro_id');
+  // console.log(storedCentroId)
   if (storedCentroId) {
     setCentroId(storedCentroId);
   }
@@ -161,14 +164,14 @@ useEffect(() => {
 useEffect(() => {
   const buscarEventos = async () => {
     if (!centroId) {
-      console.log('centroId não definido');
+      // console.log('centroId não definido');
       return;
     }
-    console.log(`Buscando publicações para centroId: ${centroId}`);
+    // console.log(`Buscando publicações para centroId: ${centroId}`);
     try {
-      const response = await axios.get(`https://backend-teste-q43r.onrender.com/eventos/listarEventos/${centroId}`);
+      const response = await axios.get(`http://localhost:3000/eventos/listarEventos/${areaId}`);
       if (response.data && Array.isArray(response.data)) {
-        console.log(response.data);
+        // console.log(response.data);
         setEventos(response.data);
       } else {
         console.error('Resposta da API vazia ou formato de dados incorreto');
@@ -184,6 +187,19 @@ useEffect(() => {
 
 
 const handleViewDetailsClick = (evento) => {
+  if(evento.centro_id == parseInt(centroId)) {
+    setshowDeleteMessage(true);
+    setTimeout(() => {
+      document.getElementById('ellipsis-da-denuncia').style.display = 'block';
+    }, 500);
+    
+  } else {
+    setshowDeleteMessage(false);
+    setTimeout(() => {
+      document.getElementById('ellipsis-da-denuncia').style.display = 'none';
+    }, 500);
+    
+  }
   setSelectedEvento(evento);
   setShowDetailView(true);
 };
@@ -337,7 +353,7 @@ const handleCreateForm = () => {
 const handleSubmit = async (e) => {
   e.preventDefault();
   
-  console.log('Iniciando handleSubmit'); // Log para verificar se a função está sendo chamada
+  // console.log('Iniciando handleSubmit'); // Log para verificar se a função está sendo chamada
 
   // Formatando o horário para o formato desejado
   const formattedHorario = {};
@@ -363,7 +379,7 @@ const handleSubmit = async (e) => {
       autor_id: sessionStorage.getItem('user_id') 
   };
   
-  console.log('Dados da Publicação:', eventoData); // Log dos dados que serão enviados
+  // console.log('Dados da Publicação:', eventoData); // Log dos dados que serão enviados
 
   try {
       const response = await axios.post('http://localhost:3000/eventos/create', eventoData, {
@@ -372,7 +388,7 @@ const handleSubmit = async (e) => {
           },
       });
 
-      console.log('Resposta do Backend:', response); // Log da resposta do backend
+      // console.log('Resposta do Backend:', response); // Log da resposta do backend
 
       if (response.status === 201) { // Ajuste o código de status para 201 Created
           setShowSuccessMessage(true); // Mostrar modal de sucesso
@@ -508,8 +524,8 @@ filteredEventos = filteredEventos.filter(evento => {
       matchesState = true;
   }
 
-  console.log('Filtro atual:', filter);
-  console.log('Estado do evento:', evento.estado);
+  // console.log('Filtro atual:', filter);
+  // console.log('Estado do evento:', evento.estado);
 
   // Combina ambos os filtros: título e estado
   return matchesTitle && matchesState;
@@ -537,7 +553,7 @@ const handleAlertClick = () => {
 
 const handleSendAlert = () => {
   // Adicione a lógica para enviar o alerta aqui
-  console.log("Alerta enviado:", alertMessage);
+  // console.log("Alerta enviado:", alertMessage);
 
   // Mostrar mensagem de sucesso
   setShowSuccessMessageAlert(true);
@@ -554,7 +570,7 @@ const handleDeleteClickMedidas = () => {
 
 const handleDeleteMedidas = () => {
 // Adicione a lógica para enviar a mensagem de remoção aqui
-console.log("Motivo da remoção:", deleteMessage);
+// console.log("Motivo da remoção:", deleteMessage);
 // Após enviar a mensagem, você pode fechar o modal
 setShowDeleteModalMedidas(false);
 setShowSuccessMessageMedidas(true);
@@ -573,7 +589,7 @@ approveLocal(eventoDetail.id);
 
 const handleConfirmApprove = () => {
 // Adicione a lógica para aprovar o local aqui
-console.log("Local aprovado!");
+// console.log("Local aprovado!");
 setShowApproveModal(false);
 setShowSuccessMessageMedidas(true); // Mostrar a mensagem de sucesso após a aprovação
 };
@@ -587,7 +603,7 @@ const handleRejectAndDelete = async () => {
 try {
   const response = await axios.delete(`http://localhost:3000/eventos/delete/${eventoDetail.id}`);
   if (response.status === 200) {
-    console.log('evento eliminada com sucesso:', response.data);
+    // console.log('evento eliminada com sucesso:', response.data);
     // Adicione qualquer lógica adicional, como redirecionamento ou atualização da UI
   } else {
     console.error('Erro ao eliminar evento:', response);
@@ -599,32 +615,32 @@ try {
 
 const handleRejectApprove = () => {
 // Adicione a lógica para aprovar o local aqui
-console.log("Local rejeitado!");
+// console.log("Local rejeitado!");
 setShowRejectModal(false);
 setShowSuccessMessageMedidas(true); // Mostrar a mensagem de sucesso após a aprovação
 };
 
 const handleRejectSubmit = () => {
 // Adicione a lógica para enviar a rejeição aqui
-console.log("Rejeição enviada:", rejectMessage);
+// console.log("Rejeição enviada:", rejectMessage);
 setShowRejectModal(false);
 };
 const isOpenNow = (horario) => {
 const currentDay = moment().format('dddd'); // Dia da semana atual em português
 const currentTime = moment(); // Hora atual
 
-console.log("Horário Completo:", horario);
-console.log("Dia Atual:", currentDay);
-console.log("Hora Atual:", currentTime.format('HH:mm'));
+// console.log("Horário Completo:", horario);
+// console.log("Dia Atual:", currentDay);
+// console.log("Hora Atual:", currentTime.format('HH:mm'));
 
 if (!horario || !horario[currentDay]) {
-  console.log("Horário não definido para o dia atual ou horário é nulo.");
+  // console.log("Horário não definido para o dia atual ou horário é nulo.");
   return false;
 }
 
 const todaySchedule = horario[currentDay];
 if (todaySchedule.toLowerCase() === 'fechado') {
-  console.log("O local está fechado hoje.");
+  // console.log("O local está fechado hoje.");
   return false;
 }
 
@@ -632,11 +648,11 @@ const [openTime, closeTime] = todaySchedule.split('-');
 const openMoment = moment(openTime, 'HH:mm');
 const closeMoment = moment(closeTime, 'HH:mm');
 
-console.log("Horário de Abertura:", openMoment.format('HH:mm'));
-console.log("Horário de Fechamento:", closeMoment.format('HH:mm'));
+// console.log("Horário de Abertura:", openMoment.format('HH:mm'));
+// console.log("Horário de Fechamento:", closeMoment.format('HH:mm'));
 
 const isOpen = currentTime.isBetween(openMoment, closeMoment);
-console.log("Está Aberto Agora:", isOpen);
+// console.log("Está Aberto Agora:", isOpen);
 
 return isOpen;
 };
@@ -669,7 +685,7 @@ useEffect(() => {
 const Comentarios = async () => {
   try {
     const response = await axios.get(`http://localhost:3000/comentarios_eventos/todoscomentarios/${selectedEvento.id}`);
-    console.log(response.data);
+    // console.log(response.data);
     setComentarios(response.data);
   } catch (error) {
     console.error('Erro ao buscar comentários:', error);
@@ -780,7 +796,7 @@ navigate(-1); // Volta para a página anterior
 const handleContinue = () => {
 const tabs = ['descricao', 'galeria', 'horario', 'localizacao', 'comentarios', 'mais_informacoes'];
 const currentIndex = tabs.indexOf(activeTab);
-console.log('Índice atual:', currentIndex);   
+// console.log('Índice atual:', currentIndex);   
 if (currentIndex < tabs.length - 1) {
   setActiveTab(tabs[currentIndex + 1]);
 }
@@ -842,7 +858,7 @@ Topicos();
 const fetchUser = async (id) => {
 try {
   const response = await axios.get(`http://localhost:3000/users/user/${id}`);
-  console.log("Resposta da API:", response.data); // Adicione este log
+  // console.log("Resposta da API:", response.data); // Adicione este log
   setUser(response.data);
 } catch (error) {
   console.error('Error fetching user:', error);
@@ -852,7 +868,7 @@ try {
 
 useEffect(() => {
 const id = sessionStorage.getItem('user_id'); // ou de onde quer que você esteja obtendo o ID do usuário
-console.log("ID do usuário logado:", id);
+// console.log("ID do usuário logado:", id);
 if (id) {
   setUserId(id);
   fetchUser(id);
@@ -876,7 +892,7 @@ try {
     autor_id: userId,
     estrelas: estrelas
   });
-  console.log('Avaliação criada:', response.data);
+  // console.log('Avaliação criada:', response.data);
   // Atualizar a UI ou fazer outras ações necessárias após criar a avaliação
 } catch (error) {
   console.error('Erro ao criar avaliação:', error);
@@ -986,7 +1002,7 @@ const handleSubmitEdit = async (e) => {
       console.error('Erro na resposta do Backend:', response); // Log de erro caso a resposta não seja 201
       // Lógica de erro adicional, se necessário
     }
-    console.log('Evento atualizado:', response.data);
+    // console.log('Evento atualizado:', response.data);
     
   } catch (error) {
     console.error('Erro ao atualizar evento:', error);
@@ -1010,7 +1026,7 @@ try {
     },
   });
   if (response.status === 200) {
-    console.log('Publicação aprovada com sucesso');
+    // console.log('Publicação aprovada com sucesso');
     // Atualize o estado local se necessário, por exemplo:
     setSelectedEvento((prev) => ({ ...prev, estado: 'Ativo' }));
   } else {
@@ -1068,9 +1084,9 @@ const adicionarParticipante = async (eventoId, usuarioId) => {
 
 // Dentro do componente, antes do return
 useEffect(() => {
-  console.log('Selected Evento:', selectedEvento);
-  console.log('Participantes:', participantes);
-  console.log('UserId:', userId);
+  // console.log('Selected Evento:', selectedEvento);
+  // console.log('Participantes:', participantes);
+  // console.log('UserId:', userId);
 }, [selectedEvento, participantes, userId]); // Dependências para re-logar quando mudarem
 
 // async function getAddressFromCoordinates(latitude, longitude) {
@@ -1131,10 +1147,10 @@ useEffect(() => {
 const [optionsOpenMarcar, setOptionsOpenMarcar] = useState(null);
 
 const toggleOptionsMarcar = (denunciaId) => {
-  console.log("Toggle Options for Denuncia ID:", denunciaId);
+  // console.log("Toggle Options for Denuncia ID:", denunciaId);
   setOptionsOpenMarcar(prevId => {
     const newId = (prevId === denunciaId ? null : denunciaId);
-    console.log("Setting optionsOpenMarcar to:", newId);
+    // console.log("Setting optionsOpenMarcar to:", newId);
     return newId;
   });
 };
@@ -1143,9 +1159,9 @@ const toggleOptionsMarcar = (denunciaId) => {
 // No useEffect para detectar clique fora:
 // useEffect(() => {
 //   const handleClickOutside = (event) => {
-//     console.log("Clicked outside:", event.target);
+//     // console.log("Clicked outside:", event.target);
 //     if (!event.target.closest('.comentario-options-publicacao')) {
-//       console.log("Resetting optionsOpenMarcar");
+//       // console.log("Resetting optionsOpenMarcar");
 //       setOptionsOpenMarcar(null);
 //     }
 //   };
@@ -1234,9 +1250,9 @@ useEffect(() => {
   const fetchDenuncias = async () => {
     try {
       const response = await axios.get(`http://localhost:3000/denuncias_comentarios_eventos/denunciasPorEvento/${eventoDetailDenunciada?.id}`);
-      console.log("Fetched denuncias response:", response.data);
+      // console.log("Fetched denuncias response:", response.data);
       setDenuncias(response.data);
-      console.log(denuncias);
+      // console.log(denuncias);
     } catch (error) {
       console.error('Erro ao buscar denúncias:', error);
     }
@@ -1262,7 +1278,7 @@ const marcarDenunciaComoResolvida = async (denunciaId) => {
 };
 
 useEffect(() => {
-  console.log('Denuncias state atualizado:', denuncias);  // Log do estado
+  // console.log('Denuncias state atualizado:', denuncias);  // Log do estado
 }, [denuncias]);
 
 
@@ -1543,7 +1559,7 @@ return (
 
   {showDetailView && selectedEvento && (
     <div className="publicacoes_div_princ">
-      {selectedEvento && console.log('selectedEvento:', selectedEvento)}
+      {selectedEvento &&  console.log('selectedEvento:', selectedEvento)}
       <h1 className="publicacoes-title2">Informações do evento</h1>
       <div className="header">
         <h1 className="header-title">{selectedEvento.nome}</h1>
@@ -1556,7 +1572,7 @@ return (
 
       </div>
   <div className="tab-content2">
-    {/* {selectedEvento.galeria && selectedEvento.galeria.length > 0 && (
+    {selectedEvento.galeria && selectedEvento.galeria.length > 0 && (
       <>
         <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do evento</button>
         <div className="gallery">
@@ -1565,19 +1581,7 @@ return (
           ))}
         </div>
       </>
-    )} */}
-    <div className="tab-content2">
-  {imagensGaleria && imagensGaleria.length > 0 && (
-    <>
-      <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Evento</button>
-      <div className="gallery">
-        {imagensGaleria.map((image, index) => (
-          <img key={index} src={image.caminho_imagem} alt={`Galeria ${index}`} className="gallery-image" />
-        ))}
-      </div>
-    </>
-  )}
-</div>
+    )}
 
 {selectedEvento.user && (
   <>
@@ -1700,7 +1704,7 @@ return (
   </>
 )}
 
-{/* <div className="tab-content2">
+<div className="tab-content2">
   {imagensGaleria && imagensGaleria.length > 0 && (
     <>
       <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Evento</button>
@@ -1711,14 +1715,9 @@ return (
       </div>
     </>
   )}
-</div> */}
+</div>
 
-
-    {/* Seção de Comentários */}
-    {/* Seção de Comentários */}
     {selectedEvento && (selectedEvento.estado === 'Ativa' || selectedEvento.estado === 'Denunciada') && (
-  // Seu código aqui, que será executado se o estado for 'Ativa' ou 'Denunciada'
-
 <div> 
   <button className="tab active"><i className="fas fa-comments tab-icon"></i> Comentários e Avaliações</button>
   <div className="comentarios-section">
@@ -1789,10 +1788,11 @@ return (
             )}
           </div>
           <div className="comentario-options">
-        <div className="options-button" onClick={() => toggleOptionsEvento(comentario.id)}>
-          <i className="fas fa-ellipsis-v"></i>
-        </div>
-        {optionsOpen === comentario.id && (
+        
+          <div className="options-button" id="ellipsis-da-denuncia" onClick={() => toggleOptionsEvento(comentario.id)}>
+            <i className="fas fa-ellipsis-v"></i>
+          </div>
+        {optionsOpen === comentario.id && showDeleteMessage && (
           <div className="options-menu">
             <button onClick={() => handleDeleteComentarioEvento(comentario.id)}>
               <i className="fas fa-trash-alt custom-delete-icon"></i> Excluir Mensagem
@@ -1877,7 +1877,7 @@ return (
 
 {showApprovalView && eventoDetail && (
   <div className="publicacoes_div_princ">
-     {console.log('eventoDetail:', eventoDetail)}
+     { console.log('eventoDetail:', eventoDetail)}
       <h1 className="publicacoes-title2">Informações do evento</h1>
       <div className="header">
         <h1 className="header-title">{eventoDetail.nome}</h1>
@@ -2487,8 +2487,7 @@ return (
           </thead>
           <tbody>
        {filteredEventos.map((eventos, index) => {
-  
-  console.log('Eventos filtrados:', filteredEventos);
+  // console.log('Eventos filtrados:', filteredEventos);
 
     return (
       <tr key={eventos.id}>
@@ -2503,26 +2502,32 @@ return (
           </span>
         </td>
         <td>
-          <div className="edit-buttons-container">
-            <button className="edit-btn" onClick={() => handleViewDetailsClick(eventos)}>i</button>
-            <button 
-              className="publications-edit-btn" 
-              onClick={() => handleHideClick(eventos)}>
-              <i className={`fas ${eventos.visivel ? 'fa-eye' : 'fa-eye-slash'}`}></i>
-            </button>
-            <button className="publications-edit-btn"onClick={() => handleEditClick(eventos)}>✏️</button>
-            <button className="publications-edit-btn" onClick={() => handleDeleteClick(eventos)}>🗑️</button>
-            {eventos.estado === 'Por validar' && (
-              <button className="publications-edit-btn" onClick={() => handlePendingViewClick(eventos)}>
-                <img src="https://i.ibb.co/9T565FK/Captura-de-ecr-2024-07-04-123100-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-123100-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
-              </button>
-            )}
-            {eventos.estado === 'Denunciada' && (
-              <button className="publications-edit-btn" onClick={() => handleReportedViewClick(eventos)}>
-                <img src="https://i.ibb.co/Cwhk8dN/Captura-de-ecr-2024-07-04-115321-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-115321-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
-              </button>
-            )}
-          </div>
+            <div className="edit-buttons-container">
+              
+                <button className="edit-btn" onClick={() => handleViewDetailsClick(eventos)}>i</button>
+                {eventos.centro_id === parseInt(centroId) && (
+                <>
+                  <button 
+                    className="publications-edit-btn" 
+                    onClick={() => handleHideClick(eventos)}>
+                    <i className={`fas ${eventos.visivel ? 'fa-eye' : 'fa-eye-slash'}`}></i>
+                  </button>
+                  <button className="publications-edit-btn"onClick={() => handleEditClick(eventos)}>✏️</button>
+                  <button className="publications-edit-btn" onClick={() => handleDeleteClick(eventos)}>🗑️</button>
+                  {eventos.estado === 'Por validar' && (
+                    <button className="publications-edit-btn" onClick={() => handlePendingViewClick(eventos)}>
+                      <img src="https://i.ibb.co/9T565FK/Captura-de-ecr-2024-07-04-123100-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-123100-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
+                    </button>
+                  )}
+                  {eventos.estado === 'Denunciada' && (
+                    <button className="publications-edit-btn" onClick={() => handleReportedViewClick(eventos)}>
+                      <img src="https://i.ibb.co/Cwhk8dN/Captura-de-ecr-2024-07-04-115321-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-115321-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          
           {showDeleteModal && (
             <div className="modal">
               <div className="modal-icon">❌</div>

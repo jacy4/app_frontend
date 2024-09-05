@@ -19,7 +19,7 @@ const handleSubmit = async (e, {
 }) => {
     e.preventDefault();
 
-    console.log('Iniciando handleSubmit');
+    // console.log('Iniciando handleSubmit');
 
     const formattedHorario = {
         inicio: `${inicioData}T${inicioHora}`,
@@ -42,7 +42,7 @@ const handleSubmit = async (e, {
         autor_id: sessionStorage.getItem('user_id')
     };
 
-    console.log('Dados do Evento:', inicioData);
+    // console.log('Dados do Evento:', inicioData);
 
     try {
         const response = await axios.post('https://backend-teste-q43r.onrender.com/eventos/create', inicioData, {
@@ -51,7 +51,7 @@ const handleSubmit = async (e, {
             },
         });
 
-        console.log('Resposta do Backend:', response);
+        // console.log('Resposta do Backend:', response);
 
         if (response.status === 201) {
             return { success: true };

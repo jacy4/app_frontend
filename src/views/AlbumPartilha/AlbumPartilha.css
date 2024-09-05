@@ -1,0 +1,492 @@
+.ap-div-princ {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 250px);
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: auto;
+  flex: 1;
+  min-height: calc(100vh - 90px);
+  margin-left: 250px;
+  margin-top: 60px;
+}
+
+.ap-title2 {
+  color: white;
+  font-size: 26px;
+  margin: 0;
+  padding: 20px 0;
+  text-align: left;
+}
+
+.ap-edit-buttons-container {
+  display: flex;
+  align-items: center;
+}
+
+.ap-edit-btn,
+.ap-publications-edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-right: 6px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ap-edit-btn {
+  background-color: #007bff;
+  color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+}
+
+.ap-publications-edit-btn:hover {
+  color: #156fca;
+}
+
+.ap-button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.ap-left-buttons {
+  display: flex;
+  gap: 20px;
+}
+
+.ap-right-button {
+  margin-left: auto;
+}
+
+.ap-create-publication-form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.ap-create-publication-form label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.ap-create-publication-form input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.ap-create-publication-form button,
+.ap-submit-button {
+  padding: 10px 20px;
+  background-color: #156fca;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ap-create-publication-form button:hover,
+.ap-submit-button:hover {
+  background-color: #135a9c;
+}
+
+.ap-publications-view {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+}
+
+.ap-publications-table {
+  color: #718EBF;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  text-align: left;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.ap-publications-table th,
+.ap-publications-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.ap-publications-table th {
+  background-color: #f4f4f4;
+}
+
+.ap-publications-table td {
+  color: black;
+}
+
+.ap-status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 12px;
+}
+
+.ap-status-badge.ativa {
+  background-color: #28a745;
+}
+
+.ap-status-badge.por-validar {
+  background-color: #f7d694;
+}
+
+.ap-status-badge.denunciada {
+  background-color: #dc3545;
+}
+
+.ap-search-container {
+  margin-bottom: 20px;
+}
+
+.ap-search-wrapper {
+  position: relative;
+  max-width: 200px;
+}
+
+.ap-search-bar {
+  display: flex;
+  background-color: #fff;
+  border-radius: 30px;
+  padding: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 300px; /* Limita o tamanho */
+}
+
+.ap-search-bar input {
+  border: none;
+  outline: none;
+  padding: 8px;
+  border-radius: 20px;
+  flex: 1;
+}
+
+.ap-search-icon {
+  color: #8c9aa1;
+  margin-right: 8px;
+  font-size: 16px; /* Ajusta o tamanho do ícone */
+}
+
+.ap-form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.ap-form-group label {
+  flex: 0.2;
+  margin-right: 10px;
+}
+
+.ap-form-group input,
+.ap-form-group select,
+.ap-form-group textarea {
+  flex: 2;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.ap-form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+}
+
+.ap-cancel-button {
+  background: none;
+  color: red;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 17px;
+}
+
+.ap-save-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.ap-save-button i {
+  margin-right: 8px;
+}
+
+.ap-save-button:hover {
+  background-color: #45a049;
+}
+
+.ap-hidden-title {
+  visibility: hidden;
+}
+
+.ap-tabs {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  background-color: #f1f1ef;
+}
+
+.ap-tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #f5f5f5;
+  border: none;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.ap-tab.active {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.ap-tab-content {
+  padding: 20px;
+  background-color: #fff;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.ap-form-group_horario {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.ap-form-group_horario label {
+  width: 100px;
+  margin-right: 10px;
+}
+
+.ap-form-group_horario input {
+  width: 100px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.ap-gallery-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.ap-upload-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.ap-upload-icon {
+  font-size: 24px;
+  color: #ccc;
+}
+
+.ap-upload-text {
+  font-size: 16px;
+  color: #ccc;
+}
+
+.ap-localizacao-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.ap-map-placeholder {
+  width: 100%;
+  height: 200px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ap-map-placeholder img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.ap-success-message,
+.ap-success-message_delete {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 8px;
+  padding: 40px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.ap-success-message h1,
+.ap-success-message_delete h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.ap-success-message p,
+.ap-success-message_delete button {
+  font-size: 16px;
+  margin-bottom: 30px;
+}
+
+.ap-success-message button,
+.ap-success-message_delete button {
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.ap-success-message button:hover,
+.ap-success-message_delete button:hover {
+  background-color: #388e3c;
+}
+
+.ap-delete-modal,
+.ap-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  text-align: center;
+  z-index: 1000;
+}
+
+.ap-delete-modal .modal-header,
+.ap-modal .modal-header {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.ap-delete-modal .modal-body,
+.ap-modal .modal-body {
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.ap-delete-modal .modal-footer,
+.ap-modal .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ap-delete-modal .modal-footer button,
+.ap-modal .modal-footer button {
+  padding: 10px 20px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ap-delete-modal .modal-footer button.cancel,
+.ap-modal .modal-footer button.cancel {
+  background-color: #9e9e9e;
+  margin-right: 10px;
+}
+
+.ap-delete-modal .modal-footer button.confirm,
+.ap-modal .modal-footer button.confirm {
+  background-color: #d32f2f;
+}
+
+.ap-clickable-icon {
+  cursor: pointer;
+  color: #007bff;
+  margin: 0 5px;
+}
+
+.ap-clickable-icon:hover {
+  color: #0056b3;
+}
+
+.ap-modal-detalhes {
+  width: 80%;
+  max-width: 800px;
+  height: 80%;
+  max-height: 600px;
+  margin: auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.ap-modal-detalhes .ap-modal-detalhes-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ap-modal-detalhes .ap-galeria {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.ap-modal-detalhes .ap-publicacao-detalhes-imagem {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 5px;
+}
+
+.ap-modal-detalhes .ap-descricao {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.ap-modal-detalhes .ap-modal-detalhes-buttons {
+  margin-top: 20px;
+}

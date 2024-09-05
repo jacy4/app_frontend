@@ -11,12 +11,14 @@ import { useDropzone } from 'react-dropzone';
 import moment from 'moment';
 import 'moment/locale/pt'; // Importar o locale português
 import Modal from 'react-modal';
+import { useParams } from 'react-router-dom';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
  
 moment.locale('pt'); // Definir o locale para português
 
 const ForumView = () => { 
+  const { areaId } = useParams();
     const [forum, setforum] = useState([]);
     const [error, setError] = useState(null);
     const [showCreateForm, setShowCreateForm] = useState(false);
@@ -86,7 +88,6 @@ const navigate = useNavigate();
 const [imageSrc, setImageSrc] = useState(null); // Estado para imagem escolhida
 const [galeria, setGaleria] = useState([]); // Estado para a galeria de imagens
 const [topicos, setTopicos] = useState([]);
-const areaId = 1; // Defina o ID da área aqui
 const [participante, setParticipante] = useState('');
 const handleAdicionarParticipanteVisual = (usuario_id) => {
   setParticipantesParaAdicionar([...participantesParaAdicionar, usuario_id]);
@@ -135,14 +136,14 @@ const [showComentarioModal, setShowComentarioModal] = useState(false);
 
 useEffect(() => {
   if (modalIsOpen) {
-    console.log("Modal está aberto agora!");
+    // console.log("Modal está aberto agora!");
     // Aqui você poderia, por exemplo, carregar dados adicionais necessários para o modal.
   }
 }, [modalIsOpen]); // A dependência modalIsOpen faz com que o efeito seja executado sempre que modalIsOpen muda.
 
 
 useEffect(() => {
-  console.log(forum);  // Verifique o conteúdo de 'forum' após o setforum
+  // console.log(forum);  // Verifique o conteúdo de 'forum' após o setforum
 }, [forum]);
 
 
@@ -164,14 +165,14 @@ useEffect(() => {
 useEffect(() => {
   const buscarforum = async () => {
     if (!centroId) {
-      console.log('centroId não definido');
+      // console.log('centroId não definido');
       return;
     }
-    console.log(`Buscando publicações para centroId: ${centroId}`);
+    // console.log(`Buscando publicações para centroId: ${centroId}`);
     try {
-      const response = await axios.get(`https://backend-teste-q43r.onrender.com/forum/list/${centroId}`);
+      const response = await axios.get(`http://localhost:3000/forum/list/${areaId}`);
       if (response.data && Array.isArray(response.data)) {
-        console.log(response.data);
+        // console.log(response.data);
         setforum(response.data);
       } else {
         console.error('Resposta da API vazia ou formato de dados incorreto');
@@ -445,8 +446,8 @@ const filteredforum = forum.filter(evento => {
       matchesState = evento.estado === 'Inativo';
 }
 
-  console.log('Filtro atual:', filter);
-console.log('Estado do evento:', evento.estado);
+  // console.log('Filtro atual:', filter);
+// console.log('Estado do evento:', evento.estado);
 
 
   // Combina ambos os filtros
@@ -473,7 +474,7 @@ const handleAlertClick = () => {
 
 const handleSendAlert = () => {
   // Adicione a lógica para enviar o alerta aqui
-  console.log("Alerta enviado:", alertMessage);
+  // console.log("Alerta enviado:", alertMessage);
 
   // Mostrar mensagem de sucesso
   setShowSuccessMessageAlert(true);
@@ -522,7 +523,7 @@ setShowApproveModal(true);
 
 const handleConfirmApprove = () => {
 // Adicione a lógica para aprovar o local aqui
-console.log("Local aprovado!");
+// console.log("Local aprovado!");
 setShowApproveModal(false);
 setShowSuccessMessageMedidas(true); // Mostrar a mensagem de sucesso após a aprovação
 };
@@ -536,7 +537,7 @@ const handleRejectAndDelete = async () => {
 try {
   const response = await axios.delete(`https://backend-teste-q43r.onrender.com/forum/delete/${eventoDetail.id}`);
   if (response.status === 200) {
-    console.log('evento eliminada com sucesso:', response.data);
+    // console.log('evento eliminada com sucesso:', response.data);
     // Adicione qualquer lógica adicional, como redirecionamento ou atualização da UI
   } else {
     console.error('Erro ao eliminar evento:', response);
@@ -548,32 +549,32 @@ try {
 
 const handleRejectApprove = () => {
 // Adicione a lógica para aprovar o local aqui
-console.log("Local rejeitado!");
+// console.log("Local rejeitado!");
 setShowRejectModal(false);
 setShowSuccessMessageMedidas(true); // Mostrar a mensagem de sucesso após a aprovação
 };
 
 const handleRejectSubmit = () => {
 // Adicione a lógica para enviar a rejeição aqui
-console.log("Rejeição enviada:", rejectMessage);
+// console.log("Rejeição enviada:", rejectMessage);
 setShowRejectModal(false);
 };
 const isOpenNow = (horario) => {
 const currentDay = moment().format('dddd'); // Dia da semana atual em português
 const currentTime = moment(); // Hora atual
 
-console.log("Horário Completo:", horario);
-console.log("Dia Atual:", currentDay);
-console.log("Hora Atual:", currentTime.format('HH:mm'));
+// console.log("Horário Completo:", horario);
+// console.log("Dia Atual:", currentDay);
+// console.log("Hora Atual:", currentTime.format('HH:mm'));
 
 if (!horario || !horario[currentDay]) {
-  console.log("Horário não definido para o dia atual ou horário é nulo.");
+  // console.log("Horário não definido para o dia atual ou horário é nulo.");
   return false;
 }
 
 const todaySchedule = horario[currentDay];
 if (todaySchedule.toLowerCase() === 'fechado') {
-  console.log("O local está fechado hoje.");
+  // console.log("O local está fechado hoje.");
   return false;
 }
 
@@ -581,11 +582,11 @@ const [openTime, closeTime] = todaySchedule.split('-');
 const openMoment = moment(openTime, 'HH:mm');
 const closeMoment = moment(closeTime, 'HH:mm');
 
-console.log("Horário de Abertura:", openMoment.format('HH:mm'));
-console.log("Horário de Fechamento:", closeMoment.format('HH:mm'));
+// console.log("Horário de Abertura:", openMoment.format('HH:mm'));
+// console.log("Horário de Fechamento:", closeMoment.format('HH:mm'));
 
 const isOpen = currentTime.isBetween(openMoment, closeMoment);
-console.log("Está Aberto Agora:", isOpen);
+// console.log("Está Aberto Agora:", isOpen);
 
 return isOpen;
 };
@@ -618,7 +619,7 @@ useEffect(() => {
 const Comentarios = async () => {
   try {
     const response = await axios.get(`http://localhost:3000/comentarios_forum/todoscomentarios/${selectedForum.id}`);
-    console.log(response.data);
+    // console.log(response.data);
     setComentarios(response.data);
   } catch (error) {
     console.error('Erro ao buscar comentários:', error);
@@ -692,7 +693,7 @@ navigate(-1); // Volta para a página anterior
 const handleContinue = () => {
 const tabs = ['descricao', 'galeria', 'horario', 'localizacao', 'comentarios', 'mais_informacoes'];
 const currentIndex = tabs.indexOf(activeTab);
-console.log('Índice atual:', currentIndex);   
+// console.log('Índice atual:', currentIndex);   
 if (currentIndex < tabs.length - 1) {
   setActiveTab(tabs[currentIndex + 1]);
 }
@@ -730,7 +731,7 @@ Topicos();
 const fetchUser = async (id) => {
 try {
   const response = await axios.get(`https://backend-teste-q43r.onrender.com/users/user/${id}`);
-  console.log("Resposta da API:", response.data); // Adicione este log
+  // console.log("Resposta da API:", response.data); // Adicione este log
   setUser(response.data);
 } catch (error) {
   console.error('Error fetching user:', error);
@@ -740,7 +741,7 @@ try {
 
 useEffect(() => {
 const id = sessionStorage.getItem('user_id'); // ou de onde quer que você esteja obtendo o ID do usuário
-console.log("ID do usuário logado:", id);
+// console.log("ID do usuário logado:", id);
 if (id) {
   setUserId(id);
   fetchUser(id);
@@ -764,7 +765,7 @@ try {
     autor_id: userId,
     estrelas: estrelas
   });
-  console.log('Avaliação criada:', response.data);
+  // console.log('Avaliação criada:', response.data);
   // Atualizar a UI ou fazer outras ações necessárias após criar a avaliação
 } catch (error) {
   console.error('Erro ao criar avaliação:', error);
@@ -985,7 +986,7 @@ const [forumId, setForumId] = useState(null);
 //     console.error('Erro na resposta do Backend:', response); // Log de erro caso a resposta não seja 201
 //     // Lógica de erro adicional, se necessário
 //   }
-//   console.log('Publicação atualizada:', response.data);
+//   // console.log('Publicação atualizada:', response.data);
   
 // } catch (error) {
 //   console.error('Erro ao atualizar publicação:', error);
@@ -1008,7 +1009,7 @@ setComentarios(comentarios.filter(comentario => comentario.id !== comentarioId))
 //     },
 //   });
 //   if (response.status === 200) {
-//     console.log('Publicação aprovada com sucesso');
+//     // console.log('Publicação aprovada com sucesso');
 //     // Atualize o estado local se necessário, por exemplo:
 //     setselectedForum((prev) => ({ ...prev, estado: 'Ativo' }));
 //   } else {
@@ -1066,9 +1067,9 @@ const adicionarParticipante = async (Forum_id, usuarioId) => {
 
 // Dentro do componente, antes do return
 useEffect(() => {
-  console.log('Selected Evento:', selectedForum);
-  console.log('Participantes:', participantes);
-  console.log('UserId:', userId);
+  // console.log('Selected Evento:', selectedForum);
+  // console.log('Participantes:', participantes);
+  // console.log('UserId:', userId);
 }, [selectedForum, participantes, userId]); // Dependências para re-logar quando mudarem
 
 // async function getAddressFromCoordinates(latitude, longitude) {
@@ -1118,7 +1119,7 @@ const handleRemoveCapa = () => {
 };
 
 const uploadImage = async (file) => {
-  console.log('Uploading image:', file); // Log do arquivo sendo enviado
+  // console.log('Uploading image:', file); // Log do arquivo sendo enviado
 
   const formData = new FormData();
   formData.append('key', '2e5f4a936d41606819335ae440e4264a'); // Verifique sua chave da API
@@ -1126,7 +1127,7 @@ const uploadImage = async (file) => {
 
   try {
     const response = await axios.post('https://api.imgbb.com/1/upload', formData);
-    console.log('Upload successful:', response.data); // Log da resposta de sucesso
+    // console.log('Upload successful:', response.data); // Log da resposta de sucesso
     return response.data.data.url;
   } catch (error) {
     console.error('Error uploading image:', error); // Log do erro detalhado
@@ -1135,11 +1136,11 @@ const uploadImage = async (file) => {
 };
 
 const onDropCapa = async (acceptedFiles) => {
-  console.log('Dropping files:', acceptedFiles); // Log dos arquivos recebidos
+  // console.log('Dropping files:', acceptedFiles); // Log dos arquivos recebidos
   if (acceptedFiles.length > 0) {
     try {
       const url = await uploadImage(acceptedFiles[0]);
-      console.log('Rendered URL:', url); // Log da URL gerada
+      // console.log('Rendered URL:', url); // Log da URL gerada
       setUrlCapa(url); // Define a URL da capa após o upload
     } catch (error) {
       console.error('Error in onDropCapa:', error); // Log de erro se o upload falhar
@@ -1153,7 +1154,7 @@ const { getRootProps: getCapaRootProps, getInputProps: getCapaInputProps } = use
   onDrop: onDropCapa,
   accept: 'image/*',
 });
-console.log('Dropzone initialized'); // Verifica se a dropzone foi inicializada corretamente
+// console.log('Dropzone initialized'); // Verifica se a dropzone foi inicializada corretamente
 
 useEffect(() => {
   const fetchDenuncias = async () => {
@@ -1393,7 +1394,7 @@ return (
       </div>
     )}
   </div>
-  {/* {console.log('Rendered URL:', urlCapa)} // Log para verificar se a URL da imagem está sendo renderizada */}
+  {/* {// console.log('Rendered URL:', urlCapa)} // Log para verificar se a URL da imagem está sendo renderizada */}
 </div>
 
 {/* Lista de Participantes */}
@@ -1761,7 +1762,7 @@ return (
           <tbody>
        {filteredforum.map((forum, index) => {
   
-  console.log('forum filtrados:', filteredforum);
+  // console.log('forum filtrados:', filteredforum);
 
   return (
     <tr key={forum.id}>
@@ -1777,12 +1778,16 @@ return (
       <td>
         <div className="edit-buttons-container">
           <button className="edit-btn" onClick={() => handleViewDetailsClick(forum)}>i</button>
-          <button className="publications-edit-btn" onClick={() => handleDeleteClick(forum)}>🗑️</button>
-          
-          {forum.estado === 'Denunciado' && (
-            <button className="publications-edit-btn" onClick={() => handleReportedViewClickForum(forum)}>
-              <img src="https://i.ibb.co/Cwhk8dN/Captura-de-ecr-2024-07-04-115321-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-115321-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
-            </button>
+          {forum.centro_id === parseInt(centroId) && (
+            <>
+            <button className="publications-edit-btn" onClick={() => handleDeleteClick(forum)}>🗑️</button>
+            
+            {forum.estado === 'Denunciado' && (
+              <button className="publications-edit-btn" onClick={() => handleReportedViewClickForum(forum)}>
+                <img src="https://i.ibb.co/Cwhk8dN/Captura-de-ecr-2024-07-04-115321-removebg-preview.png" alt="Captura-de-ecr-2024-07-04-115321-removebg-preview" className="custom-icon" /> {/* Substitua URL_DA_IMAGEM_POR_VALIDAR pelo URL da imagem */}
+              </button>
+            )}
+            </>
           )}
         </div>
 

@@ -10,7 +10,7 @@ const CentrosView = () => {
       try {
         const response = await axios.get('https://backend-teste-q43r.onrender.com/centros/listarCentros');
         if (response.data && Array.isArray(response.data)) {
-          console.log(response.data);
+          // console.log(response.data);
           setCentros(response.data);
         } else {
           console.error('Resposta da API vazia ou formato de dados incorreto');

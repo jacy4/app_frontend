@@ -6,15 +6,15 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import portugueseFlag from '../portugal.png';
 import userAvatar from '../logo192.png';
 
-const areas = [
-  { name: 'Desporto', id: 1 },
-  { name: 'Saúde', id: 2 },
-  { name: 'Gastronomia', id: 3 },
-  { name: 'Formação', id: 4 },
-  { name: 'Alojamento', id: 7 },
-  { name: 'Transportes', id: 6 },
-  { name: 'Lazer', id: 5 },
-];
+// const areas = [
+//   { name: 'Desporto', id: 1 },
+//   { name: 'Saúde', id: 2 },
+//   { name: 'Gastronomia', id: 3 },
+//   { name: 'Formação', id: 4 },
+//   { name: 'Alojamento', id: 7 },
+//   { name: 'Transportes', id: 6 },
+//   { name: 'Lazer', id: 5 },
+// ];
 
 const Navbar = () => {
   const [subMenuOpen, setSubMenuOpen] = useState({});
@@ -25,6 +25,22 @@ const Navbar = () => {
   const [userName, setUserName] = useState('');
   const [userSurname, setUserSurname] = useState('');
   const [userPhoto, setUserPhoto] = useState('');
+  const [areas, setAreas] = useState([]);
+
+  useEffect(() => {
+    // Função para buscar as áreas da API
+    const fetchAreas = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/areas/listarAreas'); // Substitua com a URL correta da sua API para buscar as áreas
+        // console.log(response.data)
+        setAreas(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar áreas:', error);
+      }
+    };
+  
+    fetchAreas();
+  }, []);
 
   const toggleSubMenu = (menu) => {
     setSubMenuOpen((prevState) => ({
@@ -128,47 +144,57 @@ const Navbar = () => {
               Página Inicial
             </Link>
           </li>
+          <li>
+            <Link
+              to="/pagina_calendario"
+              className={` ${selectedMenu === 'Calendário' ? 'active' : ''}`}
+              onClick={() => handleMenuClick('Calendário')}
+            >
+              Calendário
+            </Link>
+          </li>
           <li onClick={() => toggleSubMenu('areas')}>
             Áreas <span className={`fas fa-chevron-${subMenuOpen['areas'] ? 'up' : 'down'}`}></span>
             {subMenuOpen['areas'] && (
               <ul className="sub-menu">
                 {areas.map(area => (
-                  <li key={area.id} onClick={(e) => { e.stopPropagation(); toggleSubMenu(area.name); }}>
-                    {area.name} <span className={`fas fa-chevron-${subMenuOpen[area.name] ? 'up' : 'down'}`}></span>
-                    {subMenuOpen[area.name] && (
+                  <li id={area.createdAt} key={area.id} onClick={(e) => { e.stopPropagation(); toggleSubMenu(area.nome); }}>
+                    {area.nome} 
+                    <span className={`fas fa-chevron-${subMenuOpen[area.nome] ? 'up' : 'down'}`}></span>
+                    {subMenuOpen[area.nome] && (
                       <ul className="sub-menu">
                         <li>
                           <Link
                             to={`/listar_topicos/${area.id}`}
                             className={selectedMenu === 'Tópicos' ? 'active' : ''}
-                            onClick={() => handleMenuClick('Tópicos', area.name)}
+                            onClick={() => handleMenuClick('Tópicos', area.nome)}
                           >
                             Tópicos
                           </Link>
                         </li>
                         <li>
                           <Link
-                            to={`/pagina_eventos`}
+                            to={`/pagina_eventos/${area.id}`}
                             className={selectedMenu === 'Eventos' ? 'active' : ''}
-                            onClick={() => handleMenuClick('Eventos', area.name)}
+                            onClick={() => handleMenuClick('Eventos', area.nome)}
                           >
                             Eventos
                           </Link>
                         </li>
                         <li>
                           <Link
-                            to={`/pagina_foruns`}
+                            to={`/pagina_foruns/${area.id}`}
                             className={selectedMenu === 'Fóruns' ? 'active' : ''}
-                            onClick={() => handleMenuClick('Fóruns', area.name)}
+                            onClick={() => handleMenuClick('Fóruns', area.nome)}
                           >
                             Fóruns
                           </Link>
                         </li>
                         <li>
                           <Link
-                            to={ "/criar_publicacao" }
+                            to={ `/criar_publicacao/${area.id}`}
                             className={selectedMenu === 'Publicações' ? 'active' : ''}
-                            onClick={() => handleMenuClick('Publicações', area.name)}
+                            onClick={() => handleMenuClick('Publicações', area.nome)}
                           >
                             Publicações
                           </Link>
@@ -176,29 +202,20 @@ const Navbar = () => {
                         </li>
                         <li>
                           <Link
-                            to={`/pagina_partilhas`}
+                            to={`/pagina_partilhas/${area.id}`}
                             className={selectedMenu === 'Álbuns' ? 'active' : ''}
-                            onClick={() => handleMenuClick('Álbuns', area.name)}
+                            onClick={() => handleMenuClick('Álbuns', area.nome)}
                           >
                             Álbuns de partilhas
                           </Link>
                         </li>
                         <li>
                           <Link
-                            to={`/pagina_grupos`}
+                            to={`/pagina_grupos/${area.id}`}
                             className={selectedMenu === 'Grupos' ? 'active' : ''}
-                            onClick={() => handleMenuClick('Grupos', area.name)}
+                            onClick={() => handleMenuClick('Grupos', area.nome)}
                           >
                             Grupos
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to={`/pagina_calendario`}
-                            className={selectedMenu === 'Calendário' ? 'active' : ''}
-                            onClick={() => handleMenuClick('Calendário', area.name)}
-                          >
-                            Calendário
                           </Link>
                         </li>
                       </ul>
@@ -208,6 +225,7 @@ const Navbar = () => {
               </ul>
             )}
           </li>
+          
         </ul>
         <div className="bottom-menu">
           <ul className="sidebar-menu">

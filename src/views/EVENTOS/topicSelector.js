@@ -1,8 +1,8 @@
 import React from 'react';
 
 const TopicSelector = ({ topics, selectedTopic, onChange }) => {
-  console.log('topics:', topics); // Verifica os tópicos recebidos
-  console.log('Array.isArray(topics):', Array.isArray(topics)); // Confirma se é um array
+  // console.log('topics:', topics); // Verifica os tópicos recebidos
+  // console.log('Array.isArray(topics):', Array.isArray(topics)); // Confirma se é um array
 
   if (!Array.isArray(topics)) {
     return <div></div>;

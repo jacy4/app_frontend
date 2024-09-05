@@ -1,29 +1,28 @@
 .div_princ {
     display: flex;
-    flex-direction: column;
-    width: calc(100% - 250px); /* Ajustar a largura para descontar o menu lateral */
-    background-color: #c8373700;
-    padding: 20px;
-    box-sizing: border-box; /* Inclui padding e border no cálculo da largura e altura */
-    overflow: auto;
-    flex: 1;
-    min-height: calc(100vh - 90px); /* Ajustar para ocupar a altura da tela menos a navbar */
-    margin-left: 250px; /* Espaço para o menu lateral */
-    margin-top: 60px;
+    height: 100vh; /* Preenche a altura da tela */
   }
   
   .title2 {
-    color: white; /* Cor do texto */
-    font-size: 36px; /* Tamanho da fonte */
-    text-align: left; /* Alinha o texto à esquerda */
-    margin: 0; /* Remove margens adicionais */
-    padding: 0px 0; /* Adiciona espaçamento acima e abaixo do título */
+    margin-bottom: 20px;
   }
   
   .cards-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Define uma grade de 3 colunas */
-    gap:0px; /* Espaçamento entre os cartões */
-    margin-top:0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50%; /* Ocupa metade da largura da tela */
+    background-color: transparent; /* Opcional: define uma cor de fundo para a área do gráfico */
+  }
+  
+  .right-container {
+    width: 50%; /* Ocupa a outra metade da tela */
+    padding: 20px;
+    background-color: transparent; /* Opcional: define uma cor de fundo para a outra área */
+  }
+  
+  .radar-chart {
+    width: 100%; /* Ocupa toda a largura disponível da container */
+    height: 100%; /* Ocupa toda a altura disponível da container */
   }
   
