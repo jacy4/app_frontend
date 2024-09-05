@@ -19,7 +19,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.2",
-    "chart.js": "^3.9.1",
+    "chart.js": "^4.1.1",
     "chartjs-node-canvas": "^4.1.6",
     "imgbb-uploader": "^1.5.1",
     "jwt-decode": "^4.0.0",
