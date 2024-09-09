@@ -4,7 +4,7 @@ import axios from 'axios';
 import handleSubmit from './criar_evento';
 import TopicSelector from './topicSelector'; // Import TopicSelector component
 import { useNavigate } from 'react-router-dom';
-import CreateEventoButton from '../../componentes/botao_view_eventos/criar_evento';
+import CreatealbumButton from '../../componentes/botao_view_eventos/criar_evento';
 import { GoogleMap, LoadScript, Marker, useJsApiLoader } from '@react-google-maps/api';
 import { useDropzone } from 'react-dropzone';
 import moment from 'moment';
@@ -25,35 +25,36 @@ const AlbunsView = () => {
     const [centroId, setCentroId] = useState(null);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [eventoToDelete, setEventoToDelete] = useState(null);
+    const [albumToDelete, setalbumToDelete] = useState(null);
     const [showHideModal, setShowHideModal] = useState(false);
-    const [eventoToHide, setEventoToHide] = useState(null);
+    const [albumToHide, setalbumToHide] = useState(null);
     const [removalReason, setRemovalReason] = useState('');
     const [showEditForm, setShowEditForm] = useState(false);
-    const [eventoToEdit, setEventoToEdit] = useState(null);
-    const [evento, setEvento] = useState(null);
+    const [albumToEdit, setalbumToEdit] = useState(null);
+    const [album, setalbum] = useState(null);
     const [showSuccessMessageDelete, setShowSuccessMessageDelete] = useState(false);
     const [showSuccessMessageHide, setShowSuccessMessageHide] = useState(false);
     const [filter, setFilter] = useState('all');
     const [showDetailViewDenunciada, setShowDetailViewDenunciada] = useState(false);
-    const [eventoDetailDenunciada, setEventoDetailDenunciada] = useState(null);
+    const [albumDetailDenunciada, setalbumDetailDenunciada] = useState(null);
     const [showMedidasModal, setShowMedidasModal] = useState(false);
     const [showAlertModal, setShowAlertModal] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [showSuccessMessageAlert, setShowSuccessMessageAlert] = useState(false);
-    const [selectedEvento, setSelectedEvento] = useState(null);
+    
+    const [selectedAlbum, setselectedAlbum] = useState(null);
     const [showDeleteModalMedidas, setShowDeleteModalMedidas] = useState(false);
     const [deleteMessage, setDeleteMessage] = useState('');
     const [showSuccessMessageMedidas, setShowSuccessMessageMedidas] = useState(false);
     const [showApprovalView, setShowApprovalView] = useState(false);
-    const [eventoDetail, setEventoDetail] = useState(null);
+    const [albumDetail, setalbumDetail] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState('descricao');
     const [showApproveModal, setShowApproveModal] = useState(false);
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [rejectMessage, setRejectMessage] = useState('');
     const [showDetailView, setShowDetailView] = useState(false);
-    const [eventoDetailActive, setEventoDetailActive] = useState(null);
+    const [albumDetailActive, setalbumDetailActive] = useState(null);
     const weekDays = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
     const [showPendingModal, setShowPendingModal] = useState(false);
     const [showReportedModal, setShowReportedModal] = useState(false);
@@ -79,10 +80,10 @@ const [dataFimAtividade, setDataFimAtividade] = useState('');
 
 
 const [estado, setEstado] = useState('');
-const [capaImagemEvento, setCapaImagemEvento] = useState('');
+const [capaImagemalbum, setCapaImagemalbum] = useState('');
 const [latitude, setLatitude] = useState(null);
 const [longitude, setLongitude] = useState(null);
-const [tipodeevento, setTipoDeEvento] = useState('');
+const [tipodealbum, setTipoDealbum] = useState('');
 
 
 const [novaClassificacao, setNovaClassificacao] = useState(0);
@@ -125,7 +126,7 @@ const [participantes, setParticipantes] = useState([]);
 
 const [modalIsOpen, setModalIsOpen] = useState(false);
 
-const [dataEvento, setDataEvento] = useState('');
+const [dataalbum, setDataalbum] = useState('');
 
 const openModalParticipantes = () => {
   setModalIsOpen(true); // Abre o modal
@@ -185,8 +186,8 @@ useEffect(() => {
 }, [areaId]);
 
 
-const handleViewDetailsClick = (evento) => {
-  setSelectedEvento(evento);
+const handleViewDetailsClick = (album) => {
+  setselectedAlbum(album);
   setShowDetailView(true);
 };
 
@@ -207,27 +208,27 @@ useEffect(() => {
 }, []);
 
 
-const handlePendingViewClick = (evento) => {
-  setEventoDetail(evento);
+const handlePendingViewClick = (album) => {
+  setalbumDetail(album);
   setShowApprovalView(true);
 };
 
-const handleReportedViewClick = (evento) => {
-  setEventoDetailDenunciada(evento);
+const handleReportedViewClick = (album) => {
+  setalbumDetailDenunciada(album);
   setShowDetailViewDenunciada(true);
 };
 
 
 
 // Form states
-const handleHideClick = (evento) => {
-  setEventoToHide(evento);
+const handleHideClick = (album) => {
+  setalbumToHide(album);
   setShowHideModal(true);
 };
 
-const handleEditClick = (evento) => {
-  setEventoToEdit(evento);
-  setSelectedEvento(evento );
+const handleEditClick = (album) => {
+  setalbumToEdit(album);
+  setselectedAlbum(album );
   setShowEditForm(true);
   setShowalbunsList(false);
   setShowMedidasModal(false);
@@ -238,7 +239,7 @@ const handleEditClick = (evento) => {
 
 const handleCancelHide = () => {
   setShowHideModal(false);
-  setEventoToHide(null);
+  setalbumToHide(null);
   setRemovalReason('');
 };
 
@@ -246,8 +247,8 @@ const handleTabClick = (tab) => {
   setActiveTab(tab);
 };
 
-const handleDeleteClick = (evento) => {
-  setEventoToDelete(evento);
+const handleDeleteClick = (album) => {
+  setalbumToDelete(album);
   setShowDeleteModal(true);
 };
 
@@ -260,16 +261,16 @@ const handleDeleteConfirm = () => {
 
 const closeDeleteModal = () => {
   setShowDeleteModal(false);
-  setEventoToDelete(null);
+  setalbumToDelete(null);
 };
 const handleCancelDelete = () => {
   setShowDeleteModal(false);
-  setEventoToDelete(null);
+  setalbumToDelete(null);
 };
 const handleConfirmDelete = async () => {
   try {
-    await axios.delete(`https://backend-teste-q43r.onrender.com/albuns/delete/${eventoToDelete.id}`);
-    setAlbuns(albuns.filter(p => p.id !== eventoToDelete.id));
+    await axios.delete(`https://backend-teste-q43r.onrender.com/albuns/delete/${albumToDelete.id}`);
+    setAlbuns(albuns.filter(p => p.id !== albumToDelete.id));
     setShowSuccessMessageDelete(true); // Exibir a mensagem de sucesso após a exclusão
   } catch (error) {
     if (error.response) {
@@ -284,7 +285,7 @@ const handleConfirmDelete = async () => {
       // Algo aconteceu ao configurar a requisição
       console.error('Erro ao configurar a requisição:', error.message);
     }
-    console.error('Erro ao deletar evento:', error.config);
+    console.error('Erro ao deletar album:', error.config);
   }
   setShowDeleteModal(false);
 };
@@ -322,7 +323,7 @@ const formatarData = (data) => {
   return new Date(data).toLocaleDateString('pt-PT', options);
 };
 
-const handleCreateEventoClick = () => {
+const handleCreatealbumClick = () => {
   setShowCreateForm(true);
   setShowalbunsList(false);
   setSelectedButton('create'); // Set the selected button
@@ -345,7 +346,7 @@ const handleSubmit = async (e) => {
 
   const albumData = {
     nome, 
-    area_id: area, // Nome do evento
+    area_id: area, // Nome do album
     descricao, 
     centro_id: centroId,
     autor_id: sessionStorage.getItem('user_id')
@@ -374,7 +375,7 @@ const handleSubmit = async (e) => {
 };
 
 
-const handleShowEventoListClick = () => {
+const handleShowalbumListClick = () => {
   setShowCreateForm(false);
   setShowalbunsList(true);
   setSelectedButton('list'); // Set the selected button
@@ -382,14 +383,14 @@ const handleShowEventoListClick = () => {
 
 const handleCreatealbunsubmit = ({ nome, topico }) => {
   // Adiciona a nova publicação aos dados estáticos
-  const novoEvento = {
+  const novoalbum = {
     id: albuns.length + 1,
     nome,
     topico,
     createdAt: new Date().toISOString(),
     estado: "Active"
   };
-  setAlbuns([...albuns, novoEvento]);
+  setAlbuns([...albuns, novoalbum]);
   setShowCreateForm(false);
   setShowalbunsList(true);
 };
@@ -399,15 +400,15 @@ const handleSearchChange = (event) => {
 };
 
 
-const handleDelete = (evento) => {
+const handleDelete = (album) => {
   // Aqui você deve adicionar a lógica para deletar a publicação
   // Após deletar, você pode atualizar o estado `publicacoes` para remover a publicação
-  setAlbuns(albuns.filter(p => p.id !== evento.id));
+  setAlbuns(albuns.filter(p => p.id !== album.id));
   closeDeleteModal();
 };
 
 const handleConfirmHide = () => {
-  handleToggleVisibility(eventoToHide);
+  handleToggleVisibility(albumToHide);
   setShowHideModal(false);
   setRemovalReason('');
   setShowSuccessMessageHide(true); // Exibir a mensagem de sucesso após ocultar
@@ -492,7 +493,7 @@ filteredalbuns = filteredalbuns.filter(album => {
   }
 
   console.log('Filtro atual:', filter);
-  console.log('Estado do evento:', album.estado);
+  console.log('Estado do album:', album.estado);
 
   // Combina ambos os filtros: título e estado
   return matchesTitle && matchesState;
@@ -543,14 +544,14 @@ setShowDeleteModalMedidas(false);
 setShowSuccessMessageMedidas(true);
 };
 
-const handleInfoClick = (evento) => {
-setEventoDetail(evento);
+const handleInfoClick = (album) => {
+setalbumDetail(album);
 setShowApprovalView(true);
 };
 
 const handleApproveClick = () => {
 setShowApproveModal(true);
-approveLocal(eventoDetail.id);
+approveLocal(albumDetail.id);
 
 };
 
@@ -568,15 +569,15 @@ handleRejectAndDelete();
 
 const handleRejectAndDelete = async () => {
 try {
-  const response = await axios.delete(`https://backend-teste-q43r.onrender.com/albuns/delete/${eventoDetail.id}`);
+  const response = await axios.delete(`https://backend-teste-q43r.onrender.com/albuns/delete/${albumDetail.id}`);
   if (response.status === 200) {
-    console.log('evento eliminada com sucesso:', response.data);
+    console.log('album eliminada com sucesso:', response.data);
     // Adicione qualquer lógica adicional, como redirecionamento ou atualização da UI
   } else {
-    console.error('Erro ao eliminar evento:', response);
+    console.error('Erro ao eliminar album:', response);
   }
 } catch (error) {
-  console.error('Erro ao eliminar evento:', error);
+  console.error('Erro ao eliminar album:', error);
 }
 };
 
@@ -628,30 +629,30 @@ return isOpen;
 
 
 useEffect(() => {
-if (selectedEvento && selectedEvento.horario) {
-  setIsOpen(isOpenNow(selectedEvento.horario));
+if (selectedAlbum && selectedAlbum.horario) {
+  setIsOpen(isOpenNow(selectedAlbum.horario));
 }
-}, [selectedEvento]);
+}, [selectedAlbum]);
 
 
-const handlePendingClick = (evento) => {
+const handlePendingClick = (album) => {
 // Lógica para tratar clique no botão de "Por validar"
 // Exemplo: Abrir uma modal para validação
-setSelectedEvento(evento);
+setselectedAlbum(album);
 setShowPendingModal(true);
 };
 
-const handleReportedClick = (evento) => {
+const handleReportedClick = (album) => {
 // Lógica para tratar clique no botão de "Denunciada"
 // Exemplo: Abrir uma modal para revisão de denúncia
-setSelectedEvento(evento);
+setselectedAlbum(album);
 setShowReportedModal(true);
 };
 
 useEffect(() => {
 const Comentarios = async () => {
   try {
-    const response = await axios.get(`https://backend-teste-q43r.onrender.com/comentarios_albuns/todoscomentarios/${selectedEvento.id}`);
+    const response = await axios.get(`https://backend-teste-q43r.onrender.com/comentarios_albuns/todoscomentarios/${selectedAlbum.id}`);
     console.log(response.data);
     setComentarios(response.data);
   } catch (error) {
@@ -659,15 +660,15 @@ const Comentarios = async () => {
   }
 };
 
-if (selectedEvento) {
+if (selectedAlbum) {
   Comentarios();
 }
-}, [selectedEvento]);
+}, [selectedAlbum]);
 
 const handleLike = async (comentarioId) => {
   try {
     await axios.post(`https://backend-teste-q43r.onrender.com/likescomentariosalbuns/like`, {
-      comentario_evento_id: comentarioId,
+      comentario_album_id: comentarioId,
       user_id: sessionStorage.getItem('user_id')
     });
 
@@ -685,7 +686,7 @@ const handleLike = async (comentarioId) => {
 
 const [optionsOpen, setOptionsOpen] = useState(null);
 
-const toggleOptionsEvento = (mensagemId) => {
+const toggleOptionsalbum = (mensagemId) => {
   setOptionsOpen(prevId => (prevId === mensagemId ? null : mensagemId));
 };
 useEffect(() => {
@@ -704,7 +705,7 @@ useEffect(() => {
 const handleAddComentario = async () => {
 const user_id = sessionStorage.getItem('user_id'); // Obtendo o user_id do sessionStorage
   const comentarioData = {
-    evento_id: selectedEvento.id,
+    album_id: selectedAlbum.id,
     texto_comentario: novoComentario,
     user_id,
     classificacao: novaClassificacao
@@ -746,11 +747,11 @@ const user_id = sessionStorage.getItem('user_id'); // Obtendo o user_id do sessi
 };
 
 
-const handleToggleVisibility = async (evento) => {
+const handleToggleVisibility = async (album) => {
 try {
-  const updatedVisivel = !evento.visivel;
-  await axios.put(`https://backend-teste-q43r.onrender.com/albuns/updateVisibility/${evento.id}`, { visivel: updatedVisivel });
-  setAlbuns(albuns.map(p => p.id === evento.id ? { ...p, visivel: updatedVisivel } : p));
+  const updatedVisivel = !album.visivel;
+  await axios.put(`https://backend-teste-q43r.onrender.com/albuns/updateVisibility/${album.id}`, { visivel: updatedVisivel });
+  setAlbuns(albuns.map(p => p.id === album.id ? { ...p, visivel: updatedVisivel } : p));
 } catch (error) {
   console.error('Erro ao atualizar visibilidade da publicação:', error);
 }
@@ -851,11 +852,11 @@ setEstrelas(e.target.value);
 const handleAvaliacaoSubmit = async (e) => {
 e.preventDefault();
 const userId = sessionStorage.getItem('user_id');
-const eventoId = selectedEvento.id;
+const albumId = selectedAlbum.id;
 
 try {
   const response = await axios.post('https://backend-teste-q43r.onrender.com/avaliacao_albuns/criar', {
-    evento_id: eventoId,
+    album_id: albumId,
     autor_id: userId,
     estrelas: estrelas
   });
@@ -868,7 +869,7 @@ try {
 
 const MediaAvaliacoes2 = async () => {
 try {
-  const response = await axios.get(`https://backend-teste-q43r.onrender.com/avaliacao_albuns/media/${selectedEvento.id}`);
+  const response = await axios.get(`https://backend-teste-q43r.onrender.com/avaliacao_albuns/media/${selectedAlbum.id}`);
   setMediaAvaliacoes(response.data);
 } catch (error) {
   console.error('Erro ao buscar média de avaliações:', error);
@@ -876,42 +877,42 @@ try {
 };
 
 // useEffect(() => {
-// if (selectedEvento) {
+// if (selectedAlbum) {
 //   MediaAvaliacoes();
 // }
-// }, [selectedEvento]);
+// }, [selectedAlbum]);
 
 
 
 useEffect(() => {
-  if (eventoToEdit) {
-    setNome(eventoToEdit.nome);
-    setAutor(eventoToEdit.autor_id);
-    setDescricao(eventoToEdit.descricao);
-    setTopico(eventoToEdit.topico_id);
-    setLocalizacao(eventoToEdit.localizacao);
-    setEstado(eventoToEdit.estado);
+  if (albumToEdit) {
+    setNome(albumToEdit.nome);
+    setAutor(albumToEdit.autor_id);
+    setDescricao(albumToEdit.descricao);
+    setTopico(albumToEdit.topico_id);
+    setLocalizacao(albumToEdit.localizacao);
+    setEstado(albumToEdit.estado);
     // Formatar as datas para o formato datetime-local
-    const dataInicioFormatada = new Date(eventoToEdit.datainicioatividade).toISOString().slice(0, 16);
-    const dataFimFormatada = new Date(eventoToEdit.datafimatividade).toISOString().slice(0, 16);
+    const dataInicioFormatada = new Date(albumToEdit.datainicioatividade).toISOString().slice(0, 16);
+    const dataFimFormatada = new Date(albumToEdit.datafimatividade).toISOString().slice(0, 16);
     setDataInicioAtividade(dataInicioFormatada);
     setDataFimAtividade(dataFimFormatada);
-    setCapaImagemEvento(eventoToEdit.capa_imagem_evento);
-    setLatitude(eventoToEdit.latitude);
-    setLongitude(eventoToEdit.longitude);
-    setTipoDeEventoId(eventoToEdit.tipodeevento_id);
-    setArea(eventoToEdit.area_id);
+    setCapaImagemalbum(albumToEdit.capa_imagem_album);
+    setLatitude(albumToEdit.latitude);
+    setLongitude(albumToEdit.longitude);
+    setTipoDealbumId(albumToEdit.tipodealbum_id);
+    setArea(albumToEdit.area_id);
 
-    // Se houver uma galeria de imagens associada ao evento
-    if (eventoToEdit.imagens) {
-      setGaleria(eventoToEdit.imagens.map((image) => ({
+    // Se houver uma galeria de imagens associada ao album
+    if (albumToEdit.imagens) {
+      setGaleria(albumToEdit.imagens.map((image) => ({
         id: image.id,
         url: image.caminho_imagem,
         preview: image.caminho_imagem
       })));
     }
   }
-}, [eventoToEdit]);
+}, [albumToEdit]);
 
 
 
@@ -940,16 +941,16 @@ const handleSubmitEdit = async (e) => {
 
   const albumData = {
     nome, 
-    area_id: area, // Nome do evento
+    area_id: area, // Nome do album
     descricao,
-    capa_imagem_album: capaImagemEvento, 
+    capa_imagem_album: capaImagemalbum, 
     centro_id: centroId,
-    autor_id: eventoToEdit.autor_id || sessionStorage.getItem('user_id'),
+    autor_id: albumToEdit.autor_id || sessionStorage.getItem('user_id'),
    
   };
 
   try {
-    const response = await axios.put(`https://backend-teste-q43r.onrender.com/albuns/update/${eventoToEdit.id}`, albumData, {
+    const response = await axios.put(`https://backend-teste-q43r.onrender.com/albuns/update/${albumToEdit.id}`, albumData, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -962,10 +963,10 @@ const handleSubmitEdit = async (e) => {
       console.error('Erro na resposta do Backend:', response); // Log de erro caso a resposta não seja 201
       // Lógica de erro adicional, se necessário
     }
-    console.log('Evento atualizado:', response.data);
+    console.log('album atualizado:', response.data);
     
   } catch (error) {
-    console.error('Erro ao atualizar evento:', error);
+    console.error('Erro ao atualizar album:', error);
   }
 };
 
@@ -976,9 +977,9 @@ setComentarios(comentarios.filter(comentario => comentario.id !== comentarioId))
 };
 
 
-const approveLocal = async (eventoId) => {
+const approveLocal = async (albumId) => {
 try {
-  const response = await axios.put(`https://backend-teste-q43r.onrender.com/albuns/update/${eventoId}`, {
+  const response = await axios.put(`https://backend-teste-q43r.onrender.com/albuns/update/${albumId}`, {
     estado: 'Ativa',
   }, {
     headers: {
@@ -988,7 +989,7 @@ try {
   if (response.status === 200) {
     console.log('Publicação aprovada com sucesso');
     // Atualize o estado local se necessário, por exemplo:
-    setSelectedEvento((prev) => ({ ...prev, estado: 'Ativo' }));
+    setselectedAlbum((prev) => ({ ...prev, estado: 'Ativo' }));
   } else {
     console.error('Erro ao aprovar publicação:', response);
   }
@@ -1001,7 +1002,7 @@ useEffect(() => {
   const fetchParticipantes = async () => {
       setLoading(true);
       try {
-          const response = await axios.get(`https://backend-teste-q43r.onrender.com/listaparticipantes_evento/evento/${selectedEvento.id}`);
+          const response = await axios.get(`https://backend-teste-q43r.onrender.com/listaparticipantes_album/album/${selectedAlbum.id}`);
           setParticipantes(response.data);
           setLoading(false);
       } catch (err) {
@@ -1011,7 +1012,7 @@ useEffect(() => {
   };
 
   fetchParticipantes();
-}, [selectedEvento]);
+}, [selectedAlbum]);
 
 
 useEffect(() => {
@@ -1034,10 +1035,10 @@ useEffect(() => {
   console.log('Álbuns carregados:', albuns); // Verifique se os álbuns estão sendo atualizados
 }, [albuns]);
 
-const adicionarParticipante = async (eventoId, usuarioId) => {
+const adicionarParticipante = async (albumId, usuarioId) => {
   try {
-      const response = await axios.post('https://backend-teste-q43r.onrender.com/listaparticipantes_evento/adicionar_participante/', {
-          evento_id: eventoId,
+      const response = await axios.post('https://backend-teste-q43r.onrender.com/listaparticipantes_album/adicionar_participante/', {
+          album_id: albumId,
           usuario_id: usuarioId
       });
       const data = await response.json();
@@ -1061,14 +1062,14 @@ const adicionarParticipante = async (eventoId, usuarioId) => {
 };
 
 useEffect(() => {
-  if (selectedEvento) {
-    console.log('Selected Evento:', selectedEvento);
+  if (selectedAlbum) {
+    console.log('Selected album:', selectedAlbum);
     console.log('Participantes:', participantes);
     console.log('UserId:', userId);
   } else {
-    console.log('Evento ainda não foi carregado ou está nulo.');
+    console.log('album ainda não foi carregado ou está nulo.');
   }
-}, [selectedEvento, participantes, userId]); // Dependências para re-logar quando mudarem
+}, [selectedAlbum, participantes, userId]); // Dependências para re-logar quando mudarem
 
 
 // async function getAddressFromCoordinates(latitude, longitude) {
@@ -1086,42 +1087,42 @@ useEffect(() => {
 // const [endereco, setEndereco] = useState('');
 
 // useEffect(() => {
-//   if (selectedEvento.latitude && selectedEvento.longitude) {
-//     getAddressFromCoordinates(selectedEvento.latitude, selectedEvento.longitude)
+//   if (selectedAlbum.latitude && selectedAlbum.longitude) {
+//     getAddressFromCoordinates(selectedAlbum.latitude, selectedAlbum.longitude)
 //       .then(address => setEndereco(address))
 //       .catch(error => console.error('Erro ao obter endereço:', error));
 //   }
-// }, [selectedEvento.latitude, selectedEvento.longitude]);
+// }, [selectedAlbum.latitude, selectedAlbum.longitude]);
 
 
-// Exemplo para garantir que o selectedEvento e userId estejam definidos
-const eventoId = selectedEvento ? selectedEvento.id : null; // Certifique-se de que está pegando o ID corretamente
+// Exemplo para garantir que o selectedAlbum e userId estejam definidos
+const albumId = selectedAlbum ? selectedAlbum.id : null; // Certifique-se de que está pegando o ID corretamente
 
 useEffect(() => {
-  const fetchEvento = async () => {
-    // Verifica se o eventoId não é null
-    if (eventoId) {
+  const fetchalbum = async () => {
+    // Verifica se o albumId não é null
+    if (albumId) {
       try {
-        const response = await axios.get(`https://backend-teste-q43r.onrender.com/eventos/${eventoId}`);
-        setSelectedEvento(response.data);
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/albums/${albumId}`);
+        setselectedAlbum(response.data);
       } catch (error) {
-        console.error('Erro ao buscar o evento:', error);
+        console.error('Erro ao buscar o album:', error);
       }
     } else {
-      console.log("eventoId não está definido");
+      console.log("albumId não está definido");
     }
   };
 
-  fetchEvento();
-}, [eventoId]); // Certifique-se de passar o eventoId corretamente
+  fetchalbum();
+}, [albumId]); // Certifique-se de passar o albumId corretamente
 
 
 
 useEffect(() => {
-  if (selectedEvento && selectedEvento.id) {
+  if (selectedAlbum && selectedAlbum.id) {
     const fetchMediaAvaliacoes = async () => {
       try {
-        const response = await axios.get(`https://backend-teste-q43r.onrender.com/comentarios_albuns/mediaavaliacoes/${selectedEvento.id}`);
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/comentarios_albuns/mediaavaliacoes/${selectedAlbum.id}`);
         setMediaAvaliacoes(response.data);
       } catch (error) {
         console.error('Erro ao buscar a média das avaliações:', error);
@@ -1130,26 +1131,26 @@ useEffect(() => {
 
     fetchMediaAvaliacoes();
   } else {
-    console.log("selectedEvento ou eventoId não está definido");
+    console.log("selectedAlbum ou albumId não está definido");
   }
-}, [selectedEvento]);
+}, [selectedAlbum]);
 
 
 
 useEffect(() => {
   const fetchImagensGaleria = async () => {
-    if (selectedEvento && selectedEvento.id) {
+    if (selectedAlbum && selectedAlbum.id) {
       try {
-        const response = await axios.get(`https://backend-teste-q43r.onrender.com/galeria_evento/listar_imagens_v2/${selectedEvento.id}`);
+        const response = await axios.get(`https://backend-teste-q43r.onrender.com/galeria_album/listar_todas_imagens/${selectedAlbum.id}`);
         setImagensGaleria(response.data);
       } catch (error) {
-        console.error('Erro ao buscar imagens da galeria:', error);
+        console.error('Erro ao buscar imagens da galeria do álbum:', error);
       }
     }
   };
 
   fetchImagensGaleria();
-}, [selectedEvento]);
+}, [selectedAlbum]);
 
 const [optionsOpenMarcar, setOptionsOpenMarcar] = useState(null);
 
@@ -1194,7 +1195,7 @@ useEffect(() => {
 
 const [comentariosalbuns, setComentariosalbuns] = useState([]);
 
-const handleDeleteComentarioEvento = async (comentarioId) => {
+const handleDeleteComentarioalbum = async (comentarioId) => {
   try {
     const response = await axios.delete(`https://backend-teste-q43r.onrender.com/comentarios_albuns/apagarcomentario/${comentarioId}`);
     if (response.status === 200) {
@@ -1211,23 +1212,23 @@ const handleDeleteComentarioEvento = async (comentarioId) => {
 };
 
 
-const [tiposDeEvento, setTiposDeEvento] = useState([]);
+const [tiposDealbum, setTiposDealbum] = useState([]);
 
 useEffect(() => {
   // Função para buscar os tipos de albuns da API
-  const fetchTiposDeEvento = async () => {
+  const fetchTiposDealbum = async () => {
     try {
-      const response = await axios.get('https://backend-teste-q43r.onrender.com/tipodeevento/listarTipos'); // URL correta da sua API para buscar os tipos de albuns
-      setTiposDeEvento(response.data);
+      const response = await axios.get('https://backend-teste-q43r.onrender.com/tipodealbum/listarTipos'); // URL correta da sua API para buscar os tipos de albuns
+      setTiposDealbum(response.data);
     } catch (error) {
-      console.error('Erro ao buscar tipos de evento:', error);
+      console.error('Erro ao buscar tipos de album:', error);
     }
   };
 
-  fetchTiposDeEvento();
+  fetchTiposDealbum();
 }, []);
 
-const [tipoDeEventoId, setTipoDeEventoId] = useState('');
+const [tipoDealbumId, setTipoDealbumId] = useState('');
 
 
 // Adicionar estado para rastrear as imagens removidas
@@ -1256,7 +1257,7 @@ useEffect(() => {
   
   const fetchDenuncias = async () => {
     try {
-      const response = await axios.get(`https://backend-teste-q43r.onrender.com/denuncias_comentarios_albuns/denunciasPorEvento/${eventoDetailDenunciada?.id}`);
+      const response = await axios.get(`https://backend-teste-q43r.onrender.com/denuncias_comentarios_albuns/denunciasPoralbum/${albumDetailDenunciada?.id}`);
       console.log("Fetched denuncias response:", response.data);
       setDenuncias(response.data);
       console.log(denuncias);
@@ -1265,10 +1266,10 @@ useEffect(() => {
     }
   };
 
-  if (eventoDetailDenunciada) {
+  if (albumDetailDenunciada) {
     fetchDenuncias();
   }
-}, [eventoDetailDenunciada?.id]);
+}, [albumDetailDenunciada?.id]);
 
 const marcarDenunciaComoResolvida = async (denunciaId) => {
   try {
@@ -1297,7 +1298,7 @@ return (
       <div className="publicacoes-button-container">
         <div className="left-buttons">
         {}
-          <CreateEventoButton
+          <CreatealbumButton
             onClick={() => handleButtonClick('all')}
             iconSrc="https://i.ibb.co/P4nsk4w/Icon-criar.png"
             iconBgColor="#e0f7fa"
@@ -1305,7 +1306,7 @@ return (
             subtitle={albuns.length.toString()}
             isSelected={selectedButton === 'all'}
           />
-          <CreateEventoButton
+          <CreatealbumButton
             iconSrc="https://i.ibb.co/Y3jNfMt/pending-icon-512x504-9zrlrc78.png"
             iconBgColor="#FFEECC"
             title="Por validar"
@@ -1313,7 +1314,7 @@ return (
             isSelected={selectedButton === 'por validar'}
             onClick={() => handleButtonClick('por validar')}
           />
-          <CreateEventoButton
+          <CreatealbumButton
             iconSrc="https://i.ibb.co/D8QwJ6M/active-removebg-preview.png"
             iconBgColor="#CCFFCC"
             title="Ativos"
@@ -1322,7 +1323,7 @@ return (
             onClick={() => handleButtonClick('ativa')}
           />
           
-          <CreateEventoButton
+          <CreatealbumButton
             iconSrc="https://i.ibb.co/RPC7vW8/Icon-denuncia.png"
             iconBgColor="#FFE0EB"
             title="Denunciados"
@@ -1332,11 +1333,11 @@ return (
           />
         </div>
         <div className="right-button">
-          <CreateEventoButton
-            onClick={handleCreateEventoClick}
+          <CreatealbumButton
+            onClick={handleCreatealbumClick}
             iconSrc="https://i.ibb.co/P4nsk4w/Icon-criar.png"
             iconBgColor="#e0f7fa"
-            title="Criar Evento"
+            title="Criar album"
             subtitle="Criar..."
             isSelected={selectedButton === 'create'}
           />
@@ -1359,13 +1360,13 @@ return (
     )}
     
     {showEditForm && (
-      <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Editar informações do Evento</h1>
+      <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Editar informações do album</h1>
       <div className="header">
-      <h1 className="header-title">{selectedEvento.nome}</h1>
+      <h1 className="header-title">{selectedAlbum.nome}</h1>
       <div className="author">
           <div className="authorName"><span>Autor :</span></div>
-          <img src={selectedEvento.user.caminho_foto} alt={selectedEvento.user.nome} className="author-icon" />
-          <span>{selectedEvento.user.nome} {selectedEvento.user.sobrenome}</span>
+          <img src={selectedAlbum.user.caminho_foto} alt={selectedAlbum.user.nome} className="author-icon" />
+          <span>{selectedAlbum.user.nome} {selectedAlbum.user.sobrenome}</span>
       
         </div>
 
@@ -1417,11 +1418,11 @@ return (
               </select>
             </div>
             <div className="form-group">
-  <label>Nome do Evento</label>
-  <input type="text" placeholder="inserir nome do evento" value={nome} onChange={(e) => setNome(e.target.value)} />
+  <label>Nome do album</label>
+  <input type="text" placeholder="inserir nome do album" value={nome} onChange={(e) => setNome(e.target.value)} />
 </div>
 <div className="form-group">
-  <label>Estado do Evento</label>
+  <label>Estado do album</label>
   <select value={estado} onChange={(e) => setEstado(e.target.value)}>
     <option value="">Selecionar estado</option>
     <option value="Ativa">Ativa</option>
@@ -1433,14 +1434,14 @@ return (
 
 
 <div className="form-group">
-  <label>Descrição do Evento</label>
-  <input type="text" placeholder="inserir uma breve descrição do evento" value={descricao} onChange={(e) => setDescricao(e.target.value)}/>
+  <label>Descrição do album</label>
+  <input type="text" placeholder="inserir uma breve descrição do album" value={descricao} onChange={(e) => setDescricao(e.target.value)}/>
 </div>
 <div className="form-group">
-  <label>Tipo de Evento</label>
-  <select value={tipoDeEventoId} onChange={(e) => setTipoDeEventoId(e.target.value)}>
-    <option value="">Selecionar Tipo de Evento</option>
-    {tiposDeEvento.map((tipo) => (
+  <label>Tipo de album</label>
+  <select value={tipoDealbumId} onChange={(e) => setTipoDealbumId(e.target.value)}>
+    <option value="">Selecionar Tipo de album</option>
+    {tiposDealbum.map((tipo) => (
       <option key={tipo.id} value={tipo.id}>{tipo.nome_tipo}</option>  
     ))}
   </select>
@@ -1454,7 +1455,7 @@ return (
 
 {activeTab === 'galeria' && (
   <div className="tab-content_galeria">
-    <h2>Galeria do evento</h2>
+    <h2>Galeria do album</h2>
     <div {...getRootProps({ className: 'dropzone' })} className="gallery-upload">
       <input {...getInputProps()} />
       <div className="upload-box">
@@ -1462,7 +1463,7 @@ return (
         <span className="upload-text">Upload</span>
       </div>
       <p className="gallery-info">
-        <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do evento
+        <i className="fas fa-info-circle"></i> A primeira foto será a foto de capa do album
       </p>
     </div>
     <div className="uploaded-images">
@@ -1494,7 +1495,7 @@ return (
 </div>
 
 <a 
-        href={`https://www.google.com/maps?q=${selectedEvento.latitude},${selectedEvento.longitude}`} 
+        href={`https://www.google.com/maps?q=${selectedAlbum.latitude},${selectedAlbum.longitude}`} 
         target="_blank" 
         rel="noopener noreferrer" 
         className="map-button"
@@ -1527,26 +1528,26 @@ return (
   </div>
   )}
 
-  {showDetailView && selectedEvento && (
+  {showDetailView && selectedAlbum && (
     <div className="publicacoes_div_princ">
-      {selectedEvento && console.log('selectedEvento:', selectedEvento)}
+      {selectedAlbum && console.log('selectedAlbum:', selectedAlbum)}
       <h1 className="publicacoes-title2">Informações do álbum</h1>
       <div className="header">
-        <h1 className="header-title">{selectedEvento.nome}</h1>
+        <h1 className="header-title">{selectedAlbum.nome}</h1>
         <div className="author">
           <div className="authorName"><span>Autor :</span></div>
-          <img src={selectedEvento.autor.caminho_foto} alt={selectedEvento.autor.nome} className="author-icon" />
-          <span>{selectedEvento.autor.nome} {selectedEvento.autor.sobrenome}</span>
+          <img src={selectedAlbum.autor.caminho_foto} alt={selectedAlbum.autor.nome} className="author-icon" />
+          <span>{selectedAlbum.autor.nome} {selectedAlbum.autor.sobrenome}</span>
       
         </div>
 
       </div>
   <div className="tab-content2">
-    {/* {selectedEvento.galeria && selectedEvento.galeria.length > 0 && (
+    {/* {selectedAlbum.galeria && selectedAlbum.galeria.length > 0 && (
       <>
-        <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do evento</button>
+        <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do album</button>
         <div className="gallery">
-          {selectedEvento.galeria.map((image, index) => (
+          {selectedAlbum.galeria.map((image, index) => (
             <img key={index} src={image} alt={`Galeria ${index}`} className="gallery-image" />
           ))}
         </div>
@@ -1555,7 +1556,7 @@ return (
     <div className="tab-content2">
   {imagensGaleria && imagensGaleria.length > 0 && (
     <>
-      <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Evento</button>
+      <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Álbum</button>
       <div className="gallery">
         {imagensGaleria.map((image, index) => (
           <img key={index} src={image.caminho_imagem} alt={`Galeria ${index}`} className="gallery-image" />
@@ -1565,17 +1566,17 @@ return (
   )}
 </div>
 
-{selectedEvento.user && (
+{/* {selectedAlbum.user && (
   <>
     <button className="tab active">
   <i className="fas fa-check tab-icon"></i>
   Participantes ({participantes.length}) </button>
   
 
-  {/* Mostra o botão apenas se o usuário não estiver na lista de participantes */}
+  
   {!participantes.some(participante =>  Number(participante.usuario.id) === Number(userId))  && (
-      <button className="user-plus-button" onClick={() => adicionarParticipante(selectedEvento.id, userId)}>
-        <i className="fas fa-user-plus tab-icon user-plus-icon"></i> Participar no Evento
+      <button className="user-plus-button" onClick={() => adicionarParticipante(selectedAlbum.id, userId)}>
+        <i className="fas fa-user-plus tab-icon user-plus-icon"></i> Participar no album
       </button>
     )}
   
@@ -1600,7 +1601,7 @@ return (
       </div>
     </div>
 
-    {/* Modal para mostrar todos os participantes com um layout ampliado e mais detalhes */}
+    
     <Modal
       isOpen={modalIsOpen}
       onRequestClose={closeModalParticipantes}
@@ -1624,40 +1625,40 @@ return (
       </div>
     </Modal>
   </>
-)}
+)} */}
 
 
 
-{selectedEvento.datainicioatividade && (
+{selectedAlbum.createdAt && (
   <>
     <button className="tab active">
-      <i className="fas fa-calendar-alt tab-icon"></i> Data do Evento
+      <i className="fas fa-calendar-alt tab-icon"></i> Data do album
     </button>
     <div className="description">
-      <p><strong>Data:</strong> {new Date(selectedEvento.datainicioatividade).toLocaleString()}</p>
+      <p><strong>Data:</strong> {new Date(selectedAlbum.createdAt).toLocaleString()}</p>
     </div>
   </>
 )}
 
 
 
-    {selectedEvento.descricao && (
+    {selectedAlbum.descricao && (
       <>
-        <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Evento</button>
+        <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do album</button>
         <div className="description">
-          <p>{selectedEvento.descricao}</p>
+          <p>{selectedAlbum.descricao}</p>
         </div>
       </>
     )}
-    {selectedEvento.latitude && (
+    {/* {selectedAlbum.latitude && (
   <>
     <button className="tab active">
       <i className="fas fa-map-marker-alt tab-icon"></i> Localização
     </button>
     <div className="location">
-      <p><strong>Localização:</strong> {selectedEvento.latitude}, {selectedEvento.longitude}</p>
+      <p><strong>Localização:</strong> {selectedAlbum.latitude}, {selectedAlbum.longitude}</p>
       <a 
-        href={`https://www.google.com/maps?q=${selectedEvento.latitude},${selectedEvento.longitude}`} 
+        href={`https://www.google.com/maps?q=${selectedAlbum.latitude},${selectedAlbum.longitude}`} 
         target="_blank" 
         rel="noopener noreferrer" 
         className="map-button"
@@ -1666,30 +1667,30 @@ return (
       </a>
     </div>
   </>
-)}
+)} */}
 
-{selectedEvento.topico &&  (
+{/* {selectedAlbum.topico &&  (
   <>
     <button className="tab active">
-      <i className="fas fa-tag tab-icon"></i> Relacionado com Este Evento
+      <i className="fas fa-tag tab-icon"></i> Relacionado com Este album
     </button>
     <div className="description tags-container">
       <span className="tag">
-        <i className="fas fa-tags tag-icon"></i> {selectedEvento.topico.nome}
+        <i className="fas fa-tags tag-icon"></i> {selectedAlbum.topico.nome}
       </span>
       
       <p>
-        <i className="fas fa-tag"></i> {selectedEvento.tipo_evento.nome_tipo}
+        <i className="fas fa-tag"></i> {selectedAlbum.tipo_album.nome_tipo}
       </p>
     
     </div>
   </>
-)}
+)} */}
 
 {/* <div className="tab-content2">
   {imagensGaleria && imagensGaleria.length > 0 && (
     <>
-      <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Evento</button>
+      <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do album</button>
       <div className="gallery">
         {imagensGaleria.map((image, index) => (
           <img key={index} src={image.caminho_imagem} alt={`Galeria ${index}`} className="gallery-image" />
@@ -1702,7 +1703,7 @@ return (
 
     {/* Seção de Comentários */}
     {/* Seção de Comentários */}
-    {selectedEvento && (selectedEvento.estado === 'Ativa' || selectedEvento.estado === 'Denunciada') && (
+    {selectedAlbum && (selectedAlbum.estado === 'Ativa' || selectedAlbum.estado === 'Denunciada') && (
   // Seu código aqui, que será executado se o estado for 'Ativa' ou 'Denunciada'
 
 <div> 
@@ -1729,7 +1730,7 @@ return (
             </span>
           </>
         ) : (
-          <span className="avaliacoes-media">Sê o primeiro a avaliar este Evento!</span>
+          <span className="avaliacoes-media">Sê o primeiro a avaliar este album!</span>
         )}
       </div>
     </div>
@@ -1775,12 +1776,12 @@ return (
             )}
           </div>
           <div className="comentario-options">
-        <div className="options-button" onClick={() => toggleOptionsEvento(comentario.id)}>
+        <div className="options-button" onClick={() => toggleOptionsalbum(comentario.id)}>
           <i className="fas fa-ellipsis-v"></i>
         </div>
         {optionsOpen === comentario.id && (
           <div className="options-menu">
-            <button onClick={() => handleDeleteComentarioEvento(comentario.id)}>
+            <button onClick={() => handleDeleteComentarioalbum(comentario.id)}>
               <i className="fas fa-trash-alt custom-delete-icon"></i> Excluir Mensagem
             </button>
           </div>
@@ -1813,7 +1814,7 @@ return (
     <div className="modal-content">
       <span className="close" onClick={() => setShowComentarioModal(false)}>&times;</span>
       <div className="modal-header">
-        <h2>Classifique o Evento</h2>
+        <h2>Classifique o Álbum</h2>
       </div>
       <div className="modal-body">
         <div className="rating">
@@ -1858,27 +1859,27 @@ return (
 
 
 
-{showApprovalView && eventoDetail && (
+{showApprovalView && albumDetail && (
   <div className="publicacoes_div_princ">
-     {console.log('eventoDetail:', eventoDetail)}
-      <h1 className="publicacoes-title2">Informações do evento</h1>
+     {console.log('albumDetail:', albumDetail)}
+      <h1 className="publicacoes-title2">Informações do album</h1>
       <div className="header">
-        <h1 className="header-title">{eventoDetail.nome}</h1>
+        <h1 className="header-title">{albumDetail.nome}</h1>
         <div className="author">
           <div className="authorName"><span>Autor :</span></div>
-          <img src={eventoDetail.user.caminho_foto} alt={eventoDetail.user.nome} className="author-icon" />
-          <span>{eventoDetail.user.nome} {eventoDetail.user.sobrenome}</span>
+          <img src={albumDetail.user.caminho_foto} alt={albumDetail.user.nome} className="author-icon" />
+          <span>{albumDetail.user.nome} {albumDetail.user.sobrenome}</span>
       
         </div>
 
       </div>
   <div className="tab-content2">
     
-  {eventoDetail.imagens && eventoDetail.imagens.length > 0 && (
+  {albumDetail.imagens && albumDetail.imagens.length > 0 && (
     <>
-        <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do Evento</button>
+        <button className="tab active"><i className="fas fa-images tab-icon"></i> Galeria do album</button>
         <div className="gallery">
-            {eventoDetail.imagens.map((image, index) => (
+            {albumDetail.imagens.map((image, index) => (
                 <img key={index} src={image.caminho_imagem} alt={`Galeria ${index}`} className="gallery-image" />
             ))}
         </div>
@@ -1887,36 +1888,36 @@ return (
 
 
 
-{eventoDetail.datainicioatividade && (
+{albumDetail.datainicioatividade && (
   <>
     <button className="tab active">
-      <i className="fas fa-calendar-alt tab-icon"></i> Data do Evento
+      <i className="fas fa-calendar-alt tab-icon"></i> Data do album
     </button>
     <div className="description">
-      <p><strong>Data:</strong> {new Date(eventoDetail.datainicioatividade).toLocaleString()}</p>
+      <p><strong>Data:</strong> {new Date(albumDetail.datainicioatividade).toLocaleString()}</p>
     </div>
   </>
 )}
 
 
 
-    {eventoDetail.descricao && (
+    {albumDetail.descricao && (
       <>
-        <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Evento</button>
+        <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do album</button>
         <div className="description">
-          <p>{eventoDetail.descricao}</p>
+          <p>{albumDetail.descricao}</p>
         </div>
       </>
     )}
-    {eventoDetail.latitude && (
+    {albumDetail.latitude && (
   <>
     <button className="tab active">
       <i className="fas fa-map-marker-alt tab-icon"></i> Localização
     </button>
     <div className="location">
-      <p><strong>Localização:</strong> {eventoDetail.latitude}, {eventoDetail.longitude}</p>
+      <p><strong>Localização:</strong> {albumDetail.latitude}, {albumDetail.longitude}</p>
       <a 
-        href={`https://www.google.com/maps?q=${eventoDetail.latitude},${eventoDetail.longitude}`} 
+        href={`https://www.google.com/maps?q=${albumDetail.latitude},${albumDetail.longitude}`} 
         target="_blank" 
         rel="noopener noreferrer" 
         className="map-button"
@@ -1927,18 +1928,18 @@ return (
   </>
 )}
 
-{eventoDetail.topico &&  (
+{albumDetail.topico &&  (
   <>
     <button className="tab active">
-      <i className="fas fa-tag tab-icon"></i> Relacionado com Este Evento
+      <i className="fas fa-tag tab-icon"></i> Relacionado com Este album
     </button>
     <div className="description tags-container">
       <span className="tag">
-        <i className="fas fa-tags tag-icon"></i> {eventoDetail.topico.nome}
+        <i className="fas fa-tags tag-icon"></i> {albumDetail.topico.nome}
       </span>
       
       <p>
-        <i className="fas fa-tag"></i> {eventoDetail.tipo_evento.nome_tipo}
+        <i className="fas fa-tag"></i> {albumDetail.tipo_album.nome_tipo}
       </p>
     
     </div>
@@ -2014,18 +2015,18 @@ return (
 
 
 
-  {showDetailViewDenunciada &&  eventoDetailDenunciada&& (
+  {showDetailViewDenunciada &&  albumDetailDenunciada&& (
   <div className="publicacoes_div_princ">
-    <h1 className="publicacoes-title2">Denúncias do Evento</h1>
+    <h1 className="publicacoes-title2">Denúncias do album</h1>
     <div className="header">
-      <h1 className="header-title">{eventoDetailDenunciada.nome}</h1>
+      <h1 className="header-title">{albumDetailDenunciada.nome}</h1>
       <div className="author">
         <div className="authorName"><span>Autor :</span></div>
-        {eventoDetailDenunciada.user?.caminho_foto && (
-          <img src={eventoDetailDenunciada.user.caminho_foto} alt={eventoDetailDenunciada.user.nome} className="author-icon" />
+        {albumDetailDenunciada.user?.caminho_foto && (
+          <img src={albumDetailDenunciada.user.caminho_foto} alt={albumDetailDenunciada.user.nome} className="author-icon" />
         )}
-        {eventoDetailDenunciada.user && (
-          <span>{eventoDetailDenunciada.user.nome} {eventoDetailDenunciada.user.sobrenome}</span>
+        {albumDetailDenunciada.user && (
+          <span>{albumDetailDenunciada.user.nome} {albumDetailDenunciada.user.sobrenome}</span>
         )}
       </div>
     </div>
@@ -2104,13 +2105,13 @@ return (
         <img src="https://i.ibb.co/18XzT1q/Captura-de-ecr-2024-06-26-171433.png" alt="Captura-de-ecr-2024-06-26-171433" />
         <span>Eliminar Local</span>
       </div>
-      <div className="option" onClick={() => handleEditClick(eventoDetailDenunciada)}>
+      <div className="option" onClick={() => handleEditClick(albumDetailDenunciada)}>
         <img src="https://i.ibb.co/9hm2v8B/Captura-de-ecr-2024-06-26-171921.png" alt="Captura-de-ecr-2024-06-26-171921" />
         <span>Editar Local</span>
       </div>
       <div className="option" onClick={handleAlertClick}>
         <img src="https://i.ibb.co/ZHC0zw5/Captura-de-ecr-2024-06-26-172004.png" alt="Captura-de-ecr-2024-06-26-172004" />
-        <span>Alertar Autor do Evento</span>
+        <span>Alertar Autor do album</span>
       </div>
     </div>
     <div className="modal-footer">
@@ -2125,12 +2126,12 @@ return (
   <div className="modalDeleteMedidas">
     <div className="modalDeleteMedidas-header">
       <img src="https://i.ibb.co/4dfypxd/Captura-de-ecr-2024-06-28-111846.png" alt="Delete Icon" />
-      <span>Eliminar Evento?</span>
+      <span>Eliminar album?</span>
     </div>
     <div className="modalDeleteMedidas-body">
       <p>
-        O user que criou este Evento irá ser notificado sobre a sua ação!
-        Insira abaixo o motivo por qual removeu o evento deste utilizador, o qual vai ser notificado da sua ação.
+        O user que criou este album irá ser notificado sobre a sua ação!
+        Insira abaixo o motivo por qual removeu o album deste utilizador, o qual vai ser notificado da sua ação.
       </p>
       <textarea
         className="large-textareaDeleteMedidas"
@@ -2171,7 +2172,7 @@ return (
   </div>
   <div className="modalAlert-body">
     <p>
-      Insira abaixo o que deseja alertar para o autor deste evento, para que este possa o mesmo editar
+      Insira abaixo o que deseja alertar para o autor deste album, para que este possa o mesmo editar
     </p>
     <textarea
       className="large-textareaAlert"
@@ -2257,7 +2258,7 @@ return (
         {showSuccessMessage && (
           <div className="success-message_delete">
             <div className="success-message-icon"></div>
-            <h1>Evento criado com sucesso!</h1>
+            <h1>album criado com sucesso!</h1>
             <p>Como é o administrador do seu centro, não será necessário passar pelo processo de validação.</p>
             <button onClick={() => setShowSuccessMessage(false)}>Continuar</button>
           </div>

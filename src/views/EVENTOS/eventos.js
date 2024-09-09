@@ -158,9 +158,10 @@ useEffect(() => {
   const storedCentroId = sessionStorage.getItem('centro_id');
   // console.log(storedCentroId)
   if (storedCentroId) {
-    setCentroId(storedCentroId);
+    setCentroId(storedCentroId);console.log('Centro ID log dos eventos:', storedCentroId);
   }
 }, []);
+
 
 useEffect(() => {
   const buscarEventos = async () => {
@@ -1722,7 +1723,7 @@ return (
   )}
 </div>
 
-    {selectedEvento && (selectedEvento.estado === 'Ativa' || selectedEvento.estado === 'Denunciada') && (
+    {selectedEvento && (selectedEvento.estado === 'Ativa' || selectedEvento.estado === 'Denunciada'|| selectedEvento.estado === 'Finalizada') && (
 <div> 
   <button className="tab active"><i className="fas fa-comments tab-icon"></i> Comentários e Avaliações</button>
   <div className="comentarios-section">
@@ -2230,7 +2231,7 @@ return (
 
 
 {showCreateForm && (
-      <div className="publicacoes_div_princ"><h1 className="publicacoes-title2">Criar Evento</h1>
+      <div className="publicacoes_div_princ" ><h1 className="publicacoes-title2">Criar Evento</h1>
         <div className="header">
           <h1 className="header-title">Nome do evento</h1>
           <div className="author">

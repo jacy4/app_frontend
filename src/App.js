@@ -4,7 +4,7 @@ import Navbar from './componentes/navbar/Navbar';
 import Login from '../src/views/LOGIN/Login';
 import CentrosView from './views/CentrosView';
 import UsersView from './views/VIEW_USUARIOS/usuarios_view';
-import PaginaInicial from './views/PAGINA_INICIAL/pagina_inicial';
+import PaginaInicial from './views/PAGINA_INICIAL/pagina_inicial_old';
 import { TopicsProvider } from './views/DESPORTO/TopicsContext';
 import PublicacoesView from './views/PUBLICACOES/publicacao_view';
 import Desporto from './views/DESPORTO/desporto';

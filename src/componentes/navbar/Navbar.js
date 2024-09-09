@@ -51,6 +51,9 @@ const Navbar = () => {
 
   useEffect(() => {
     const storedCentroId = sessionStorage.getItem('centro_id');
+    console.log('Centro ID:', storedCentroId);
+    
+
     const storedUserId = sessionStorage.getItem('user_id');
     if (storedCentroId) {
       setCentroId(storedCentroId);
@@ -68,6 +71,7 @@ const Navbar = () => {
       setSelectedMenu(path.charAt(0).toUpperCase() + path.slice(1));
     }
   }, [location]);
+  
 
   const fetchCentroName = async (id) => {
     try {

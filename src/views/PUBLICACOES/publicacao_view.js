@@ -913,6 +913,8 @@ const handleSubmitEdit = async (e) => {
     descricao,
     horario: formattedHorario,
     localizacao,
+    latitude,
+    longitude,
     paginaweb,
     telemovel,
     estado,
@@ -1300,30 +1302,27 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
   </div>
 )}
 
-        {activeTab === 'localizacao' && (
+{activeTab === 'localizacao' && (
           <div className="tab-content_localizacao">
             <h2>Localização do local</h2>
             <div className="localizacao-content">
-              <div className="form-group">
-                <label>Endereço do local:</label>
-                <input
-                  type="text"
-                  placeholder="inserir local"
-                  value={localizacao}
-                  onChange={(e) => setLocalizacao(e.target.value)}
-                />
-              </div>
-              <div className="map-placeholder">
-                <LoadScript googleMapsApiKey={API_KEY}>
-                  <GoogleMap
-                    mapContainerStyle={containerStyle}
-                    center={center}
-                    zoom={10}
-                  >
-                    <Marker position={center} />
-                  </GoogleMap>
-                </LoadScript>
-              </div>
+            <div className="form-group">
+  <label>Latitude</label>
+  <input type="text" placeholder="Latitude" value={latitude} onChange={(e) => setLatitude(e.target.value)} />
+</div>
+<div className="form-group">
+  <label>Longitude</label>
+  <input type="text" placeholder="Longitude" value={longitude} onChange={(e) => setLongitude(e.target.value)} />
+</div>
+
+<a 
+        href={`https://www.google.com/maps?q=${selectedPublication.latitude},${selectedPublication.longitude}`} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="map-button"
+      >
+        Ver no Google Maps
+      </a>
             </div>
             <div className="form-buttons">
               <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
@@ -1846,14 +1845,24 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
         </div>
       </>
     )}
-    {publicationDetail.localizacao && (
-      <>
-        <button className="tab active"><i className="fas fa-map-marker-alt tab-icon"></i> Localização</button>
-        <div className="location">
-          <p><strong>Localização:</strong> {publicationDetail.localizacao}</p>
-        </div>
-      </>
-    )}
+    {publicationDetail.latitude && (
+  <>
+    <button className="tab active">
+      <i className="fas fa-map-marker-alt tab-icon"></i> Localização
+    </button>
+    <div className="location">
+      <p><strong>Localização:</strong> {publicationDetail.latitude}, {publicationDetail.longitude}</p>
+      <a 
+        href={`https://www.google.com/maps?q=${publicationDetail.latitude},${publicationDetail.longitude}`} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="map-button"
+      >
+        Ver no Google Maps
+      </a>
+    </div>
+  </>
+)}
     {publicationDetail.paginaweb && (
       <>
         <button className="tab active"><i className="fas fa-globe tab-icon"></i> Página Web</button>

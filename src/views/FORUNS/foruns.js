@@ -174,6 +174,7 @@ const ForumView = () => {
     const storedCentroId = sessionStorage.getItem('centro_id');
     if (storedCentroId) {
       setCentroId(storedCentroId);
+      console.log("centro id forum :",storedCentroId);
     }
   }, []);
 
@@ -1866,7 +1867,7 @@ const ForumView = () => {
                       {showDeleteModal && (
                         <div className="modal">
                           <div className="modal-icon">❌</div>
-                          <div className="modal-header">Eliminar Publicação?</div>
+                          <div className="modal-header">Eliminar este Fórum?</div>
                           <div className="modal-body">
                             O user que criou esta publicação irá ser notificado sobre a sua ação!
                           </div>

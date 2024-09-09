@@ -2,7 +2,7 @@ import React from 'react';
 import { FaCalendarAlt, FaShareAlt, FaComments, FaFileAlt } from 'react-icons/fa'; // Ícones do Font Awesome
 import './card_area.css';
 
-const Card = ({ title, events, shares, messages, posts, icon, backgroundColor, backgroundImage }) => {
+const Card = ({ title, events,mostCommentedEvent, pendingApproval, shares, messages, posts, icon, backgroundColor, backgroundImage }) => {
   return (
     <div className="card" style={{ borderColor: backgroundColor }}>
       <div className="card-icon-container" style={{ backgroundColor }}>
@@ -15,6 +15,16 @@ const Card = ({ title, events, shares, messages, posts, icon, backgroundColor, b
         <div className="card-item">
           <FaCalendarAlt className="item-icon" />
           {events} Eventos
+        </div>
+        {mostCommentedEvent && (
+  <div className="card-item">
+    <FaCalendarAlt className="item-icon" />
+    Evento mais comentado: {mostCommentedEvent}
+  </div>
+)}
+        <div className="card-item">
+          <FaCalendarAlt className="item-icon" />
+          {pendingApproval} Eventos Por validar
         </div>
         <div className="card-item">
           <FaShareAlt className="item-icon" />
