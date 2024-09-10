@@ -382,7 +382,8 @@ const handleSubmit = async (e) => {
     autor_id: sessionStorage.getItem('user_id'),  // ID do autor
     capa_imagem_evento: galeria.length > 0 ? galeria[0].url : null,  // Se não houver imagem, envie `null`
     latitude: latitude || null,  // Use `null` se a latitude estiver indefinida
-    longitude: longitude || null,  // Use `null` se a longitude estiver indefinida
+    longitude: longitude || null,
+    localizacao,  // Use `null` se a longitude estiver indefinida
     area_id: area || null,  // Certifique-se de que o `area_id` é um número ou `null`
     tipodeevento_id: 1  // Certifique-se de que o `tipodeevento_id` é um número ou `null`
 };
@@ -990,6 +991,7 @@ const handleSubmitEdit = async (e) => {
     capa_imagem_evento: capaImagemEvento,
     latitude,
     longitude,
+    localizacao,
     tipodeevento_id: tipoDeEventoId,
     imagensRemovidas,
   };
@@ -1524,10 +1526,16 @@ return (
   <label>Latitude</label>
   <input type="text" placeholder="Latitude" value={latitude} onChange={(e) => setLatitude(e.target.value)} />
 </div>
+
+
 <div className="form-group">
   <label>Longitude</label>
   <input type="text" placeholder="Longitude" value={longitude} onChange={(e) => setLongitude(e.target.value)} />
 </div>
+{/* <div className="form-group">
+  <label>Localização</label>
+  <input type="text" placeholder="Localização" value={Localização} onChange={(e) => setLocalizacao(e.target.value)} />
+</div> */}
 
 <a 
         href={`https://www.google.com/maps?q=${selectedEvento.latitude},${selectedEvento.longitude}`} 
@@ -1659,6 +1667,7 @@ return (
     </button>
     <div className="description">
       <p><strong>Data:</strong> {new Date(selectedEvento.datainicioatividade).toLocaleString()}</p>
+      <p><strong>Data:</strong> {new Date(selectedEvento.datafimatividade).toLocaleString()}</p>
     </div>
   </>
 )}
@@ -1682,6 +1691,24 @@ return (
       <p><strong>Localização:</strong> {selectedEvento.latitude}, {selectedEvento.longitude}</p>
       <a 
         href={`https://www.google.com/maps?q=${selectedEvento.latitude},${selectedEvento.longitude}`} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="map-button"
+      >
+        Ver no Google Maps
+      </a>
+    </div>
+  </>
+)}
+{selectedEvento.localizacao && (
+  <>
+    <button className="tab active">
+      <i className="fas fa-map-marker-alt tab-icon"></i> Localização
+    </button>
+    <div className="location">
+      <p><strong>Localização:</strong> {selectedEvento.localizacao}</p>
+      <a 
+        href={`https://www.google.com/maps?q=${encodeURIComponent(selectedEvento.localizacao)}`} 
         target="_blank" 
         rel="noopener noreferrer" 
         className="map-button"
@@ -1940,6 +1967,24 @@ return (
       <p><strong>Localização:</strong> {eventoDetail.latitude}, {eventoDetail.longitude}</p>
       <a 
         href={`https://www.google.com/maps?q=${eventoDetail.latitude},${eventoDetail.longitude}`} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="map-button"
+      >
+        Ver no Google Maps
+      </a>
+    </div>
+  </>
+)}
+{eventoDetail.localizacao && (
+  <>
+    <button className="tab active">
+      <i className="fas fa-map-marker-alt tab-icon"></i> Localização
+    </button>
+    <div className="location">
+      <p><strong>Localização:</strong> {eventoDetail.localizacao}</p>
+      <a 
+        href={`https://www.google.com/maps?q=${encodeURIComponent(eventoDetail.localizacao)}`} 
         target="_blank" 
         rel="noopener noreferrer" 
         className="map-button"
@@ -2380,6 +2425,15 @@ return (
             <div className="tab-content_localizacao">
               <h2>Localização do evento</h2>
               <div className="localizacao-content">
+                <div className="form-group">
+                  <label>Localização</label>
+                  <input
+                    type="text"
+                    placeholder="inserir local"
+                    value={localizacao}
+                    onChange={(e) => setLocalizacao(e.target.value)}
+                  />
+                </div>
                 <div className="form-group">
                   <label>Latitude</label>
                   <input

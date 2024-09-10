@@ -1302,7 +1302,7 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
   </div>
 )}
 
-{activeTab === 'localizacao' && (
+{/* {activeTab === 'localizacao' && (
           <div className="tab-content_localizacao">
             <h2>Localização do local</h2>
             <div className="localizacao-content">
@@ -1314,6 +1314,31 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
   <label>Longitude</label>
   <input type="text" placeholder="Longitude" value={longitude} onChange={(e) => setLongitude(e.target.value)} />
 </div>
+
+<a 
+        href={`https://www.google.com/maps?q=${selectedPublication.latitude},${selectedPublication.longitude}`} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="map-button"
+      >
+        Ver no Google Maps
+      </a>
+            </div>
+            <div className="form-buttons">
+              <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
+              <button type="button" className="save-button" onClick={handleSubmitEdit}><i className="fas fa-save"></i>Alterações</button>
+            </div>
+          </div>
+        )} */}
+        {activeTab === 'localizacao' && (
+          <div className="tab-content_localizacao">
+            <h2>Localização do local</h2>
+            <div className="localizacao-content">
+            <div className="form-group">
+  <label>Localização</label>
+  <input type="text" placeholder="Latitude" value={localizacao} onChange={(e) => setLocalizacao(e.target.value)} />
+</div>
+
 
 <a 
         href={`https://www.google.com/maps?q=${selectedPublication.latitude},${selectedPublication.longitude}`} 
@@ -1530,15 +1555,15 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
           </div>
         </>
       )}
-      {selectedPublication.latitude && (
+      {selectedPublication.localizacao && (
   <>
     <button className="tab active">
       <i className="fas fa-map-marker-alt tab-icon"></i> Localização
     </button>
     <div className="location">
-      <p><strong>Localização:</strong> {selectedPublication.latitude}, {selectedPublication.longitude}</p>
+      <p><strong>Localização:</strong> {selectedPublication.localizacao}</p>
       <a 
-        href={`https://www.google.com/maps?q=${selectedPublication.latitude},${selectedPublication.longitude}`} 
+        href={`https://www.google.com/maps?q=${encodeURIComponent(selectedPublication.localizacao)}`} 
         target="_blank" 
         rel="noopener noreferrer" 
         className="map-button"
@@ -1548,6 +1573,7 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
     </div>
   </>
 )}
+
       {selectedPublication.paginaweb && (
         <>
           <button className="tab active"><i className="fas fa-globe tab-icon"></i> Página Web</button>
@@ -1845,15 +1871,15 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
         </div>
       </>
     )}
-    {publicationDetail.latitude && (
+    {publicationDetail.localizacao && (
   <>
     <button className="tab active">
       <i className="fas fa-map-marker-alt tab-icon"></i> Localização
     </button>
     <div className="location">
-      <p><strong>Localização:</strong> {publicationDetail.latitude}, {publicationDetail.longitude}</p>
+      <p><strong>Localização:</strong> {publicationDetail.localizacao}</p>
       <a 
-        href={`https://www.google.com/maps?q=${publicationDetail.latitude},${publicationDetail.longitude}`} 
+        href={`https://www.google.com/maps?q=${encodeURIComponent(publicationDetail.localizacao)}`} 
         target="_blank" 
         rel="noopener noreferrer" 
         className="map-button"
@@ -1863,6 +1889,7 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
     </div>
   </>
 )}
+
     {publicationDetail.paginaweb && (
       <>
         <button className="tab active"><i className="fas fa-globe tab-icon"></i> Página Web</button>
@@ -2295,7 +2322,7 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
   </div>
 )}
 
-        {activeTab === 'localizacao' && (
+        {/* {activeTab === 'localizacao' && (
           <div className="tab-content_localizacao">
             <h2>Localização do local</h2>
             <div className="localizacao-content">
@@ -2324,7 +2351,35 @@ const handleDeleteComentarioPublicacao = async (comentarioId) => {
               <button type="submit" className="submit-button" onClick={handleContinue} >Continuar</button>
             </div>
           </div>
+        )} */}
+        {activeTab === 'localizacao' && (
+          <div className="tab-content_localizacao">
+            <h2>Localização do local</h2>
+            <div className="localizacao-content">
+              <div className="form-group">
+              <label>Localização</label>
+  <input type="text" placeholder="Latitude" value={localizacao} onChange={(e) => setLocalizacao(e.target.value)} />
+</div>
+
+              <div className="map-placeholder">
+                <LoadScript googleMapsApiKey={API_KEY}>
+                  <GoogleMap
+                    mapContainerStyle={containerStyle}
+                    center={center}
+                    zoom={10}
+                  >
+                    <Marker position={center} />
+                  </GoogleMap>
+                </LoadScript>
+              </div>
+            </div>
+            <div className="form-buttons">
+              <button type="button" className="cancel-button"onClick={handleCancel}>Cancelar</button>
+              <button type="submit" className="submit-button" onClick={handleContinue} >Continuar</button>
+            </div>
+          </div>
         )}
+
 
 
         {activeTab === 'mais_informacoes' && (
