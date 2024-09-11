@@ -1673,7 +1673,14 @@ return (
 )}
 
 
-
+{selectedEvento.centro && (
+  <>
+    <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Nome do Centro</button>
+    <div className="description">
+      <p>{selectedEvento.centro.nome}</p> {/* Acessando o nome do centro */}
+    </div>
+  </>
+)}
     {selectedEvento.descricao && (
       <>
         <button className="tab active"><i className="fas fa-info-circle tab-icon"></i> Descrição do Evento</button>
